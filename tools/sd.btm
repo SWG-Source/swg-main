@@ -1,0 +1,22 @@
+@echo off
+
+:LABEL_process
+set INPATH=%_CWD
+if "%@INDEX[%INPATH,\dsrc\]" != "-1" goto LABEL_data
+if "%@INDEX[%INPATH,\data\]" != "-1" goto LABEL_dsrc
+@rem echo %INPATH
+@rem echo %@INDEX[%INPATH,\dsrc\]
+@rem echo %@INDEX[%INPATH,\data\]
+goto LABEL_end
+
+:LABEL_data
+set OUTPATH=%@REPLACE[\dsrc\,\data\,%INPATH]
+cd %OUTPATH
+goto LABEL_end
+
+:LABEL_dsrc
+set OUTPATH=%@REPLACE[\data\,\dsrc\,%INPATH]
+cd %OUTPATH
+goto LABEL_end
+
+:LABEL_end

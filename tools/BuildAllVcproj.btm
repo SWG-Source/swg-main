@@ -1,0 +1,3 @@
+@echo off
+
+perl buildAllVcproj.pl

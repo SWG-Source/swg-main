@@ -1,0 +1,51 @@
+// ======================================================================
+// Lint options file.
+// Machine-independent, Linux-platform includes.
+//
+// Copyright 2002, Sony Online Entertainment, Inc.
+// All rights reserved.
+// ======================================================================
+
+// Include platform independent options.
+swg-core-platform-common.lnt
+
+
+// Platform options.
+-si4  // # bytes in an integer.
+-sp4  // # bytes in a pointer.
++fll  // enable long long type.
+
+// Options specific to this platform.
++rw(__restrict) // add this reserved word.
+//-"D__restrict=" // This is a Linux library include symbol that isn't getting picked up properly. @todo track down how it is normally defined and see what defines we're missing.
+
+// Defines needed by the SWG source.
+-DLINUX=1
+
+// **
+// * Output suppressions that are set to conform with mandatory suppressions under Win32.
+// * These items we would prefer to have output, but will be suppressed to match Win32.
+// **
+
+// Error: 19 (Useless Declaration)
+-e19
+
+// **
+// * General items that should be suppressed.  These may be categorizable by type of
+// * library being included.  We can break these out later if we care to and let each
+// * project.lnt specify.
+// *
+// * On the Windows side, these are suppressed for us already.
+// **
+
+// Warning: 578 (Declaration of symbol 'X' hides 'X (another scope's version)')
+-esym(578, index) // /usr/include/string.h defines a function named index.
+
+// Error: 1025 (No function matches pointer type).
+-emacro(1025, NULL) // One of the reasons I use 0 instead of NULL, although in this case it is a harmless error.
+
+// Error: 1703 (Function arbitrarily chosen).  Happens in conjunction with 1025.
+-emacro(1703, NULL) // Usually occurs immediately after 1025.
+
+// Note: 1924 (C-style cast)
+-emacro(1924, NULL)

@@ -1,0 +1,19 @@
+@echo off
+if not exist "common.cfg" goto error_win32
+if "%1" == "" goto error_usage
+if "%2" == "" goto error_usage
+perl ..\..\tools\buildPatchTreeRsp.pl common.cfg patch_%1_%2.rsp %1..%2
+..\..\tools\TreeFileBuilder -r patch_%1_%2.rsp patch_%1_%2.tre
+copy patch_%1_%2.tre p:\swo\swg_bootleg_builds\tre
+echo searchTreeX=patch_%1_%2.tre >> p:\swo\swg_bootleg_builds\tre\common_tre.cfg
+
+goto end
+
+:error_win32
+echo You must run this from the exe\win32 directory!
+goto end
+
+:error_usage
+echo usage: BuildTre changelist1 changelist2
+
+:end

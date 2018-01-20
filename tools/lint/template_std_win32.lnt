@@ -1,0 +1,12 @@
+//  Standard lint options
+
+// All machine-independent options required for this platform.
+swg-core-platform-win32.lnt
+
+// Machine-specific options.
+-i"c:\program files\Microsoft Visual Studio\VC98\Include;c:\program files\Microsoft Visual Studio\VC98\MFC\Include"
+
+// Setup the output for your environment so you can use editor "go to line" functions.
+// Only uncomment one of the following lines.
+env-vc6.lnt  // For MSDEV 6.0
+// env-emacs.lnt  // For Emacs

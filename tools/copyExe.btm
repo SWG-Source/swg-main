@@ -1,0 +1,99 @@
+@echo off
+if not exist "copyexe.btm" goto error
+if not exist ..\exe\win32 md /s ..\exe\win32
+
+:run
+
+echo AnimationEditor...
+copy %1 ..\src\compile\win32\AnimationEditor\optimized\AnimationEditor_o.exe ..\exe\win32
+
+echo Client...
+copy %1 ..\src\compile\win32\SwgClient\optimized\SwgClient_o.exe ..\exe\win32
+copy %1 ..\src\compile\win32\SwgClient\optimized\SwgClient_o.pdb ..\exe\win32
+copy %1 ..\src\compile\win32\SwgClient\release\SwgClient_r.exe ..\exe\win32
+copy %1 ..\src\compile\win32\SwgClient\release\SwgClient_r.pdb ..\exe\win32
+copy %1 ..\src\compile\win32\SwgGodClient\optimized\SwgGodClient_o.exe ..\exe\win32
+copy %1 ..\src\compile\win32\SwgGodClient\optimized\SwgGodClient_o.pdb ..\exe\win32
+copy %1 ..\src\compile\win32\SwgClientSetup\release\SwgClientSetup_r.exe ..\exe\win32
+
+echo ClientEffectEditor...
+copy %1 ..\src\compile\win32\ClientEffectEditor\optimized\ClientEffectEditor_o.exe ..\exe\win32
+
+echo PlanetWatcher...
+copy %1 ..\src\compile\win32\PlanetWatcher\optimized\PlanetWatcher_o.exe ..\exe\win32
+
+echo ParticleEditor...
+copy %1 ..\src\compile\win32\ParticleEditor\optimized\ParticleEditor_o.exe ..\exe\win32
+
+echo ShaderBuilder...
+copy %1 ..\src\compile\win32\ShaderBuilder\optimized\ShaderBuilder_o.exe ..\exe\win32
+
+echo SoundEditor...
+copy %1 ..\src\compile\win32\SoundEditor\optimized\SoundEditor_o.exe ..\exe\win32
+
+echo SwgLoadClient...
+copy %1 ..\src\compile\win32\SwgLoadClient\debug\SwgLoadClient_d.exe ..\exe\win32\SwgLoadClient_d.exe
+
+echo TerrainEditor...
+copy %1 ..\src\compile\win32\TerrainEditor\optimized\TerrainEditor_o.exe ..\exe\win32
+
+echo TextureBuilder...
+copy %1 ..\src\compile\win32\TextureBuilder\optimized\TextureBuilder_o.exe ..\exe\win32
+
+echo Viewer...
+copy %1 ..\src\compile\win32\Viewer\optimized\Viewer_o.exe ..\exe\win32
+
+echo WorldSnapshotViewer...
+copy %1 ..\src\compile\win32\WorldSnapshotViewer\optimized\WorldSnapshotViewer_o.exe ..\exe\win32
+
+echo MayaExporter...
+copy %1 ..\src\compile\win32\MayaExporter\optimized\MayaExporter.mll ..\exe\win32
+
+echo dlls...
+copy %1 ..\dev\win32\*.dll ..\exe\win32
+del gl_004d.dll
+del gl_004r.dll
+del ..\exe\win32\gl_004d.dll
+del ..\exe\win32\gl_004r.dll
+
+echo UI Tools...
+copy %1 ..\src\compile\win32\UIBuilder\release\UIBuilder.exe ..\exe\win32
+copy %1 ..\src\compile\win32\UIFontBuilder\release\UIFontBuilder.exe ..\exe\win32
+copy %1 ..\src\compile\win32\LocalizationTool\optimized\LocalizationTool_o.exe ..\exe\win32
+
+echo TemplateCompilers...
+copy %1 ..\src\compile\win32\TemplateDefinitionCompiler\optimized\TemplateDefinitionCompiler_o.exe ..\exe\win32\TemplateDefinitionCompiler.exe
+copy %1 ..\src\compile\win32\TemplateCompiler\optimized\TemplateCompiler_o.exe ..\exe\win32\TemplateCompiler.exe
+
+echo DataTableTool...
+copy %1 ..\src\compile\win32\DataTableTool\optimized\DataTableTool_o.exe ..\exe\win32\DataTableTool.exe
+
+echo PlanetServer (Debug)...
+copy %1 ..\src\compile\win32\PlanetServer\Debug\PlanetServer_d.exe ..\exe\win32\PlanetServer_d.exe
+
+echo SwgGameServer (Debug)...
+copy %1 ..\src\compile\win32\SwgGameServer\Debug\SwgGameServer_d.exe ..\exe\win32\SwgGameServer_d.exe
+
+echo configuration files...
+copy /u ..\dev\win32\*.iff ..\exe\win32
+copy /u ..\dev\win32\*.tip ..\exe\win32
+copy /u ..\dev\win32\*.ini ..\exe\win32
+copy /u ..\dev\win32\*.snap ..\exe\win32
+copy /u ..\dev\win32\*.path ..\exe\win32
+copy /u ..\dev\win32\aliases.txt ..\exe\win32
+copy /u ..\exe\win32\*.iff ..\dev\win32
+copy /u ..\exe\win32\*.tip ..\dev\win32
+copy /u ..\exe\win32\*.ini ..\dev\win32
+copy /u ..\exe\win32\*.snap ..\dev\win32
+copy /u ..\exe\win32\*.path ..\dev\win32
+copy /u ..\exe\win32\aliases.txt ..\dev\win32
+
+pause
+
+goto end
+
+:error
+echo You must run this from the tools directory!
+goto end
+
+:end

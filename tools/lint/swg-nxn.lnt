@@ -1,0 +1,18 @@
+// NxN (AlienbrainXDK) Project.lnt
+
+//suppress the errors that the AlienbrainXDK generates through includes
+
+// Error -- Undeclared identifier xxx)
+-e40 
+
+// (Error -- Expected a type)
+-e49 
+
+// (Error -- Initializing a non-const reference XXX with a non-lvalue) 
+-e1058 
+
+// (Error -- ambiguous reference to constructor)
+-e1036 
+
+// (Error -- Type mismatch)
+-e64 

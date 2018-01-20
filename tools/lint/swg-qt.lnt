@@ -1,0 +1,8 @@
+// Lint supressions for QT library
+
+// error 1512: (Warning -- destructor for base class is not virtual)
+-esym(1512, QGDictIterator)
+-esym(1512, QGListIterator)
+-esym(1512, QString)
+-esym(1512, QValueList<*>)
+-esym(1512, QPtrListIterator<*>)

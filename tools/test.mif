@@ -1,0 +1,352 @@
+form "CSTB"
+{
+	form "0000"
+	{
+		chunk "DATA"
+		{
+			int32 110
+		}
+
+		chunk "CRCT"
+		{
+			uint32 0x0118f2c2
+			uint32 0x071b5cb4
+			uint32 0x07dc90ac
+			uint32 0x07f0308b
+			uint32 0x0aca0e33
+			uint32 0x0bb7b42a
+			uint32 0x0fd8c2d7
+			uint32 0x0fdc1b13
+			uint32 0x13eb8375
+			uint32 0x1493d7f3
+			uint32 0x17c11891
+			uint32 0x1c1a605d
+			uint32 0x2136581d
+			uint32 0x2146eb87
+			uint32 0x21d0e687
+			uint32 0x22304a3e
+			uint32 0x25bb1ec0
+			uint32 0x292b6c6d
+			uint32 0x2e71c624
+			uint32 0x2e796acf
+			uint32 0x314ae407
+			uint32 0x3531c729
+			uint32 0x353a3f3b
+			uint32 0x3afc35be
+			uint32 0x3fdfeaa7
+			uint32 0x408cef82
+			uint32 0x40df4fb5
+			uint32 0x41db48cb
+			uint32 0x436b3ac7
+			uint32 0x43cf6b39
+			uint32 0x469e46a4
+			uint32 0x4a7d0856
+			uint32 0x4c8775c1
+			uint32 0x52952b9d
+			uint32 0x53af7596
+			uint32 0x562fa059
+			uint32 0x58d8f595
+			uint32 0x59912d48
+			uint32 0x5d22447d
+			uint32 0x5d332fca
+			uint32 0x5e3bf14a
+			uint32 0x5f3f76c0
+			uint32 0x5ffe9b68
+			uint32 0x608edb7f
+			uint32 0x615db20a
+			uint32 0x6182410b
+			uint32 0x631bcba2
+			uint32 0x659055d5
+			uint32 0x67e21e2a
+			uint32 0x6b352a7a
+			uint32 0x6ce6cf8a
+			uint32 0x6eb9730f
+			uint32 0x75347d61
+			uint32 0x76608238
+			uint32 0x78c389db
+			uint32 0x790992c4
+			uint32 0x79cd85e9
+			uint32 0x7a0896cd
+			uint32 0x7abbcaa1
+			uint32 0x7ba81dd0
+			uint32 0x7d3cdff0
+			uint32 0x80554433
+			uint32 0x83c46933
+			uint32 0x846889a5
+			uint32 0x87964fea
+			uint32 0x8a58ef79
+			uint32 0x8c562960
+			uint32 0x8ed2220e
+			uint32 0x906ee7fe
+			uint32 0x91a3a541
+			uint32 0x933eb044
+			uint32 0x95ee3e7e
+			uint32 0x965657b6
+			uint32 0x97bdd926
+			uint32 0x9f5500d1
+			uint32 0xa105cfec
+			uint32 0xa12b46be
+			uint32 0xa88572a5
+			uint32 0xa952a8f4
+			uint32 0xae4468e9
+			uint32 0xb372444e
+			uint32 0xb9d6faa7
+			uint32 0xbb1713e8
+			uint32 0xbe0a0d57
+			uint32 0xbe468f4e
+			uint32 0xc0d385a8
+			uint32 0xc1b8bc35
+			uint32 0xc98d4cbe
+			uint32 0xc9c069c8
+			uint32 0xcbe7de5d
+			uint32 0xceae53fa
+			uint32 0xd1451685
+			uint32 0xd4281e48
+			uint32 0xd4bfd092
+			uint32 0xd6c39e79
+			uint32 0xd6d1b47a
+			uint32 0xd83528b7
+			uint32 0xdadc70b2
+			uint32 0xddbdb518
+			uint32 0xe0a8d6f6
+			uint32 0xe0c9adbe
+			uint32 0xe6d3ade9
+			uint32 0xed464c3e
+			uint32 0xed59325d
+			uint32 0xefcc08e4
+			uint32 0xf291b9f7
+			uint32 0xf486f7af
+			uint32 0xf66d531d
+			uint32 0xfac0da72
+			uint32 0xfd617b31
+		}
+
+		chunk "STRT"
+		{
+			int32 0
+			int32 38
+			int32 130
+			int32 226
+			int32 379
+			int32 409
+			int32 433
+			int32 447
+			int32 449
+			int32 462
+			int32 518
+			int32 671
+			int32 697
+			int32 850
+			int32 1003
+			int32 1156
+			int32 1230
+			int32 1278
+			int32 1431
+			int32 1530
+			int32 1538
+			int32 1554
+			int32 1707
+			int32 1737
+			int32 1890
+			int32 1903
+			int32 2056
+			int32 2086
+			int32 2239
+			int32 2392
+			int32 2414
+			int32 2429
+			int32 2442
+			int32 2472
+			int32 2494
+			int32 2523
+			int32 2549
+			int32 2559
+			int32 2619
+			int32 2636
+			int32 2662
+			int32 2815
+			int32 2820
+			int32 2973
+			int32 2975
+			int32 3128
+			int32 3192
+			int32 3207
+			int32 3226
+			int32 3379
+			int32 3419
+			int32 3422
+			int32 3575
+			int32 3589
+			int32 3592
+			int32 3595
+			int32 3610
+			int32 3633
+			int32 3635
+			int32 3788
+			int32 3941
+			int32 3975
+			int32 4009
+			int32 4162
+			int32 4187
+			int32 4340
+			int32 4493
+			int32 4535
+			int32 4547
+			int32 4568
+			int32 4598
+			int32 4600
+			int32 4615
+			int32 4642
+			int32 4714
+			int32 4725
+			int32 4738
+			int32 4891
+			int32 5044
+			int32 5060
+			int32 5092
+			int32 5104
+			int32 5114
+			int32 5126
+			int32 5278
+			int32 5294
+			int32 5322
+			int32 5475
+			int32 5517
+			int32 5547
+			int32 5562
+			int32 5566
+			int32 5601
+			int32 5605
+			int32 5758
+			int32 5769
+			int32 5832
+			int32 5985
+			int32 6138
+			int32 6291
+			int32 6444
+			int32 6469
+			int32 6517
+			int32 6544
+			int32 6574
+			int32 6591
+			int32 6600
+			int32 6621
+			int32 6724
+			int32 6877
+		}
+
+		chunk "STNG"
+		{
+			cstring "	rename("tempfile", $outputFileName);" /* 0x0118f2c2 */
+			cstring "	"If the output file name extension is .mif, then the text mif file will be generated.\n" ." /* 0x071b5cb4 */
+			cstring "die "usage: buildCrcStringTable.pl [-t tabFileName.ext] outputFileName.ext [stringFile...]\n" ." /* 0x07dc90ac */
+			cstring "	hex("0xF12F560E"), hex("0xF5EE4BB9"), hex("0xF8AD6D60"), hex("0xFC6C70D7"), hex("0xE22B20D2"), hex("0xE6EA3D65"), hex("0xEBA91BBC"), hex("0xEF68060B")," /* 0x07f0308b */
+			cstring "print "\t\tchunk \"DATA\"\n";" /* 0x0aca0e33 */
+			cstring "	$offset{$_} = $offset;" /* 0x0bb7b42a */
+			cstring "	use integer;" /* 0x0fd8c2d7 */
+			cstring "(" /* 0x0fdc1b13 */
+			cstring "print "}\n";" /* 0x13eb8375 */
+			cstring "	"-t : generate tab delimited output file as well\n" . " /* 0x1493d7f3 */
+			cstring "	hex("0x4C11DB70"), hex("0x48D0C6C7"), hex("0x4593E01E"), hex("0x4152FDA9"), hex("0x5F15ADAC"), hex("0x5BD4B01B"), hex("0x569796C2"), hex("0x52568B75")," /* 0x17c11891 */
+			cstring "	$outputFileName = shift;" /* 0x1c1a605d */
+			cstring "	hex("0x6A1936C8"), hex("0x6ED82B7F"), hex("0x639B0DA6"), hex("0x675A1011"), hex("0x791D4014"), hex("0x7DDC5DA3"), hex("0x709F7B7A"), hex("0x745E66CD")," /* 0x2136581d */
+			cstring "	hex("0x4F040D56"), hex("0x4BC510E1"), hex("0x46863638"), hex("0x42472B8F"), hex("0x5C007B8A"), hex("0x58C1663D"), hex("0x558240E4"), hex("0x51435D53")," /* 0x2146eb87 */
+			cstring "	hex("0x89B8FD09"), hex("0x8D79E0BE"), hex("0x803AC667"), hex("0x84FBDBD0"), hex("0x9ABC8BD5"), hex("0x9E7D9662"), hex("0x933EB0BB"), hex("0x97FFAD0C")," /* 0x21d0e687 */
+			cstring "	open(OUTPUT, ">" . $tabFileName) || die "could not open $tabFileName\n";" /* 0x22304a3e */
+			cstring "	system("miff -i tempfile -o $outputFileName");" /* 0x25bb1ec0 */
+			cstring "	hex("0xD727BBB6"), hex("0xD3E6A601"), hex("0xDEA580D8"), hex("0xDA649D6F"), hex("0xC423CD6A"), hex("0xC0E2D0DD"), hex("0xCDA1F604"), hex("0xC960EBB3")," /* 0x292b6c6d */
+			cstring "	"Otherwise, the binary IFF data will be written.\n" if (@ARGV < 1 || $ARGV[0] =~ /^[\/-][h\?]$/);" /* 0x2e71c624 */
+			cstring "sub crc" /* 0x2e796acf */
+			cstring "my $offset = 0;" /* 0x314ae407 */
+			cstring "	hex("0xC6BCF05F"), hex("0xC27DEDE8"), hex("0xCF3ECB31"), hex("0xCBFFD686"), hex("0xD5B88683"), hex("0xD1799B34"), hex("0xDC3ABDED"), hex("0xD8FBA05A")," /* 0x3531c729 */
+			cstring "print "\t\tchunk \"CRCT\"\n";" /* 0x353a3f3b */
+			cstring "	hex("0xD4326D90"), hex("0xD0F37027"), hex("0xDDB056FE"), hex("0xD9714B49"), hex("0xC7361B4C"), hex("0xC3F706FB"), hex("0xCEB42022"), hex("0xCA753D95")," /* 0x3afc35be */
+			cstring "my $tab = 0;" /* 0x3fdfeaa7 */
+			cstring "	hex("0x690CE0EE"), hex("0x6DCDFD59"), hex("0x608EDB80"), hex("0x644FC637"), hex("0x7A089632"), hex("0x7EC98B85"), hex("0x738AAD5C"), hex("0x774BB0EB")," /* 0x408cef82 */
+			cstring "	print $outputFileName, "\n";" /* 0x40df4fb5 */
+			cstring "	hex("0xE3A1CBC1"), hex("0xE760D676"), hex("0xEA23F0AF"), hex("0xEEE2ED18"), hex("0xF0A5BD1D"), hex("0xF464A0AA"), hex("0xF9278673"), hex("0xFDE69BC4")," /* 0x41db48cb */
+			cstring "	hex("0x3793A651"), hex("0x3352BBE6"), hex("0x3E119D3F"), hex("0x3AD08088"), hex("0x2497D08D"), hex("0x2056CD3A"), hex("0x2D15EBE3"), hex("0x29D4F654")," /* 0x436b3ac7 */
+			cstring "	my $crc = $crc_init;" /* 0x43cf6b39 */
+			cstring "	if ($_ ne "")" /* 0x469e46a4 */
+			cstring "select $old;" /* 0x4a7d0856 */
+			cstring "	foreach (split(//, $string))" /* 0x4c8775c1 */
+			cstring "my $tabFileName = "";" /* 0x52952b9d */
+			cstring "if ($outputFileName eq "-t")" /* 0x53af7596 */
+			cstring "my $old = select(OUTPUT);" /* 0x562fa059 */
+			cstring "	chomp();" /* 0x58d8f595 */
+			cstring "	print "\t\t\tcstring \"", $crc{$_}, "\" /* ", $_, " */\n";" /* 0x59912d48 */
+			cstring "print "\t\t{\n";" /* 0x5d22447d */
+			cstring "	return $crc ^ $crc_init;" /* 0x5d332fca */
+			cstring "	hex("0x2608EDB8"), hex("0x22C9F00F"), hex("0x2F8AD6D6"), hex("0x2B4BCB61"), hex("0x350C9B64"), hex("0x31CD86D3"), hex("0x3C8EA00A"), hex("0x384FBDBD")," /* 0x5e3bf14a */
+			cstring "else" /* 0x5f3f76c0 */
+			cstring "	hex("0x5D8A9099"), hex("0x594B8D2E"), hex("0x5408ABF7"), hex("0x50C9B640"), hex("0x4E8EE645"), hex("0x4A4FFBF2"), hex("0x470CDD2B"), hex("0x43CDC09C")," /* 0x5ffe9b68 */
+			cstring "}" /* 0x608edb7f */
+			cstring "	hex("0x8AAD2B2F"), hex("0x8E6C3698"), hex("0x832F1041"), hex("0x87EE0DF6"), hex("0x99A95DF3"), hex("0x9D684044"), hex("0x902B669D"), hex("0x94EA7B2A")," /* 0x615db20a */
+			cstring "		$crc = $crctable[(($crc>>24) ^ ord($_)) & 255] ^ ($crc << 8);" /* 0x6182410b */
+			cstring "my @crctable =" /* 0x631bcba2 */
+			cstring "		$crc{$crc} = $_;" /* 0x659055d5 */
+			cstring "	hex("0xBE2B5B58"), hex("0xBAEA46EF"), hex("0xB7A96036"), hex("0xB3687D81"), hex("0xAD2F2D84"), hex("0xA9EE3033"), hex("0xA4AD16EA"), hex("0xA06C0B5D")," /* 0x67e21e2a */
+			cstring "		my $crc = sprintf("0x%08x", crc($_));" /* 0x6b352a7a */
+			cstring "	{" /* 0x6ce6cf8a */
+			cstring "	hex("0x34867077"), hex("0x30476DC0"), hex("0x3D044B19"), hex("0x39C556AE"), hex("0x278206AB"), hex("0x23431B1C"), hex("0x2E003DC5"), hex("0x2AC12072")," /* 0x6eb9730f */
+			cstring "use warnings;" /* 0x75347d61 */
+			cstring "	}" /* 0x76608238 */
+			cstring ");" /* 0x78c389db */
+			cstring "print "\t}\n";" /* 0x790992c4 */
+			cstring "	$tabFileName = shift;" /* 0x79cd85e9 */
+			cstring "{" /* 0x7a0896cd */
+			cstring "	hex("0xE0B41DE7"), hex("0xE4750050"), hex("0xE9362689"), hex("0xEDF73B3E"), hex("0xF3B06B3B"), hex("0xF771768C"), hex("0xFA325055"), hex("0xFEF34DE2")," /* 0x7abbcaa1 */
+			cstring "	hex("0x119B4BE9"), hex("0x155A565E"), hex("0x18197087"), hex("0x1CD86D30"), hex("0x029F3D35"), hex("0x065E2082"), hex("0x0B1D065B"), hex("0x0FDC1BEC")," /* 0x7ba81dd0 */
+			cstring "	print "\t\t\tuint32 ", $_, "\n";" /* 0x7d3cdff0 */
+			cstring "	$offset += length($crc{$_}) + 1;" /* 0x80554433 */
+			cstring "	hex("0x128E9DCF"), hex("0x164F8078"), hex("0x1B0CA6A1"), hex("0x1FCDBB16"), hex("0x018AEB13"), hex("0x054BF6A4"), hex("0x0808D07D"), hex("0x0CC9CDCA")," /* 0x83c46933 */
+			cstring "print "form \"CSTB\"\n";" /* 0x846889a5 */
+			cstring "	hex("0x9823B6E0"), hex("0x9CE2AB57"), hex("0x91A18D8E"), hex("0x95609039"), hex("0x8B27C03C"), hex("0x8FE6DD8B"), hex("0x82A5FB52"), hex("0x8664E6E5")," /* 0x87964fea */
+			cstring "	hex("0xACA5C697"), hex("0xA864DB20"), hex("0xA527FDF9"), hex("0xA1E6E04E"), hex("0xBFA1B04B"), hex("0xBB60ADFC"), hex("0xB6238B25"), hex("0xB2E29692")," /* 0x8a58ef79 */
+			cstring "			print OUTPUT $_, "\t", $crc{$_}, "\n";" /* 0x8c562960 */
+			cstring "my %offset;" /* 0x8ed2220e */
+			cstring "	my $string = $_[0];" /* 0x906ee7fe */
+			cstring "	return 0 if ($string eq "");" /* 0x91a3a541 */
+			cstring "	" /* 0x933eb044 */
+			cstring "close(OUTPUT);" /* 0x95ee3e7e */
+			cstring "print "\tform \"0000\"\n";" /* 0x965657b6 */
+			cstring "# =====================================================================" /* 0x97bdd926 */
+			cstring "while (<>)" /* 0x9f5500d1 */
+			cstring "print "{\n";" /* 0xa105cfec */
+			cstring "	hex("0x251D3B9E"), hex("0x21DC2629"), hex("0x2C9F00F0"), hex("0x285E1D47"), hex("0x36194D42"), hex("0x32D850F5"), hex("0x3F9B762C"), hex("0x3B5A6B9B")," /* 0xa12b46be */
+			cstring "	hex("0x7B827D21"), hex("0x7F436096"), hex("0x7200464F"), hex("0x76C15BF8"), hex("0x68860BFD"), hex("0x6C47164A"), hex("0x61043093"), hex("0x65C52D24")," /* 0xa88572a5 */
+			cstring "#!/usr/bin/perl" /* 0xa952a8f4 */
+			cstring "if ($outputFileName =~ /\.mif/)" /* 0xae4468e9 */
+			cstring "use strict;" /* 0xb372444e */
+			cstring "if ($tab)" /* 0xb9d6faa7 */
+			cstring "print "\n";" /* 0xbb1713e8 */
+			cstring "	hex("0xAFB010B1"), hex("0xAB710D06"), hex("0xA6322BDF"), hex("0xA2F33668"), hex("0xBCB4666D"), hex("0xB8757BDA"), hex("0xB5365D03"), hex("0xB1F740B4")" /* 0xbe0a0d57 */
+			cstring "	close(OUTPUT);" /* 0xbe468f4e */
+			cstring "my $outputFileName = shift;" /* 0xc0d385a8 */
+			cstring "	hex("0x0315D626"), hex("0x07D4CB91"), hex("0x0A97ED48"), hex("0x0E56F0FF"), hex("0x1011A0FA"), hex("0x14D0BD4D"), hex("0x19939B94"), hex("0x1D528623")," /* 0xc1b8bc35 */
+			cstring "	print "\t\t\tint32 ", $offset{$_}, "\n";" /* 0xc98d4cbe */
+			cstring "print "\t\tchunk \"STRT\"\n";" /* 0xc9c069c8 */
+			cstring "print "\t{\n";" /* 0xcbe7de5d */
+			cstring "		}" /* 0xceae53fa */
+			cstring "	my $crc_init = hex("0xffffffff");" /* 0xd1451685 */
+			cstring "		{" /* 0xd4281e48 */
+			cstring "	hex("0x5E9F46BF"), hex("0x5A5E5B08"), hex("0x571D7DD1"), hex("0x53DC6066"), hex("0x4D9B3063"), hex("0x495A2DD4"), hex("0x44190B0D"), hex("0x40D816BA")," /* 0xd4bfd092 */
+			cstring "	$tab = 1;" /* 0xd6c39e79 */
+			cstring "open(OUTPUT, "> tempfile") || die "could not open tempfile\n";" /* 0xd6d1b47a */
+			cstring "	hex("0xBD3E8D7E"), hex("0xB9FF90C9"), hex("0xB4BCB610"), hex("0xB07DABA7"), hex("0xAE3AFBA2"), hex("0xAAFBE615"), hex("0xA7B8C0CC"), hex("0xA379DD7B")," /* 0xd83528b7 */
+			cstring "	hex("0xC5A92679"), hex("0xC1683BCE"), hex("0xCC2B1D17"), hex("0xC8EA00A0"), hex("0xD6AD50A5"), hex("0xD26C4D12"), hex("0xDF2F6BCB"), hex("0xDBEE767C")," /* 0xdadc70b2 */
+			cstring "	hex("0x9B3660C6"), hex("0x9FF77D71"), hex("0x92B45BA8"), hex("0x9675461F"), hex("0x8832161A"), hex("0x8CF30BAD"), hex("0x81B02D74"), hex("0x857130C3")," /* 0xddbdb518 */
+			cstring "	hex("0x00000000"), hex("0x04C11DB7"), hex("0x09823B6E"), hex("0x0D4326D9"), hex("0x130476DC"), hex("0x17C56B6B"), hex("0x1A864DB2"), hex("0x1E475005")," /* 0xe0a8d6f6 */
+			cstring "foreach (sort keys %crc)" /* 0xe0c9adbe */
+			cstring "print "\t\t\tint32 ", scalar(keys(%crc)), "\n";" /* 0xe6d3ade9 */
+			cstring "		foreach (sort keys %crc)" /* 0xed464c3e */
+			cstring "print "\t\tchunk \"STNG\"\n";" /* 0xed59325d */
+			cstring "print "\t\t}\n";" /* 0xefcc08e4 */
+			cstring "my %crc;" /* 0xf291b9f7 */
+			cstring "	unlink("tempfile");" /* 0xf486f7af */
+			cstring "		die "crc string clash for $crc:\n\t$crc{$crc}\n\t$_\n" if (defined($crc{$crc}) && $_ ne $crc{$crc});" /* 0xf66d531d */
+			cstring "	hex("0xF23A8028"), hex("0xF6FB9D9F"), hex("0xFBB8BB46"), hex("0xFF79A6F1"), hex("0xE13EF6F4"), hex("0xE5FFEB43"), hex("0xE8BCCD9A"), hex("0xEC7DD02D")," /* 0xfac0da72 */
+			cstring "	hex("0x7897AB07"), hex("0x7C56B6B0"), hex("0x71159069"), hex("0x75D48DDE"), hex("0x6B93DDDB"), hex("0x6F52C06C"), hex("0x6211E6B5"), hex("0x66D0FB02")," /* 0xfd617b31 */
+		}
+	}
+}

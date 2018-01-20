@@ -1,0 +1,20 @@
+// Error 413: Warning -- Likely use of null pointer in left argument to operator '->'
+-emacro(413 , DIMOFS_*)
+-emacro(412,  DIJOFS_*)
+
+// Error 545: Warning -- Suspicious use of &
+-emacro(545,  DIMOFS_*)
+
+// Error 648: Warning -- Overflow in computing constant for operation: xx (e.g. 'shift left')
+-emacro(648, D3DVSD*)
+
+// Error 732: Info -- Loss of sign (initialization) (long to unsigned long)
+-emacro(732,  DIJOFS_*)
+
+// Error 1924: Note -- C-style cast
+-emacro(1924, DIPROP_*)
+-emacro(1924, DIERR_*)
+-emacro(1924, DIMOFS_*)
+-emacro(1924, DIJOFS_*)
+-emacro(1924, DISEQUENCE_COMPARE)
+-emacro(1924, E_NOINTERFACE)

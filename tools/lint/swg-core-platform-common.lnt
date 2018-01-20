@@ -1,0 +1,19 @@
+//**
+//** Author options.
+//**
+au-sm.lnt
+
+//**
+//** Common output handling options.
+//**
++linebuf  // this makes the output line handle 1200 character --- some of the debug output lines are extremely lengthy.
+
+//**
+//** Desired error suppressions.
+//**
+
+// Expression-like macro not parenthesized.
+-e773
+
+// Macro XXX could become const variable.
+-e1923

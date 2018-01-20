@@ -1,0 +1,102 @@
+// use the debug compile
+-D_DEBUG
+
+// Functions which do not return
+-function(exit(0), Fatal(0))
+
+// Error 39: conflicting redefinition.  If we hit this, the compiler should be barking as well.
+// -TRF- suppress this warning because I can't get rid of error 39: (Error -- Redefinition of symbol '_STL::vector<bool,_STL::allocator<bool>>' conflicts with line 95, file D:\work\swg\current\src\external\3rd\library\stlport453\stlport\stl\_vector.h)
+-e39
+// -esym(39, _STL::char_traits<unsigned short>)        // John W. might need to look at Unicode forward declarations which TRF thinks may have introduced this.
+
+// Error 64: Type mismatch.
+-e64 // safe_cast<>() generates this also.  I'm not concerned about disabling this because the compiler will pick this up if it truly is a type mismatch.
+
+// Warning -- Constant value Boolean
+-emacro(506, FATAL)
+-emacro(506, DEBUG_FATAL)
+-emacro(506, REPORT)
+-emacro(506, REPORT_LOG)
+-emacro(506, REPORT_PRINT)
+-emacro(506, REPORT_LOG_PRINT)
+-emacro(506, DEBUG_REPORT)
+-emacro(506, DEBUG_REPORT_LOG)
+-emacro(506, DEBUG_REPORT_PRINT)
+-emacro(506, DEBUG_REPORT_LOG_PRINT)
+-emacro(506, DEBUG_WARNING)
+-emacro(506, WARNING)
+-emacro(506, WARNING_STRICT_FATAL)
+-emacro(506, JAVA_THROW_SCRIPT_EXCEPTION)
+
+// Warning -- Repeated include file
+-e537   
+
+// Warning 578 -- Declaration of symbol 'X' hides 'X from some encosing context'
+-esym(578, floor) // this is the obvious variable name for a Floor object but hides stdlib's floor() math function.
+-esym(578, time)
+
+// Info -- local structure member not referenced
+//-esym(754, *::*)         // suppress this warning on all private constructors.
+-esym(754, *::operator=) // suppress this warning on all operator
+
+
+// Info -- Redundant declaration for symbol previously declared
+-e763 
+
+// Note -- Successful completion
+-e900   
+
+// Error -- No template function has same argument count
+-esym(1024, ValidateRangeClosedOpen)      
+-esym(1024, ValidateRangeClosedClosed)
+
+// (Error -- '<some function>' cannot be distinguished from '<some overloading function>')
+// TRF: As of PC-Lint 8.00e, I am seeing this error message in a number of places where there
+//      is no overloading functions.  It appears Lint is buggy with respect to this error.
+-e1053
+
+// error 1526: (Warning -- Member function 'xxx' not defined)
+-e1526
+
+// 1550: (Warning -- exception xxx thrown by function is not on throw-list of function yyy)
+-esym(1550, std::bad_alloc)
+
+// error 1551: (Warning -- Function may throw exception '...' in destructor xyz -- More Effective C++ #11
+-e1551
+
+// 1702: Info -- operator 'operator<**>' is both ordinary function and member function. // This started showing up everywhere for me recently.
+-e1702
+
+// Info -- Constructor has private access specification
+-e1704
+
+// Info -- class member is a reference
+-e1725
+
+// Info -- Inline not previously declared inline
+-e1727
+
+// Info -- Redundant access specifier.  We do this all the time in our headers for formatting purposes.
+-e1736
+
+// Note -- Old-style C comment
+-e1904
+
+// Note -- C-style cast
+-emacro(1924, va_start)
+-emacro(1924, va_end)
+
+// Note -- Base class is not abstract
+-e1932
+
+// Info -- Loss of sign in promotion from int to unsigned int
+-esym(737, new)
+
+// turn on full filename output
++ffn
+
+// Indicate that overridden operator new calls will never return NULL.
+// Add an entry for each class that overrides operator new and cannot return NULL.
+-function(operator new(r), CrcLowerString::operator new(r))
+-function(operator new(r), StaticVertexBuffer::operator new(r))
+-function(operator new(r), SystemVertexBuffer::operator new(r))

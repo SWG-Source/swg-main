@@ -1,0 +1,33 @@
+@echo off
+@rem This file is to be used on project.lnt files to check the validity of included folders
+
+set slLintFile=%1
+if "%1" == "" set slLintFile=project.lnt
+
+@rem count number of lines
+set slFileCount=%@LINES[%slLintFile]
+set slErrors=0
+
+echo Scanning %2/%slLintFile
+
+@rem for all lines in the file
+do i = 0 to %slFileCount by 1
+	set slFileLine=%@TRIM[%@LINE[%slLintFile, %i]]
+	set slLineLength=%@LEN[%slFileLine]
+	set slRightLength=%@DEC[%@DEC[%slLineLength]]
+	set slDirectory=%@RIGHT[%slRightLength, %slFileLine]
+	set slIsDirectory=%@TRIM[%@LEFT[3, %slFileLine]]
+	if "%slIsDirectory" == "-i" (if not isdir "%slDirectory" (set slErrors=%@INC[%slErrors] & echo   x [%@INC[%i]] "%slDirectory"))
+enddo
+
+echo %slErrors error(s) found
+
+@rem cleanup variables
+set slFileCount=
+set i=
+set slFileLine=
+set slLineLength=
+set slRightLength=
+set slDirectory=
+set slIsDirectory=
+set slErrors=

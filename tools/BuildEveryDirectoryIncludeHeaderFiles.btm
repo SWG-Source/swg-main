@@ -1,0 +1,11 @@
+cd ..\src\engine\shared\library
+call BuildAllDirectoryIncludeHeaderFiles
+cd ..\..\..\engine\client\library
+call BuildAllDirectoryIncludeHeaderFiles
+cd ..\..\..\engine\server\library
+call BuildAllDirectoryIncludeHeaderFiles
+cd ..\..\..\game\shared\library
+call BuildAllDirectoryIncludeHeaderFiles
+cd ..\..\..\game\client\library
+call BuildAllDirectoryIncludeHeaderFiles
+cd ..\..\..\..\tools

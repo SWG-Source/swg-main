@@ -1,0 +1,22 @@
+// swg-mfc.lnt lint warning supressions
+
+// 528: symbol not referenced
+-esym(528, THIS_FILE)
+
+// 648: Warning -- Overflow in computing constant for operation: 'xxx'
+-emacro(648, ON_NOTIFY_REFLECT)
+
+// 1773: Info -- Attempt to cast away const (or volatile)
+-emacro(1773, RUNTIME_CLASS)
+
+// 1924: Note: C-style cast
+-emacro(1924, END_MESSAGE_MAP)
+-emacro(1924, IMPLEMENT_DYNCREATE)
+-emacro(1924, ON_BN_*)
+-emacro(1924, ON_COMMAND)
+-emacro(1924, ON_NOTIFY*)
+-emacro(1924, ON_UPDATE_COMMAND_UI)
+-emacro(1924, ON_WM_*)
+-emacro(1924, RGB)
+-emacro(1924, RUNTIME_CLASS)
+-emacro(1924, TVI_*)

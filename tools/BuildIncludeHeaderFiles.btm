@@ -1,0 +1,76 @@
+@echo off
+
+set includesub=%@word["\",-0,%@lfn[.]]
+
+if NOT ISDIR include mkdir include
+if NOT ISDIR include\public mkdir include\public
+if NOT ISDIR include\private mkdir include\private
+if NOT ISDIR include\public\%includesub mkdir include\public\%includesub
+if NOT ISDIR include\private\%includesub mkdir include\private\%includesub
+del /e /y /q include\public\%includesub
+del /e /y /q include\private\%includesub
+
+dir /sbfa:-d src\shared\*.h src\shared\*.def > shared.txt
+for %header in (@shared.txt) gosub header
+
+dir /sbfa:-d src\win32\*.h src\win32\*.def > win32.txt
+for %header in (@win32.txt) gosub win32
+
+dir /sbfa:-d src\linux\*.h src\linux\*.def > linux.txt
+for %header in (@linux.txt) gosub linux
+
+dir /sbfa:-a-d include\public\%dirname > platform.txt
+dir /sbfa:-a-d include\private\%dirname >> platform.txt
+for %header in (@platform.txt) gosub platform
+
+del /q shared.txt
+del /q win32.txt
+del /q linux.txt
+del /q platform.txt
+
+quit 0
+
+:setup
+set filename=include\%export\%includesub\%@filename[%header]
+set relative=%@replace[%@lfn[.]\,..\..\,%header]
+set relative=%@replace[\,/,%relative]
+return
+
+:header
+gosub export
+gosub setup
+echo #include "%relative" >> %filename
+return
+
+:win32
+gosub export
+gosub setup
+echo #if defined(PLATFORM_WIN32) >> %filename
+echo #include "%relative" >> %filename
+attrib /q -a %filename
+return
+
+:linux
+gosub export
+gosub setup
+set iftest=if
+if EXIST %filename set iftest=elif
+echo #%iftest defined(PLATFORM_LINUX) >> %filename
+echo #include "%relative" >> %filename
+attrib /q -a %filename
+return
+
+:platform
+echo #else >> %header
+echo #error unsupported platform >> %header
+echo #endif >> %header
+attrib /q +a %header
+return
+
+:export
+set export=public
+set exportHandle=%@fileopen[%header, read, t]
+set exportRead="%@fileread[%exportHandle]"
+if %@index[%exportRead,PRIVATE] != -1 set export=private
+set exportClose=%@fileclose[%exportHandle]
+return

@@ -1,0 +1,56 @@
+@echo off
+if not exist "common.cfg" goto error1
+if "%1" == "" goto error2
+
+timer
+
+set dn=patcher_%1
+
+inkey Press ESC to abort creating patcher version %dn:  %%key
+if "%@ascii[%key]" == "27" goto :end
+
+md \%dn
+
+if "%2" == "-t" gosub buildtrees
+copy /u ..\..\src\compile\win32\SwgClient\Release\SwgClient_r.exe \%dn
+copy /u ..\..\src\compile\win32\SwgClient\Release\SwgClient_r.pdb \%dn
+copy /u ..\..\src\compile\win32\SwgClient\Optimized\SwgClient_o.exe \%dn
+copy /u ..\..\src\compile\win32\SwgClient\Optimized\SwgClient_o.pdb \%dn
+copy /u ..\..\src\compile\win32\SwgClientSetup\Release\SwgClientSetup_r.exe \%dn
+copy /u ..\..\dev\win32\*.dll \%dn
+copy /u template_patcher_client.cfg \%dn\client.cfg
+copy /u locations.txt \%dn
+copy /u mss32.dll \%dn
+md \%dn\miles
+copy /u miles\*.* \%dn\miles\
+
+timer
+
+goto end
+
+:buildtrees
+del data_compressed_animation.rsp
+del data_compressed_mesh_skeletal.rsp
+del data_compressed_mesh_static.rsp
+del data_compressed_other.rsp
+del data_compressed_texture.rsp
+del data_uncompressed_music.rsp
+del data_uncompressed_sample.rsp
+..\..\tools\TreeFileRspBuilder common.cfg
+..\..\tools\TreeFileBuilder -r data_compressed_animation.rsp \%dn\data_compressed_animation.tre
+..\..\tools\TreeFileBuilder -r data_compressed_mesh_skeletal.rsp \%dn\data_compressed_mesh_skeletal.tre
+..\..\tools\TreeFileBuilder -r data_compressed_mesh_static.rsp \%dn\data_compressed_mesh_static.tre
+..\..\tools\TreeFileBuilder -r data_compressed_other.rsp \%dn\data_compressed_other.tre
+..\..\tools\TreeFileBuilder -r data_compressed_texture.rsp \%dn\data_compressed_texture.tre
+..\..\tools\TreeFileBuilder -r data_uncompressed_music.rsp -f \%dn\data_uncompressed_music.tre
+..\..\tools\TreeFileBuilder -r data_uncompressed_sample.rsp -f \%dn\data_uncompressed_sample.tre
+return
+
+:error1
+echo You must run this from the exe\win32 directory!
+goto end
+
+:error2
+echo Usage: BuildTreeFileVersion changelist [-t (build tree files)]
+
+:end

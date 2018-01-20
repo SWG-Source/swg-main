@@ -1,0 +1,14 @@
+@echo off
+
+set tmpFile=_allDsps.tmp
+
+c:\cygwin\bin\find ../src -name "settings.rsp" > %tmpFile
+
+perl -pi.bak -e"s/\/(\w*)\/build\/win32\/settings\.rsp/\/$1\/build\/win32\/$1\.dsp/g;" %tmpFile
+
+cat %tmpFile
+xargs p4 edit < %tmpFile
+
+for %file in (@%tmpFile) do (echo Building %file & buildDsp.pl %file)
+xargs p4 revert -a < %tmpFile
+rm %tmpFile

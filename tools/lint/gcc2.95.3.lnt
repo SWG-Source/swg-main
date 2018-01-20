@@ -1,0 +1,7 @@
+// Compiler options.
+co-gnu3.lnt
+-D__GNUC__=2
+-D__GNUC_MINOR__=95
+-D__HONOR_STD       // Without this, STL-port and gcc 2.95.3 do not cooperate with gcc-defined exceptions in namespace std
+-D__linux__
+-D__i386__

@@ -1,0 +1,8 @@
+// swg-regex.lnt
+//
+// lint supressions for the boost regex library.
+
+// undeclared identifier
+-esym(40, traits_size_type)
+-esym(40, traits_uchar_type)
+-esym(40, traits_string_type)

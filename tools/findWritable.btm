@@ -1,0 +1,10 @@
+p4 where //depot/swg/current/src > srcloc.txt
+input %%srcloc < srcloc.txt
+del /e /q srcloc.txt
+
+set srcdir=%@word[2,%srcloc]
+pushd %srcdir
+dir /sbfa:-r-d engine
+dir /sbfa:-r-d external
+dir /sbfa:-r-d game
+popd

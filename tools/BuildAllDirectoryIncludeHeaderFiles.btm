@@ -1,0 +1,13 @@
+@echo off
+
+dir /ba:d > dirs.txt
+for ddd in (@dirs.txt) gosub dddd
+del /e /z /q dirs.txt
+quit 0
+
+:dddd
+echo %ddd
+cd %ddd
+call BuildIncludeHeaderFiles
+cd ..
+return

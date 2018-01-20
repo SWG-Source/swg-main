@@ -1,0 +1,12 @@
+// Template for std.lnt file: SWG Team, Linux Platform.
+
+// All machine-independent options required for this platform.
+swg-core-platform-linux.lnt
+
+// Machine-specific options required for this platform.
+// e.g. include path to system includes, output formatting for editor.
+env-emacs.lnt
+
+// Compiler include directories.
+-i/usr/lib/gcc-lib/i686-pc-linux-gnu/2.95.3/include
+-i/usr/include

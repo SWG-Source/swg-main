@@ -1,0 +1,64 @@
+@echo off
+
+goto end
+
+:scanSub1
+pushd %i
+for /a:d j in (*) do (if "%@TRIM[%@LEFT[2, %j]]" != "." (gosub scanSub2))
+popd
+return
+
+:scanSub2
+pushd %j
+for /a:d k in (*) do (if "%@TRIM[%@LEFT[2, %k]]" != "." (gosub scanSub3))
+popd
+return
+
+:scanSub3
+if not isdir %k\include\public\%k goto missingpublic
+pushd %k
+for l in (include\public\%k\*) do (if "%@TRIM[%@LEFT[2, %k]]" != "." (gosub scanSub4public))
+popd
+
+if not isdir %k\include\private\%k goto missingprivate
+pushd %k\include\private\%k
+for l in (include\private\%k\*) do (if "%@TRIM[%@LEFT[2, %k]]" != "." (gosub scanSub4private))
+popd
+
+return
+
+:scanSub4public
+call ScanInc %l %k include\public
+return
+
+:scanSub4private
+call ScanInc %l %k include\private
+return
+
+:missingpublic
+@rem echo missing %k\include\public\%k
+return
+
+:missingprivate
+@rem echo missing %k\include\private\%k
+return
+
+pushd ..\src\engine
+set i=shared
+gosub scanSub1
+set i=client
+gosub scanSub1
+set i=server
+gosub scanSub1
+popd
+
+pushd ..\src\game
+set i=shared
+gosub scanSub1
+set i=client
+gosub scanSub1
+set i=server
+gosub scanSub1
+popd
+
+:end

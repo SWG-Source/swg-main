@@ -1,0 +1,36 @@
+@echo off
+
+rem =================================================================
+rem
+rem makedata template for .mif files
+rem asommers
+rem 
+rem copyright 2002, sony online entertainment
+rem
+rem =================================================================
+
+if "%1" == "" goto LABEL_all
+
+:LABEL_one
+for %x in (%1) do (gosub LABEL_process)
+goto LABEL_end
+
+:LABEL_all
+for %x in (*.mif) do (gosub LABEL_process)
+goto LABEL_end
+
+:LABEL_process
+set INFILE=%@FULL[%x]
+set OUTPATH=%@REPLACE[dsrc,data,%@PATH[%INFILE]]
+set OUTNAME=%@NAME[%INFILE]
+set OUTEXT=iff
+set OUTFILE=%OUTPATH%%OUTNAME.%OUTEXT
+
+rem -- make sure outpath exists
+if not exist %OUTPATH md /s %OUTPATH
+
+p4 edit %INFILE 
+p4 edit %OUTFILE
+return
+
+:LABEL_end

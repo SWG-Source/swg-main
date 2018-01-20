@@ -1,0 +1,26 @@
+// Warning -- Macro defined with arguments
+-emacro(123, DialogBox)
+-emacro(123, DialogBoxA)
+-emacro(123, MAKEINTRESOURCE)
+
+// Info -- call to function not made in presence of a prototype
+-esym(746, MAKEINTRESOURCEA)
+-esym(746, DialogBoxA)
+
+// Error -- undeclared
+-esym(1055, MAKEINTRESOURCEA)
+-esym(1055, DialogBoxA)
+
+// Note -- C-style cast
+-emacro(1924, DialogBox)
+-emacro(1924, FAILED)
+-emacro(1924, HIWORD)
+-emacro(1924, HWND_*)
+-emacro(1924, IDC_ARROW)
+-emacro(1924, INVALID_HANDLE_VALUE)
+-emacro(1924, LOWORD)
+-emacro(1924, MAKEINTRESOURCE)
+-emacro(1924, MAKELANGID)
+-emacro(1924, SUCEEDED)
+-emacro(1924, SWP_*)
+-emacro(1924, WAIT_OBJECT_0)

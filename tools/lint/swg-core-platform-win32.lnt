@@ -1,0 +1,24 @@
+// ======================================================================
+// Lint options file.
+// Machine-independent, Linux-platform includes.
+//
+// Copyright 2002, Sony Online Entertainment, Inc.
+// All rights reserved.
+// ======================================================================
+
+// Include platform independent options.
+swg-core-platform-common.lnt
+
+// Compiler options.
+co-msc60.lnt
+
+// Platform options.
+-si4  // # bytes in an integer.
+-sp4  // # bytes in a pointer.
+// +fll  // enable long long type.
+
+// Options specific to this platform.
+
+// Defines needed by the SWG source.
+-DWIN32=1
+-DPLATFORM_WIN32=1

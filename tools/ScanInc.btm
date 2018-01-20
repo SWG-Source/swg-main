@@ -1,0 +1,37 @@
+@echo off
+@rem This file is to be used on includePaths.rsp files to check the validity of included folders
+
+set slMode=delete
+
+set slIncludeFile=%1
+@rem echo %slIncludeFile
+if not exist "%slIncludeFile" (echo %slIncludeFile not found & goto end)
+
+set slFileLine=%@TRIM[%@LINE[%slIncludeFile, 0]]
+set slInclude=%@INSTR[1, 8, %slFileLine]
+if "%slInclude" == "#include" goto process
+if "%slInclude" == "#ifndef" p4 edit %slIncludeFile
+if "%slInclude" == "#error o" p4 delete %slIncludeFile
+goto skip
+
+:process
+set slFileLine2=%@INSTR[17, 100, %slFileLine]
+set slLineLength=%@LEN[%slFileLine2]
+set slLine=%@LEFT[%slLineLength, %slFileLine2]
+set slLine=%@REPLACE[/,\,%slLine]
+set slLine=%@TRIM[%slLine]
+
+if not exist "%slLine" (if not "%slLine" == "" (echo   %2/%slIncludeFile & echo   x "%slLine" & p4 %slMode %slIncludeFile))
+goto end
+
+:skip
+echo skipping %slIncludeFile {%slInclude} [%slFileLine]
+
+:end
+@rem cleanup variables
+set slFileCount=
+set i=
+set slFileLine=
+set slErrors=
+set slIncludeFile=
+set slLine=

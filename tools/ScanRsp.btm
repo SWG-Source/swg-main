@@ -1,0 +1,30 @@
+@echo off
+@rem This file is to be used on includePaths.rsp files to check the validity of included folders
+
+set slIncludeFile=%1
+if "%1" == "" set slIncludeFile=includePaths.rsp
+
+@rem count number of lines
+set slFileCount=%@LINES[%slIncludeFile]
+set slErrors=0
+
+echo Scanning %2/%slIncludeFile
+
+@rem for all lines in the file
+do i = 0 to %slFileCount by 1
+	set slDirectory=%@TRIM[%@LINE[%slIncludeFile, %i]]
+	if not isdir "%slDirectory" (if not "%slDirectory" == "" (if not "%slDirectory" == "..\..\include\private" (if not "%slDirectory" == "../../include/private" (set slErrors=%@INC[%slErrors] & echo   x [%@INC[%i]] "%slDirectory"))))
+enddo
+
+echo %slErrors error(s) found
+@rem if not "%slErrors" == "0" p4 edit %slIncludeFile & pause
+
+@rem cleanup variables
+set slFileCount=
+set i=
+set slFileLine=
+set slLineLength=
+set slRightLength=
+set slDirectory=
+set slIsDirectory=
+set slErrors=

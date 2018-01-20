@@ -1,0 +1,50 @@
+@echo off
+if not exist "SwgClient_r.exe" goto error
+set dd=%_date
+set dn=patcher_20%@instr[6,2,%dd]%@instr[0,2,%dd]%@instr[3,2,%dd]internal
+
+inkey Press ESC to abort creating patcher version %dn:  %%key
+if "%@ascii[%key]" == "27" goto :end
+
+
+md \%dn
+
+copy /u h:\gmcdaniel\public\patch_stuff\patch_trees\*.tre \%dn
+
+copy /u SwgClient_r.exe \%dn
+copy /u SwgClient_r.pdb \%dn
+copy /u SwgClient_o.exe \%dn
+copy /u SwgClient_o.pdb \%dn
+copy /u SwgClientSetup_r.exe \%dn
+copy /u dpvs.dll \%dn
+copy /u dpvsd.dll \%dn
+copy /u gl04_r.dll \%dn
+copy /u gl04_o.dll \%dn
+copy /u dbghelp.dll \%dn
+copy /u DllExport.dll \%dn
+copy /u template_patcher_client.cfg \%dn\client.cfg
+copy /u locations.txt \%dn
+copy /u mss32.dll \%dn
+md \%dn\miles
+copy /u miles\*.* \%dn\miles\
+
+
+
+goto end
+
+:error
+echo You must run this from the exe\win32 directory!
+goto end
+
+
+
+
+
+pushd /%dn
+del \\sdlux2\projects\pc\patch\starwars\game\*.tre
+copy /u *.* \\sdlux2\projects\pc\patch\starwars\game
+popd
+popd
+start http://laser:7000
+pause
+:end

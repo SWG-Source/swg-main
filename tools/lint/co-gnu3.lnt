@@ -1,0 +1,153 @@
+
+//    co-gnu3.lnt
+//    Compiler Options for GCC versions 2.95.3 and later
+
+//    This file contains options to allow FlexeLint to process source
+//    files for the Gnu compiler (GCC).
+//
+//    flint  co-gnu3.lnt  source-file(s)
+//
+//    If you are using GCC on some other system you will need to change
+//    the following options:
+
+-cgnu       // Notifies FlexeLint that gcc is being used.
+
+// Begin: System Dependent Options
+// -------------------------------
+
+-di386=1         // needed for some Unix's
+-a#machine(i386) //  #assert's machine(i386)  (SVR4 facility).
+
+// What follows is the trickiest thing about a gcc installation, i.e.,
+// one or more -i options to tell FlexeLint where the header files
+// are coming from.
+
+// -i/FlexeLint/supp/ansi  // This we humbly offer as a collection of ...
+            // ANSI (i.e ISO) header files.  Replace the word "FlexeLint"
+            // with the name of the directory in which FlexeLint has
+            // been installed.  Note, you might want to replace "ansi"
+            // with "posix".
+
+// -----------------------------
+// End: System Dependent Options
+
++cpp(.cc,.C)  // extensions for C++ that are commonly used in addition
+            // to the default extensions of .cpp and .cxx
+
+            // while processing library headers
+-wlib(1)    // sets the warning level within library headers to 1
+	    // (no warnings, just syntax errors).  Comment out if you
+	    // are actually linting library headers.  This
+	    // option makes obsolete options of the form -elib(axxx) where
+	    // xxx >= 400 which may be retained for historical reasons.
+-elib(15)   // redeclaration of symbol
+-elib(516)  // lots of redeclarations in Linux stdlib.h
+-elib(652)  // suppress message about #define of earlier declared symbols
+-elib(762)  // suppress message about multiple identical declarations and
+-elib(760)  // suppress message about multiple identical macro defs
+-elib(553)  // undefined preprocessor variables are taken as 0
+-elib(410)  // unusual size_t
+-elib(767)  // differently defined macro
+-elib(624)  // typedef symbol redeclared
+-elib(607)  // parameter substitution within string
+-elib(602)  // in dial.h there are comments within comments ?
+-elib(537)  // repeated include files
+-elib(2)    // unclosed quotes in nserve.h
+-elib(123)  // size is both a variable and a macro with args
+-elib(1014) // class member definition within extern "C++"
+
+-emacro(734,putc)   // don't complain about items being too large.
+-emacro((???),va_arg)   // the va_arg() macro can yield 415, 416, 661, 662
+			// 796 and 797 (out-of-bounds errors).
+-emacro(413,offsetof)  // use of NULL pointer creates a stir
+-emacro(545,offsetof)  // addressing an array member is OK
+
+-elib(793)   // Linux has minor ANSI violation in stddef.h 
+-elib(569)   // Linux truncates some data in huge_val.h
+-esym(528,__huge_val,__nan,__qnan,__qnanf,__snan,__snanf)
+           // We don't care if we don't reference some GNU funcs
+-esym(528,__gnu_malloc,__gnu_calloc)
+
+
+//  The following options were found necessary when processing
+//  the Unix headers within /usr/include
+
++fdi            // Use the directory of the including file
+
++ppw(ident)     // Tolerate #ident
++rw(__inline)   // enable the (non-standard) __inline keyword
++rw(__inline__)   // enable the (non-standard) __inline__ keyword
+
+//  The following functions exhibit variable return modes.
+//  That is, they may equally-usefully be called for a value
+//  as called just for their effects.  Accordingly we inhibit
+//  Warning 534 for these functions.
+//  Feel free to add to or subtract from this list.
+
+-esym(534,close,creat,fclose,fprintf,fputc)
+-esym(534,fputs,fscanf,fseek,fwrite,lseek,memcpy,memmove,memset)
+-esym(534,printf,puts,scanf,sprintf,sscanf,strcat,strcpy)
+-esym(534,strncat,strncpy,unlink,write)
+
+// For non-ANSI compilers we suppress messages 515 and 516
+// for functions known to have variable argument lists.
+// For ANSI compilers, header files should take care of this.
+
+-esym(515,fprintf,printf,sprintf,fscanf,scanf,sscanf)
+-esym(516,fprintf,printf,sprintf,fscanf,scanf,sscanf)
+
+// The following options are required by most compilers to
+// noiselessly process iostream.h
+
+-elib(1717) //empty prototypes
+-elib(522) //function return value ignored
+-elib(1053) //prototypes cannot be distinguished
+-elib(1721) //unusual operator =() declaration
+-elib(1720) //assignment op has non-const parameter
+-elib(655)  // bitwise operator combining compatible enum's
+-elib(641)  // converting enum's to int
+-elib(537)  // repeated include file (ios.h)
+-elib(1511) // member (rdbuf) hides nonvirtual member
+-elib(1712) // default constructor not defined for class
+-esym(1702,operator<<,operator>>)
+
+// These functions return things that are frequently ignored.
+
+-esym(534,ostream::operator<<,istream::operator>>)
+
+-elib(747) //significant prototype coercion
+-elib(740) //unusual pointer casts
+-elib(1029) //default argument repeated -- can't dist. char, signed char
+-elib(1055) //call to rdbuf() questioned?
+-elib(1708,1709) // minor C/C++ declaration conflict
+
+-elib(763)   // redundant declaration
+-elib(1510)  // base class has no destructor
+-elib(1516)  // data member hiding inherited member
+-elib(1730)  // class/struct inconsistancy
+-elib(569)   // loss of information 8-bits - 7bits
+
+// What follows here is a collection of options we have found
+// to be needed to support Version 3 of GCC.  The need for these
+// options actually predate Version 3 and are of the 2.9... time frame
+
+-e93         // allow newlines within quoted string arguments to macros
+-dasm()=     // support inline assembly code by ignoring asm(...)
+-d__attribute__()=   // ignore this keyword and following parenthetical
+-d__extension__=            // ignore this keyword
+-d__builtin_va_list=void*   // used by stdarg.h
+-d__builtin_stdarg_start()=_to_semi  // ditto
+-d__builtin_va_end()=_to_semi        // ditto
++rw(_to_semi)               // needed for the two macros above.
+-d__const=const             // gconv.h uses __const rather than const
+-d__STDC_VERSION__=199901L  // required by C99
+-d__FUNCTION__="somefunction"
+-d__PRETTY_FUNCTION__="somefunction"
++fwc                    // wchar_t is builtin
+-d_WCHAR_T              // tell the header files as much
+-elib(148)              // Some of the libraries are redefining member
+                        // functions
+-elib(1073)             // reverse_iterator<> is being invoked with
+                        // an insufficient number of parameters.
++rw(__typeof__)         // activate __typeof__ keyword
+-d__typeof=__typeof__   // an alternative to using __typeof__

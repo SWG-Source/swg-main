@@ -1,0 +1,16 @@
+deb http://ftp.us.debian.org/debian testing main contrib non-free
+
+deb http://ftp.debian.org/debian/ jessie-updates main contrib non-free
+
+deb http://security.debian.org/ jessie/updates main contrib non-free
+
+#Debian Backports
+deb http://http.debian.net/debian jessie-backports main
+
+deb http://mirrors.kernel.org/debian/ jessie main
+deb-src http://mirrors.kernel.org/debian/ jessie main
+
+# jessie-updates, previously known as 'volatile'
+deb http://mirrors.kernel.org/debian/ jessie-updates main
+deb-src http://mirrors.kernel.org/debian/ jessie-updates main
+

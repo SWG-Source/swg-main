@@ -1,0 +1,38 @@
+// Include platform-independent stl-port options
+lib-stl.lnt
+
+// Error: 10 (Expecting a 'Y') // stlport generates this with mem_fun.
+-elib(10)
+
+// error 18 (Error -- Symbol XYZ redeclared (basic) conflicts with line abc)
+-esym(18, _STL::distance)
+-esym(18, _STL::equal_range)
+
+// error 26 Error -- Expected an expression
+-elib(26)
+
+// error 39 Error -- Redefinition of symbol 'x' conflicts with line y
+-esym(39, _STL::char_traits<char>)
+
+// error 46 Error -- Field type should be int
+-elib(46)
+
+// error 62 Error -- Incompatible types (TypeDiff) for operator ':'
+-elib(62)
+
+// error 534 Error -- Ignoring return value of function
+-esym(534, _STL::for_each)
+-esym(534, _STL::transform)
+
+// error 1062 Error -- template must be either a class or a function
+-elib(1062)
+
+// error 1039 (Error -- Symbol  is not a member of class
+-elib(1039)
+
+// error 429: Warning -- Custodial pointer has not been freed or returned
+-sem(_STL::list::push_back, custodial(1))
+-sem(_STL::vector::push_back, custodial(1))
+
+// same as above, but this works to solve map inserts
+-sem(_STL::pair::pair, custodial(2))

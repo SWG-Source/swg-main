@@ -1,0 +1,2 @@
+#!/bin/sh
+p4 opened | sed "s/#/ /" | cut -f 1  | p4 -x - where | sed "s/ /      /g" | cut -f 3 | xargs dos2unix

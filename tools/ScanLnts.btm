@@ -1,0 +1,49 @@
+@echo off
+pushd ..\src\engine
+set i=shared
+gosub scanSub1
+set i=client
+gosub scanSub1
+set i=server
+gosub scanSub1
+popd
+
+pushd ..\src\game
+set i=shared
+gosub scanSub1
+set i=client
+gosub scanSub1
+set i=server
+gosub scanSub1
+popd
+
+goto end
+
+:scanSub1
+pushd %i
+for /a:d j in (*) do (if "%@TRIM[%@LEFT[2, %j]]" != "." (gosub scanSub2))
+popd
+return
+
+:scanSub2
+pushd %j
+for /a:d k in (*) do (if "%@TRIM[%@LEFT[2, %k]]" != "." (gosub scanSub3))
+popd
+return
+
+:scanSub3
+pushd %k
+if not exist project.lnt goto missing
+
+:found
+echo ----------
+call ScanLnt project.lnt %i/%j/%k
+popd
+return
+
+:missing
+echo missing project.lnt in %i/%j/%k 
+popd
+return
+
+:end
