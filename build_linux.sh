@@ -10,26 +10,23 @@ CLUSTERNAME=
 NODEID=
 DSRC_DIR=
 DATA_DIR=
-GIT_URL="https://darth-swg@bitbucket.org/stellabellumswg/dsrc.git"
-GIT_REPO_SRC=${GIT_URL}src.git
-GIT_REPO_DSRC=${GIT_URL}dsrc.git
-GIT_REPO_CONFIG=${GIT_URL}configs.git
-GIT_REPO_DATA=${GIT_URL}data.git
 
-# Debug and Release are for testing and not public servers, they lack optimizations
-MODE=Release
-#MODE=Debug
-
-# Public/high load release builds - heavily optimized bins
-#MODE=MINSIZEREL
-
-# Builds binaries to generate profdata
+# Public facing - builds profdata
 #MODE=RELWITHDEBINFO
+
+# Public facing, builds heavily optimized bins
+#MODE=MINSIZEREL
 
 if [ ! -d $basedir/build ]
 then
 	mkdir $basedir/build
 fi
+
+read -p "What is your GIT username (so we can get the code correctly): " response
+GIT_USER=${response,,}
+GIT_URL=https://${GIT_USER}@bitbucket.org/theswgsource/
+GIT_REPO_SRC=${GIT_URL}src-1.2.git
+GIT_REPO_DSRC=${GIT_URL}dsrc-1.2.git
 
 if [ ! -f $basedir/.setup ]; then
 	if [[ $(lsb_release -a) =~ .*Ubuntu.* ]] || [ -f "/etc/debian_version" ]
@@ -77,6 +74,14 @@ if [[ $response =~ ^(yes|y| ) ]]; then
 		git pull
 		cd $basedir
 	fi
+fi
+
+read -p "Is this for DEBUG mode or RELEASE mode? (d/r): " response
+response=${response,,}
+if [[ $response =~ ^(debug|d| ) ]]; then
+	MODE=Debug
+else
+	MODE=Release
 fi
 
 read -p "Do you want to recompile the server code (C++) now? (y/n) " response
@@ -318,7 +323,7 @@ if [[ $response =~ ^(yes|y| ) ]]; then
 		read DBPASSWORD
 	fi
 
-	./database_update.pl --username=$DBUSERNAME --password=$DBPASSWORD --service=$DBSERVICE --goldusername=$DBUSERNAME --loginusername=$DBUSERNAME --createnewcluster --packages
+	perl ./database_update.pl --username=$DBUSERNAME --password=$DBPASSWORD --service=$DBSERVICE --goldusername=$DBUSERNAME --loginusername=$DBUSERNAME --createnewcluster --packages
 
 	if [[ $templatesLoaded = false ]]; then
 		echo "Loading template list"
