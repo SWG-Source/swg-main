@@ -1,7 +1,7 @@
 #/bin/sh
 
 echo "Initializing Environment"
-
+basedir=$PWD
 arch=$(arch)
 echo "arch is $arch"
 
@@ -29,42 +29,23 @@ else
 	sudo apt-get remove libxml2-dev:amd64 libncurses-dev:amd64 zlib1g-dev:amd64
 fi
 
-if [ ! -f oracle-instantclient-basiclite-10.2.0.4-1.i386.rpm ]; then
-	wget --no-check-certificate https://bitbucket.org/swgnoobs/dontask/downloads/oracle-instantclient-basiclite-10.2.0.4-1.i386.rpm
-fi
-
-if [ ! -f oracle-instantclient-devel-10.2.0.4-1.i386.rpm ]; then
-	wget --no-check-certificate https://bitbucket.org/swgnoobs/dontask/downloads/oracle-instantclient-devel-10.2.0.4-1.i386.rpm
-fi
-
-if [ ! -f oracle-instantclient-sqlplus-10.2.0.4-1.i386.rpm ]; then
-        wget --no-check-certificate  https://bitbucket.org/swgnoobs/dontask/downloads/oracle-instantclient-sqlplus-10.2.0.4-1.i386.rpm
-fi
-
+cd ~/swg-main/dependencies
 # install java
-# if you want oldjava manually grab and use this:
-# wget --no-check-certificate https://bitbucket.org/apathyboy/openswg/downloads/IBMJava2-SDK-1.4.2-13.18.tgz
-
-if [ ! -f jdk-8u73-linux-i586.tar.gz ]; then
-	wget --no-check-certificate https://bitbucket.org/swgnoobs/dontask/downloads/jdk-8u73-linux-i586.tar.gz
-fi
-
-# install java
-tar -xvzf jdk-8u73-linux-i586.tar.gz
-sudo mv jdk1.8.0_73/ /opt
-sudo ln -s /opt/jdk1.8.0_73 /usr/java
+tar -xvzf jdk-8u152-linux-i586.tar.gz
+sudo mv jdk1.8.0_152/ /opt
+sudo ln -s /opt/jdk1.8.0_152 /usr/java
 
 # nuke old versions
 sudo rm -rf /usr/lib/oracle &> /dev/null
 
 if [ $arch == "i386" ]; then 
-	sudo alien -i oracle-instantclient-basiclite-10.2.0.4-1.i386.rpm
-	sudo alien -i oracle-instantclient-devel-10.2.0.4-1.i386.rpm
-	sudo alien -i oracle-instantclient-sqlplus-10.2.0.4-1.i386.rpm
+	sudo alien -i oracle-instantclient12.2-basiclite-12.2.0.1.0-1.i386.rpm
+	sudo alien -i oracle-instantclient12.2-devel-12.2.0.1.0-1.i386.rpm
+	sudo alien -i oracle-instantclient12.1-sqlplus-12.1.0.2.0-1.i386.rpm
 else
-	sudo alien -i --target=amd64 oracle-instantclient-basiclite-10.2.0.4-1.i386.rpm
-	sudo alien -i --target=amd64 oracle-instantclient-devel-10.2.0.4-1.i386.rpm
-	sudo alien -i --target=amd64 oracle-instantclient-sqlplus-10.2.0.4-1.i386.rpm
+	sudo alien -i --target=amd64 oracle-instantclient12.2-basiclite-12.2.0.1.0-1.i386.rpm
+	sudo alien -i --target=amd64 oracle-instantclient12.2-devel-12.2.0.1.0-1.i386.rpm
+	sudo alien -i --target=amd64 oracle-instantclient12.1-sqlplus-12.1.0.2.0-1.i386.rpm
 fi
 
 # set env vars
@@ -73,23 +54,25 @@ sudo find /usr/lib -lname '/usr/lib/oracle/*' -delete &> /dev/null
 sudo touch /etc/profile.d/oracle.sh
 sudo touch /etc/ld.so.conf.d/oracle.conf
 
-export ORACLE_HOME="/usr/lib/oracle/10.2.0.4/client"
+export ORACLE_HOME="/usr/lib/oracle/12.2.0.1/client"
 export JAVA_HOME=/usr/java
 
+cd $basedir;
+
 # Set java include paths - you want to change these to something like the below for oracle
-cp java_ldsoconfd_example.conf /etc/ld.so.conf.d/java.conf
-cp java_profile_example.sh /etc/profile.d/java.sh
+sudo cp utils/init/java_ldsoconfd_example.conf /etc/ld.so.conf.d/java.conf
+sudo cp utils/init/java_profile_example.sh /etc/profile.d/java.sh
 
-echo "/usr/lib/oracle/10.2.0.4/client/lib" | sudo tee -a /etc/ld.so.conf.d/oracle.conf
+echo "/usr/lib/oracle/12.2.0.1/client/lib" | sudo tee -a /etc/ld.so.conf.d/oracle.conf
 
-echo "export ORACLE_HOME=/usr/lib/oracle/10.2.0.4/client" | sudo tee -a /etc/profile.d/oracle.sh
-echo "export PATH=\$PATH:/usr/lib/oracle/10.2.0.4/client/bin" | sudo tee -a /etc/profile.d/oracle.sh
-echo "export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/lib/oracle/10.2.0.4/client/lib:/usr/include/oracle/10.2.0.4/client" | sudo tee -a /etc/profile.d/oracle.sh
+echo "export ORACLE_HOME=/usr/lib/oracle/12.2.0.1/client" | sudo tee -a /etc/profile.d/oracle.sh
+echo "export PATH=\$PATH:/usr/lib/oracle/12.2.0.1/client/bin" | sudo tee -a /etc/profile.d/oracle.sh
+echo "export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/lib/oracle/12.2.0.1/client/lib:/usr/include/oracle/12.2.0.1/client" | sudo tee -a /etc/profile.d/oracle.sh
 
 source /etc/profile.d/oracle.sh
 source /etc/profile.d/java.sh
 
-sudo ln -s /usr/include/oracle/10.2.0.4/client $ORACLE_HOME/include
+sudo ln -s /usr/include/oracle/12.2.0.1/client $ORACLE_HOME/include
 
 sudo ldconfig
 
