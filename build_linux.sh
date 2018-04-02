@@ -25,8 +25,10 @@ fi
 read -p "What is your GIT username (so we can get the code correctly): " response
 GIT_USER=${response,,}
 GIT_URL=https://${GIT_USER}@bitbucket.org/theswgsource/
+GIT_REPO_DEPEND=${GIT_URL}dependencies-1.2.git
 GIT_REPO_SRC=${GIT_URL}src-1.2.git
 GIT_REPO_DSRC=${GIT_URL}dsrc-1.2.git
+GIT_REPO_CONFIG=${GIT_URL}configs-1.2.git
 
 if [ ! -f $basedir/.setup ]; then
 	if [[ $(lsb_release -a) =~ .*Ubuntu.* ]] || [ -f "/etc/debian_version" ]
@@ -34,6 +36,13 @@ if [ ! -f $basedir/.setup ]; then
 		read -p "!!!ONLY RUN ONCE!!! Do you want to install dependencies (y/n)?" response
 		response=${response,,} # tolower
 		if [[ $response =~ ^(yes|y| ) ]]; then
+			if [ ! -d $basedir/dependencies ]; then
+				git clone $GIT_REPO_DEPEND src
+			else
+				cd $basedir/dependencies
+				git pull
+				cd $basedir
+			fi
 			$basedir/utils/init/debian.sh
 			source /etc/profile.d/java.sh
 			source /etc/profile.d/oracle.sh
