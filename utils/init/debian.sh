@@ -54,7 +54,7 @@ sudo find /usr/lib -lname '/usr/lib/oracle/*' -delete &> /dev/null
 sudo touch /etc/profile.d/oracle.sh
 sudo touch /etc/ld.so.conf.d/oracle.conf
 
-export ORACLE_HOME="/usr/lib/oracle/12.2.0.1/client"
+export ORACLE_HOME="/usr/lib/oracle/12.2/client"
 export JAVA_HOME=/usr/java
 
 cd $basedir;
@@ -63,16 +63,16 @@ cd $basedir;
 sudo cp utils/init/java_ldsoconfd_example.conf /etc/ld.so.conf.d/java.conf
 sudo cp utils/init/java_profile_example.sh /etc/profile.d/java.sh
 
-echo "/usr/lib/oracle/12.2.0.1/client/lib" | sudo tee -a /etc/ld.so.conf.d/oracle.conf
+echo "/usr/lib/oracle/12.2/client/lib" | sudo tee -a /etc/ld.so.conf.d/oracle.conf
 
-echo "export ORACLE_HOME=/usr/lib/oracle/12.2.0.1/client" | sudo tee -a /etc/profile.d/oracle.sh
-echo "export PATH=\$PATH:/usr/lib/oracle/12.2.0.1/client/bin" | sudo tee -a /etc/profile.d/oracle.sh
-echo "export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/lib/oracle/12.2.0.1/client/lib:/usr/include/oracle/12.2.0.1/client" | sudo tee -a /etc/profile.d/oracle.sh
+echo "export ORACLE_HOME=/usr/lib/oracle/12.2/client" | sudo tee -a /etc/profile.d/oracle.sh
+echo "export PATH=\$PATH:/usr/lib/oracle/12.2/client/bin" | sudo tee -a /etc/profile.d/oracle.sh
+echo "export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/lib/oracle/12.2/client/lib:/usr/include/oracle/12.2/client" | sudo tee -a /etc/profile.d/oracle.sh
 
 source /etc/profile.d/oracle.sh
 source /etc/profile.d/java.sh
 
-sudo ln -s /usr/include/oracle/12.2.0.1/client $ORACLE_HOME/include
+sudo ln -s /usr/include/oracle/12.2/client $ORACLE_HOME/include
 
 sudo ldconfig
 
