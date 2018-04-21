@@ -99,10 +99,10 @@ if [[ $response =~ ^(yes|y| ) ]]; then
 	cd $basedir/build
 
 	# prefer clang
-	if type clang &> /dev/null; then
-		export CC=clang
-		export CXX=clang++
-	fi	
+	# if type clang &> /dev/null; then
+	#	export CC=clang
+	#	export CXX=clang++
+	# fi	
 
 	if [ $(arch) == "x86_64" ]; then
         	export LDFLAGS=-L/usr/lib32
