@@ -30,6 +30,12 @@ GIT_REPO_SRC=${GIT_URL}src-1.2.git
 GIT_REPO_DSRC=${GIT_URL}dsrc-1.2.git
 GIT_REPO_CONFIG=${GIT_URL}configs-1.2.git
 
+# specify git branches for each repo
+GIT_REPO_DEPEND_BRANCH=master
+GIT_REPO_SRC_BRANCH=master
+GIT_REPO_DSRC_BRANCH=master
+GIT_REPO_CONFIG_BRANCH=master
+
 if [ ! -f $basedir/.setup ]; then
 	if [[ $(lsb_release -a) =~ .*Ubuntu.* ]] || [ -f "/etc/debian_version" ]
 	then
@@ -37,7 +43,7 @@ if [ ! -f $basedir/.setup ]; then
 		response=${response,,} # tolower
 		if [[ $response =~ ^(yes|y| ) ]]; then
 			if [ ! -d $basedir/dependencies ]; then
-				git clone $GIT_REPO_DEPEND src
+				git clone -b $GIT_REPO_DEPEND_BRANCH $GIT_REPO_DEPEND dependencies
 			else
 				cd $basedir/dependencies
 				git pull
@@ -61,7 +67,7 @@ if [[ $response =~ ^(yes|y| ) ]]; then
 
 	# update or clone each sub-repo
 	if [ ! -d $basedir/src ]; then
-		git clone $GIT_REPO_SRC src
+		git clone -b $GIT_REPO_SRC_BRANCH $GIT_REPO_SRC src
 	else
 		cd $basedir/src
 		git pull
@@ -69,7 +75,7 @@ if [[ $response =~ ^(yes|y| ) ]]; then
 	fi
 
 	if [ ! -d $basedir/dsrc ]; then
-		git clone $GIT_REPO_DSRC dsrc
+		git clone -b $GIT_REPO_DSRC_BRANCH $GIT_REPO_DSRC dsrc
 	else
 		cd $basedir/dsrc
 		git pull
@@ -77,7 +83,7 @@ if [[ $response =~ ^(yes|y| ) ]]; then
 	fi
 
 	if [ ! -d $basedir/configs ]; then
-		git clone $GIT_REPO_CONFIG configs
+		git clone -b $GIT_REPO_CONFIG_BRANCH $GIT_REPO_CONFIG configs
 	else
 		cd $basedir/configs
 		git pull
