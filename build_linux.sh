@@ -22,6 +22,14 @@ then
 	mkdir $basedir/build
 fi
 
+echo -e "\n";
+echo -e "\033[1;33m ___ __      __ ___  ___                                 _     ___  ";
+echo -e "\033[1;33m/ __|\ \    / // __|/ __| ___  _  _  _ _  __  ___  __ __/ |   |_  )";
+echo -e "\033[1;33m\__ \ \ \/\/ /| (_ |\__ \/ _ \| || || '_|/ _|/ -_) \ V /| | _  / /";
+echo -e "\033[1;33m|___/  \_/\_/  \___||___/\___/ \_,_||_|  \__|\___|  \_/ |_|(_)/___|";
+echo -e "\033[1;31m";
+
+
 read -p "What is your GIT username (so we can get the code correctly): " response
 GIT_USER=${response,,}
 GIT_URL=https://${GIT_USER}@bitbucket.org/theswgsource/
@@ -39,7 +47,11 @@ GIT_REPO_CONFIG_BRANCH=master
 if [ ! -f $basedir/.setup ]; then
 	if [[ $(lsb_release -a) =~ .*Ubuntu.* ]] || [ -f "/etc/debian_version" ]
 	then
-		read -p "!!!ONLY RUN ONCE!!! Do you want to install dependencies (y/n)?" response
+	read -p "******************************************************************
+This section of the build script will install latest dependencies
+******************************************************************
+******************************************************************
+!!!ONLY RUN ONCE!!! Do you want to install dependencies (y/n)?" response
 		response=${response,,} # tolower
 		if [[ $response =~ ^(yes|y| ) ]]; then
 			if [ ! -d $basedir/dependencies ]; then
@@ -59,7 +71,13 @@ if [ ! -f $basedir/.setup ]; then
 	fi
 fi
 
-read -p "Do you want to pull/update git? (y/n) " response
+echo -e "\033[1;36m";
+read -p "******************************************************************
+This section of script will pull latest src/dsrc from our bitbucket 
+repo. https://bitbucket.org/theswgsource
+******************************************************************
+******************************************************************
+Do you want to pull/update git? (y/n) " response
 response=${response,,} # tolower
 if [[ $response =~ ^(yes|y| ) ]]; then
 	# update main repo
@@ -99,16 +117,27 @@ else
 	MODE=Release
 fi
 
-read -p "Do you want to recompile the server code (C++) now? (y/n) " response
+echo -e "\033[1;32m";
+read -p "******************************************************************
+G++ ONLY COMPILE METHOD!!!
+This secton of script will compile the src to binaries. The new
+binaries will be located in /home/swg/swg-main/build/bin
+******************************************************************
+******************************************************************
+Do you want to recompile the server code (C++) (GCC) now? (y/n) " response
 response=${response,,} # tolower
 if [[ $response =~ ^(yes|y| ) ]]; then
-	cd $basedir/build
 
-	# prefer clang
-	# if type clang &> /dev/null; then
-	#	export CC=clang
-	#	export CXX=clang++
-	# fi	
+                unset ORACLE_HOME;
+                unset ORACLE_SID;
+                unset JAVA_HOME;   
+                export ORACLE_HOME=/usr/lib/oracle/12.2/client;
+                export JAVA_HOME=/usr/java;
+                export ORACLE_SID=swg;
+                rm -rf /home/swg/swg-main/build
+                mkdir /home/swg/swg-main/build
+	        mkdir /home/swg/swg-main/build/bin
+	        cd $basedir/build
 
 	if [ $(arch) == "x86_64" ]; then
         	export LDFLAGS=-L/usr/lib32
@@ -126,20 +155,80 @@ if [[ $response =~ ^(yes|y| ) ]]; then
 	fi
 
 	make -j$(nproc)
-
+ 
+        # This option strips the bins of debug to make smaller size 
 	if [[ $MODE =~ ^(Release) ]]; then
 		strip -s bin/*
 	fi
 
 	cd $basedir
+
 fi
 
-read -p "Do you want to build the config environment now? (y/n) " response
+echo -e "\033[2;33m";
+read -p "******************************************************************
+CLANG ONLY COMPILER METHOD!!!
+This secton of script will compile the src to binaries. The new
+binaries will be located in /home/swg/swg-main/build/bin
+******************************************************************
+******************************************************************
+Do you want to recompile the server code (C++) (CLANG) now? (y/n) " response
+response=${response,,} # tolower
+if [[ $response =~ ^(yes|y| ) ]]; then
+
+                unset ORACLE_HOME;
+                unset ORACLE_SID;
+                unset JAVA_HOME;   
+                export ORACLE_HOME=/usr/lib/oracle/12.2/client;
+                export JAVA_HOME=/usr/java;
+                export ORACLE_SID=swg;
+                rm -rf /home/swg/swg-main/build
+                mkdir /home/swg/swg-main/build
+	        mkdir /home/swg/swg-main/build/bin
+	        cd $basedir/build
+
+        if type clang &> /dev/null; then
+	        export CC=clang
+		export CXX=clang++
+        fi	
+
+	if [ $(arch) == "x86_64" ]; then
+        	export LDFLAGS=-L/usr/lib32
+		export CMAKE_PREFIX_PATH="/usr/lib32:/lib32:/usr/lib/i386-linux-gnu:/usr/include/i386-linux-gnu"
+
+		cmake -DCMAKE_C_FLAGS=-m32 \
+		-DCMAKE_CXX_FLAGS=-m32 \
+		-DCMAKE_EXE_LINKER_FLAGS=-m32 \
+		-DCMAKE_MODULE_LINKER_FLAGS=-m32 \
+		-DCMAKE_SHARED_LINKER_FLAGS=-m32 \
+		-DCMAKE_BUILD_TYPE=$MODE \
+		$basedir/src
+	else
+		cmake $basedir/src -DCMAKE_BUILD_TYPE=$MODE
+	fi
+
+	make -j$(nproc)
+ 
+        # This option strips the bins of debug to make smaller size 
+	if [[ $MODE =~ ^(Release) ]]; then
+		strip -s bin/*
+	fi
+
+	cd $basedir
+
+fi
+echo -e "\033[1;36m";
+read -p "******************************************************************
+This section of script will add your VM's IP to NGE Server configs  
+New configs will be built in /home/swg/swg-main/exe/linux 
+******************************************************************
+******************************************************************
+Do you want to build the config environment now? (y/n) " response
 response=${response,,} # tolower
 if [[ $response =~ ^(yes|y| ) ]]; then
 
 	# Prompt for configuration environment.
-	read -p "Configure environment (local, live, tc, design)? You probably want local. " config_env
+	read -p "Configure environment (local, live, tc)? " config_env
 
 	# Make sure the configuration environment exists.
 	if [ ! -d $basedir/configs/$config_env ]; then
@@ -151,16 +240,16 @@ if [[ $response =~ ^(yes|y| ) ]]; then
 	echo "Enter your IP address (LAN for port forwarding or internal, outside IP for DMZ)"
 	read HOSTIP
 
-	echo "Enter the DSN for the database connection "
+	echo "Enter the DSN for the database connection. i.e. 127.0.0.1 "
 	read DBSERVICE
 
-	echo "Enter the database username "
+	echo "Enter the database username. i.e. swg "
 	read DBUSERNAME
 
-	echo "Enter the database password "
+	echo "Enter the database password. i.e. swg "
 	read DBPASSWORD
 
-	echo "Enter a name for the galaxy cluster "
+	echo "Enter a name for the galaxy cluster. Use the same name for importing your swg database. "
 	read CLUSTERNAME
 
 	if [ -d $basedir/exe ]; then
@@ -186,16 +275,47 @@ if [[ $response =~ ^(yes|y| ) ]]; then
 		# Generate at least 1 node that is the /etc/hosts IP.
 		$basedir/utils/build_node_list.sh
 fi
+echo -e "\033[2;32m";
+read -p "******************************************************************
+This section of script will compile your /dsrc to /data. It will 
+basically convert your Java scripts, tabs & tpf to .iff that server
+will be able to read.
+NOTE: It will do all the conversions at once, or you can skip this
+section of the script and run each individually with next sections
+of script.
+******************************************************************
+******************************************************************
+Do you want to build all the scripts now? (y/n) " response
+response=${response,,} # tolower
+if [[ $response =~ ^(yes|y| ) ]]; then
+	#prepare environment to run data file builders
+	oldPATH=$PATH
+	PATH=$basedir/build/bin:$PATH
 
-if [ ! -d $basedir/data ]; then
-	read -p "Symlink to data directory (y/n)? " remote_dsrc_response
-	remote_dsrc_response=${remote_dsrc_response,,}
-	if [[ $remote_dsrc_response =~ ^(yes|y| ) ]]; then
-		read -p "Enter target data directory " DATA_DIR
-		ln -s $DATA_DIR ./data
-	fi
+	read -p "Do you wanna use multicore scripts or the safe option? 
+Recommended you use safe for this VM operation.(multi/safe) " response
+         response=${response,,}
+        if [[ $response =~ ^(multi|m| ) ]]; then
+          $basedir/utils/build_java_multi.sh
+          $basedir/utils/build_miff.sh
+          $basedir/utils/build_tab_multi.sh
+          $basedir/utils/build_tpf_multi.sh
+        else
+          $basedir/utils/build_java.sh
+          $basedir/utils/build_miff.sh
+          $basedir/utils/build_tab.sh
+          $basedir/utils/build_tpf.sh
+        fi
+
+	$basedir/utils/build_object_template_crc_string_tables.py
+	$basedir/utils/build_quest_crc_string_tables.py
+
+	PATH=$oldPATH
 fi
-
+echo -e "\033[2;31m******************************************************************
+Begin individual building of scripts for /dsrc to /data
+******************************************************************";
+echo -e "\033[2;36m";
 read -p "Do you want to recompile the scripts (.java)? (y/n) " response
 response=${response,,} # tolower
 if [[ $response =~ ^(yes|y| ) ]]; then
@@ -317,34 +437,67 @@ if [[ $buildTemplates = true ]]; then
 	cd $basedir
 	PATH=$oldPATH
 fi
+echo -e "\033[2;36m";
+echo -e "\033[1;31m******************************************************************
+END of individual building of scripts for /dsrc to /data
+******************************************************************"
 
-read -p "Import database? (y/n) " response
+echo -e "\033[2;32m";
+read -p "******************************************************************
+This script will (re)build your stationapi (chat server)
+******************************************************************
+******************************************************************
+Do you want to build stationapi chat server now? (y/n) " response
+response=${response,,}
+         if [[ $response =~ ^(yes|y| ) ]]; then
+            rm -rf chat
+            cd $basedir/stationapi
+            rm -rf build
+            ./build.sh
+            mv -T /home/swg/swg-main/stationapi/build/bin /home/swg/swg-main/chat
+            cd $basedir
+fi
+
+echo -e "\033[0;37m";
+read -p "******************************************************************
+This script will import the SWG database into Oracle 12.2 R2.
+******************************************************************
+******************************************************************
+Do you want to import the database to Oracle? (y/n) " response
 response=${response,,}
 if [[ $response =~ ^(yes|y| ) ]]; then
-	cd $basedir/src/game/server/database/build/linux
+	cd $basedir/src/game/server/database/build/linux;
+        unset ORACLE_HOME;
+        unset ORACLE_SID;
+        unset JAVA_HOME;
+        export JAVA_HOME=/usr/java;
+        export ORACLE_HOME=/usr/lib/oracle/12.2/client;
+        export ORACLE_SID=swg;
+        export PATH=$ORACLE_HOME/bin:$PATH;
 
 	if [[ -z "$DBSERVICE" ]]; then
-		echo "Enter the DSN for the database connection "
+		echo "Enter the DSN for the database connection i.e. //127.0.0.1/swg "
 		read DBSERVICE
 	fi
 
 	if [[ -z "$DBUSERNAME" ]]; then
-		echo "Enter the database username "
+		echo "Enter the database username i.e. swg "
 		read DBUSERNAME
 	fi
 
 	if [[ -z "$DBPASSWORD" ]]; then
-		echo "Enter the database password "
+		echo "Enter the database password i.e. swg "
 		read DBPASSWORD
 	fi
 
-	perl ./database_update.pl --username=$DBUSERNAME --password=$DBPASSWORD --service=$DBSERVICE --goldusername=$DBUSERNAME --loginusername=$DBUSERNAME --createnewcluster --packages
+	./database_update.pl --username=$DBUSERNAME --password=$DBPASSWORD --service=$DBSERVICE --goldusername=$DBUSERNAME --loginusername=$DBUSERNAME --createnewcluster --packages
 
 	if [[ $templatesLoaded = false ]]; then
-		echo "Loading template list"
-		perl ../../templates/processTemplateList.pl < ../../../../../../dsrc/sku.0/sys.server/built/game/misc/object_template_crc_string_table.tab > $basedir/build/templates.sql
-		sqlplus ${DBUSERNAME}/${DBPASSWORD}@${DBSERVICE} @$basedir/build/templates.sql > $basedir/build/templates.out
-	fi
+		echo "Loading template list from object_template_crc_string table "
+                perl $basedir/src/game/server/database/templates/processTemplateList.pl < $basedir/dsrc/sku.0/sys.server/built/game/misc/object_template_crc_string_table.tab > $basedir/build/templates.sql
+	        sqlplus ${DBUSERNAME}/${DBPASSWORD}@${DBSERVICE} @$basedir/build/templates.sql > $basedir/build/templates.out
+	        cd $basedir
+        fi
 fi
-
-echo "Build complete!"
+echo -e "\033[1;33m";
+echo "Congratulations build_linux script is complete!"
