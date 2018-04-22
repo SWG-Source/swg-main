@@ -29,7 +29,7 @@ echo -e "\033[1;33m\__ \ \ \/\/ /| (_ |\__ \/ _ \| || || '_|/ _|/ -_) \ V /| | _
 echo -e "\033[1;33m|___/  \_/\_/  \___||___/\___/ \_,_||_|  \__|\___|  \_/ |_|(_)/___|";
 echo -e "\033[1;31m";
 
-
+echo -e "\033[1;36m";
 read -p "What is your GIT username (so we can get the code correctly): " response
 GIT_USER=${response,,}
 GIT_URL=https://${GIT_USER}@bitbucket.org/theswgsource/
@@ -44,10 +44,11 @@ GIT_REPO_SRC_BRANCH=master
 GIT_REPO_DSRC_BRANCH=master
 GIT_REPO_CONFIG_BRANCH=master
 
+echo -e "\033[1;31m";
 if [ ! -f $basedir/.setup ]; then
 	if [[ $(lsb_release -a) =~ .*Ubuntu.* ]] || [ -f "/etc/debian_version" ]
 	then
-	read -p "******************************************************************
+read -p "******************************************************************
 This section of the build script will install latest dependencies
 ******************************************************************
 ******************************************************************
