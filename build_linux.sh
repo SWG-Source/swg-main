@@ -23,10 +23,10 @@ then
 fi
 
 echo -e "\n";
-echo -e "\033[1;33m ___ __      __ ___  ___                                 _     ___  ";
-echo -e "\033[1;33m/ __|\ \    / // __|/ __| ___  _  _  _ _  __  ___  __ __/ |   |_  )";
-echo -e "\033[1;33m\__ \ \ \/\/ /| (_ |\__ \/ _ \| || || '_|/ _|/ -_) \ V /| | _  / /";
-echo -e "\033[1;33m|___/  \_/\_/  \___||___/\___/ \_,_||_|  \__|\___|  \_/ |_|(_)/___|";
+echo -e "\033[1;33m ___ __      __ ___   ___                                 _     ___  ";
+echo -e "\033[1;33m/ __|\ \    / // __| / __| ___  _  _  _ _  __  ___  __ __/ |   |_  )";
+echo -e "\033[1;33m\__ \ \ \/\/ /| (_ | \__ \/ _ \| || || '_|/ _|/ -_) \ V /| | _  / /";
+echo -e "\033[1;33m|___/  \_/\_/  \___| |___/\___/ \_,_||_|  \__|\___|  \_/ |_|(_)/___|";
 echo -e "\033[1;31m";
 
 echo -e "\033[1;36m";
@@ -37,12 +37,14 @@ GIT_REPO_DEPEND=${GIT_URL}dependencies-1.2.git
 GIT_REPO_SRC=${GIT_URL}src-1.2.git
 GIT_REPO_DSRC=${GIT_URL}dsrc-1.2.git
 GIT_REPO_CONFIG=${GIT_URL}configs-1.2.git
+GIT_REPO_CLIENTDATA=${GIT_URL}clientdata-1.2.git
 
 # specify git branches for each repo
 GIT_REPO_DEPEND_BRANCH=master
 GIT_REPO_SRC_BRANCH=master
 GIT_REPO_DSRC_BRANCH=master
 GIT_REPO_CONFIG_BRANCH=master
+GIT_REPO_CLIENTDATA_BRANCH=master
 
 echo -e "\033[1;31m";
 if [ ! -f $basedir/.setup ]; then
@@ -108,6 +110,13 @@ if [[ $response =~ ^(yes|y| ) ]]; then
 		git pull
 		cd $basedir
 	fi
+	if [ ! -d $basedir/clientdata ]; then
+		git clone -b $GIT_REPO_CLIENTDATA_BRANCH $GIT_REPO_CLIENTDATA clientdata
+	else
+		cd $basedir/clientdata
+		git pull
+		cd $basedir
+	fi
 fi
 
 read -p "Is this for DEBUG mode or RELEASE mode? (d/r): " response
@@ -166,62 +175,62 @@ if [[ $response =~ ^(yes|y| ) ]]; then
 
 fi
 
-echo -e "\033[2;33m";
-read -p "******************************************************************
-CLANG ONLY COMPILER METHOD!!!
-This secton of script will compile the src to binaries. The new
-binaries will be located in /home/swg/swg-main/build/bin
-******************************************************************
-******************************************************************
-Do you want to recompile the server code (C++) (CLANG) now? (y/n) " response
-response=${response,,} # tolower
-if [[ $response =~ ^(yes|y| ) ]]; then
-
-                unset ORACLE_HOME;
-                unset ORACLE_SID;
-                unset JAVA_HOME;   
-                export ORACLE_HOME=/usr/lib/oracle/12.2/client;
-                export JAVA_HOME=/usr/java;
-                export ORACLE_SID=swg;
-                rm -rf /home/swg/swg-main/build
-                mkdir /home/swg/swg-main/build
-	        mkdir /home/swg/swg-main/build/bin
-	        cd $basedir/build
-
-        if type clang &> /dev/null; then
-	        export CC=clang
-		export CXX=clang++
-        fi	
-
-	if [ $(arch) == "x86_64" ]; then
-        	export LDFLAGS=-L/usr/lib32
-		export CMAKE_PREFIX_PATH="/usr/lib32:/lib32:/usr/lib/i386-linux-gnu:/usr/include/i386-linux-gnu"
-
-		cmake -DCMAKE_C_FLAGS=-m32 \
-		-DCMAKE_CXX_FLAGS=-m32 \
-		-DCMAKE_EXE_LINKER_FLAGS=-m32 \
-		-DCMAKE_MODULE_LINKER_FLAGS=-m32 \
-		-DCMAKE_SHARED_LINKER_FLAGS=-m32 \
-		-DCMAKE_BUILD_TYPE=$MODE \
-		$basedir/src
-	else
-		cmake $basedir/src -DCMAKE_BUILD_TYPE=$MODE
-	fi
-
-	make -j$(nproc)
- 
-        # This option strips the bins of debug to make smaller size 
-	if [[ $MODE =~ ^(Release) ]]; then
-		strip -s bin/*
-	fi
-
-	cd $basedir
-
-fi
+#echo -e "\033[2;33m";
+#read -p "******************************************************************
+#CLANG ONLY COMPILER METHOD!!!
+#This secton of script will compile the src to binaries. The new
+#binaries will be located in /home/swg/swg-main/build/bin
+#******************************************************************
+#******************************************************************
+#Do you want to recompile the server code (C++) (CLANG) now? (y/n) " response
+#response=${response,,} # tolower
+#if [[ $response =~ ^(yes|y| ) ]]; then
+#
+#                unset ORACLE_HOME;
+#                unset ORACLE_SID;
+#                unset JAVA_HOME;   
+#                export ORACLE_HOME=/usr/lib/oracle/12.2/client;
+#                export JAVA_HOME=/usr/java;
+#                export ORACLE_SID=swg;
+#                rm -rf /home/swg/swg-main/build
+#                mkdir /home/swg/swg-main/build
+#	        mkdir /home/swg/swg-main/build/bin
+#	        cd $basedir/build
+#
+#        if type clang &> /dev/null; then
+#	        export CC=clang
+#		export CXX=clang++
+#        fi	
+#
+#	if [ $(arch) == "x86_64" ]; then
+#        	export LDFLAGS=-L/usr/lib32
+#		export CMAKE_PREFIX_PATH="/usr/lib32:/lib32:/usr/lib/i386-linux-gnu:/usr/include/i386-linux-gnu"
+#
+#		cmake -DCMAKE_C_FLAGS=-m32 \
+#		-DCMAKE_CXX_FLAGS=-m32 \
+#		-DCMAKE_EXE_LINKER_FLAGS=-m32 \
+#		-DCMAKE_MODULE_LINKER_FLAGS=-m32 \
+#		-DCMAKE_SHARED_LINKER_FLAGS=-m32 \
+#		-DCMAKE_BUILD_TYPE=$MODE \
+#		$basedir/src
+#	else
+#		cmake $basedir/src -DCMAKE_BUILD_TYPE=$MODE
+#	fi
+#
+#	make -j$(nproc)
+# 
+#        # This option strips the bins of debug to make smaller size 
+#	if [[ $MODE =~ ^(Release) ]]; then
+#		strip -s bin/*
+#	fi
+#
+#	cd $basedir
+#
+#fi
 echo -e "\033[1;36m";
 read -p "******************************************************************
 This section of script will add your VM's IP to NGE Server configs  
-New configs will be built in /home/swg/swg-main/exe/linux 
+New configs will be built in /root/swg-main/exe/linux 
 ******************************************************************
 ******************************************************************
 Do you want to build the config environment now? (y/n) " response
@@ -229,19 +238,19 @@ response=${response,,} # tolower
 if [[ $response =~ ^(yes|y| ) ]]; then
 
 	# Prompt for configuration environment.
-	read -p "Configure environment (local, live, tc)? " config_env
-
+#	read -p "Configure environment (local, live, tc)? " config_env
+#
 	# Make sure the configuration environment exists.
-	if [ ! -d $basedir/configs/$config_env ]; then
-		echo "Invalid configuration environment."
-		exit
-	fi
-
+#	if [ ! -d $basedir/configs/$config_env ]; then
+#		echo "Invalid configuration environment."
+#		exit
+#	fi
+#
         
 	echo "Enter your IP address (LAN for port forwarding or internal, outside IP for DMZ)"
 	read HOSTIP
 
-	echo "Enter the DSN for the database connection. i.e. 127.0.0.1 "
+	echo "Enter the DSN for the database connection. i.e. //127.0.0.1/swg "
 	read DBSERVICE
 
 	echo "Enter the database username. i.e. swg "
@@ -313,136 +322,136 @@ Recommended you use safe for this VM operation.(multi/safe) " response
 
 	PATH=$oldPATH
 fi
-echo -e "\033[2;31m******************************************************************
-Begin individual building of scripts for /dsrc to /data
-******************************************************************";
-echo -e "\033[2;36m";
-read -p "Do you want to recompile the scripts (.java)? (y/n) " response
-response=${response,,} # tolower
-if [[ $response =~ ^(yes|y| ) ]]; then
+#echo -e "\033[2;31m******************************************************************
+#Begin individual building of scripts for /dsrc to /data
+#******************************************************************";
+#echo -e "\033[2;36m";
+#read -p "Do you want to recompile the scripts (.java)? (y/n) " response
+#response=${response,,} # tolower
+#if [[ $response =~ ^(yes|y| ) ]]; then
 	#prepare environment to run data file builders
-	oldPATH=$PATH
-	PATH=$basedir/build/bin:$PATH
-
-	read -p "Do you wanna use multi-core building (default) or stick with the safe option? You may need to rerun the single version if there are stragglers. (multi/safe) " response
-    response=${response,,}
-	if [[ $response =~ ^(multi|m| ) ]]; then
-	  $basedir/utils/build_java_multi.sh
-	else
-	  $basedir/utils/build_java.sh
-	fi
-
-	PATH=$oldPATH
-fi
-
-buildTemplates=false
-
-read -p "Do you want to build the mIFF files (.mif)? (y/n) " response
-response=${response,,}
-if [[ $response =~ ^(yes|y| ) ]]; then
+#	oldPATH=$PATH
+#	PATH=$basedir/build/bin:$PATH
+#
+#	read -p "Do you wanna use multi-core building (default) or stick with the safe option? You may need to rerun the single version if there are stragglers. (multi/safe) " response
+#    response=${response,,}
+#	if [[ $response =~ ^(multi|m| ) ]]; then
+#	  $basedir/utils/build_java_multi.sh
+#	else
+#	  $basedir/utils/build_java.sh
+#	fi
+#
+#	PATH=$oldPATH
+#fi
+#
+#buildTemplates=false
+#
+#read -p "Do you want to build the mIFF files (.mif)? (y/n) " response
+#response=${response,,}
+#if [[ $response =~ ^(yes|y| ) ]]; then
+#	#prepare environment to run data file builders
+#	oldPATH=$PATH
+#	PATH=$basedir/build/bin:$PATH
+#	
+#	$basedir/utils/build_miff.sh
+#	
+#	buildTemplates=true
+#	
+#	PATH=$oldPATH
+#fi
+#
+#read -p "Do you want to build the datatables (.tab)? (y/n) " response
+#response=${response,,}
+#if [[ $response =~ ^(yes|y| ) ]]; then
 	#prepare environment to run data file builders
-	oldPATH=$PATH
-	PATH=$basedir/build/bin:$PATH
-	
-	$basedir/utils/build_miff.sh
-	
-	buildTemplates=true
-	
-	PATH=$oldPATH
-fi
-
-read -p "Do you want to build the datatables (.tab)? (y/n) " response
-response=${response,,}
-if [[ $response =~ ^(yes|y| ) ]]; then
-	#prepare environment to run data file builders
-	oldPATH=$PATH
-	PATH=$basedir/build/bin:$PATH
-
-	read -p "Do you wanna use multi-core building (default) or stick with the safe option? You may need to rerun the single version if there are stragglers. (multi/safe) " response
-    response=${response,,}
-	if [[ $response =~ ^(multi|m| ) ]]; then
-	  $basedir/utils/build_tab_multi.sh
-	else
-	  $basedir/utils/build_tab.sh
-	fi
-	
-	buildTemplates=true
-	
-	PATH=$oldPATH
-fi
-
-read -p "Do you want to build the template files (.tpf)? (y/n) " response
-response=${response,,}
-if [[ $response =~ ^(yes|y| ) ]]; then
-	#prepare environment to run data file builders
-	oldPATH=$PATH
-	PATH=$basedir/build/bin:$PATH
-
-	read -p "Do you wanna use multi-core building (default) or stick with the safe option? You may need to rerun the single version if there are stragglers. (multi/safe) " response
-    response=${response,,}
-	if [[ $response =~ ^(multi|m| ) ]]; then
-	  $basedir/utils/build_tpf_multi.sh
-	else
-	  $basedir/utils/build_tpf.sh
-	fi
-	
-	buildTemplates=true
-	
-	PATH=$oldPATH
-fi
-
-if [[ $buildTemplates = false ]]; then
-	read -p "Do you want to build the Object Template or Quest CRC files? (y/n) " response
-	response=${response,,}
-	if [[ $response =~ ^(yes|y| ) ]]; then		
-		buildTemplates=true
-	fi
-fi
-
-templatesLoaded=false
-
-if [[ $buildTemplates = true ]]; then
-	echo "Object Template and Quest CRC files will now be built and re-imported into the database."
-
-	if [[ -z "$DBSERVICE" ]]; then
-		echo "Enter the DSN for the database connection "
-		read DBSERVICE
-	fi
-
-	if [[ -z "$DBUSERNAME" ]]; then
-		echo "Enter the database username "
-		read DBUSERNAME
-	fi
-
-	if [[ -z "$DBPASSWORD" ]]; then
-		echo "Enter the database password "
-		read DBPASSWORD
-	fi
-	
-	#prepare environment to run data file builders
-	oldPATH=$PATH
-	PATH=$basedir/build/bin:$PATH
-	
-	$basedir/utils/build_object_template_crc_string_tables.py
-	$basedir/utils/build_quest_crc_string_tables.py
-	
-	cd $basedir/src/game/server/database
-	
-	echo "Loading template list"
-	
-	perl ./templates/processTemplateList.pl < $basedir/dsrc/sku.0/sys.server/built/game/misc/object_template_crc_string_table.tab > $basedir/build/templates.sql
-	sqlplus ${DBUSERNAME}/${DBPASSWORD}@${DBSERVICE} @$basedir/build/templates.sql > $basedir/build/templates.out
-	
-	templatesLoaded=true
-	
-	cd $basedir
-	PATH=$oldPATH
-fi
-echo -e "\033[2;36m";
-echo -e "\033[1;31m******************************************************************
-END of individual building of scripts for /dsrc to /data
-******************************************************************"
-
+#	oldPATH=$PATH
+#	PATH=$basedir/build/bin:$PATH
+#
+#	read -p "Do you wanna use multi-core building (default) or stick with the safe option? You may need to rerun the single version if there are stragglers. (multi/safe) " response
+#   response=${response,,}
+#	if [[ $response =~ ^(multi|m| ) ]]; then
+#	  $basedir/utils/build_tab_multi.sh
+#	else
+#	  $basedir/utils/build_tab.sh
+#	fi
+#	
+#	buildTemplates=true
+#	
+#	PATH=$oldPATH
+#fi
+#
+#read -p "Do you want to build the template files (.tpf)? (y/n) " response
+#response=${response,,}
+#if [[ $response =~ ^(yes|y| ) ]]; then
+#	#prepare environment to run data file builders
+#	oldPATH=$PATH
+#	PATH=$basedir/build/bin:$PATH
+#
+#	read -p "Do you wanna use multi-core building (default) or stick with the safe option? You may need to rerun the single version if there are stragglers. (multi/safe) " response
+#    response=${response,,}
+#	if [[ $response =~ ^(multi|m| ) ]]; then
+#	  $basedir/utils/build_tpf_multi.sh
+#	else
+#	  $basedir/utils/build_tpf.sh
+#	fi
+#	
+#	buildTemplates=true
+#	
+#	PATH=$oldPATH
+#fi
+#
+#if [[ $buildTemplates = false ]]; then
+#	read -p "Do you want to build the Object Template or Quest CRC files? (y/n) " response
+#	response=${response,,}
+#	if [[ $response =~ ^(yes|y| ) ]]; then		
+#		buildTemplates=true
+#	fi
+#fi
+#
+#templatesLoaded=false
+#
+#if [[ $buildTemplates = true ]]; then
+#	echo "Object Template and Quest CRC files will now be built and re-imported into the database."
+#
+#	if [[ -z "$DBSERVICE" ]]; then
+#		echo "Enter the DSN for the database connection "
+#		read DBSERVICE
+#	fi
+#
+#	if [[ -z "$DBUSERNAME" ]]; then
+#		echo "Enter the database username "
+#		read DBUSERNAME
+#	fi
+#
+#	if [[ -z "$DBPASSWORD" ]]; then
+#		echo "Enter the database password "
+#		read DBPASSWORD
+#	fi
+#	
+#	#prepare environment to run data file builders
+#	oldPATH=$PATH
+#	PATH=$basedir/build/bin:$PATH
+#	
+#	$basedir/utils/build_object_template_crc_string_tables.py
+#	$basedir/utils/build_quest_crc_string_tables.py
+#	
+#	cd $basedir/src/game/server/database
+#	
+#	echo "Loading template list"
+#	
+#	perl ./templates/processTemplateList.pl < $basedir/dsrc/sku.0/sys.server/built/game/misc/object_template_crc_string_table.tab > $basedir/build/templates.sql
+#	sqlplus ${DBUSERNAME}/${DBPASSWORD}@${DBSERVICE} @$basedir/build/templates.sql > $basedir/build/templates.out
+#	
+#	templatesLoaded=true
+#	
+#	cd $basedir
+#	PATH=$oldPATH
+#fi
+#echo -e "\033[2;36m";
+#echo -e "\033[1;31m******************************************************************
+#END of individual building of scripts for /dsrc to /data
+#******************************************************************"
+#
 echo -e "\033[2;32m";
 read -p "******************************************************************
 This script will (re)build your stationapi (chat server)
@@ -451,11 +460,9 @@ This script will (re)build your stationapi (chat server)
 Do you want to build stationapi chat server now? (y/n) " response
 response=${response,,}
          if [[ $response =~ ^(yes|y| ) ]]; then
-            rm -rf chat
             cd $basedir/stationapi
-            rm -rf build
             ./build.sh
-            mv -T /home/swg/swg-main/stationapi/build/bin /home/swg/swg-main/chat
+            mv -T /root/swg-main/stationapi/build/bin /root/swg-main/chat
             cd $basedir
 fi
 
