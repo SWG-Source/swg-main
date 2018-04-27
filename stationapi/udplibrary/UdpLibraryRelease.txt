@@ -1,0 +1,1298 @@
+UdpLibrary Release Notes
+=================================================================================================================
+
+-----------------------------------------------------------------------------------------------------------------
+6/11/2003
+-----------------------------------------------------------------------------------------------------------------
+- There are a lot of significant changes in this release.  CPU usage, throughput ability, and memory-usage
+  have all been improved substantially, particularly for high-stress server-to-server type environments.
+  The optimizations are such that old settings that used up a lot of memory can be changed to more reasonable
+  values without adversely effecting throughput ability or CPU usage.  To make things simpler in this regard, 
+  below is a list of recommended settings for different types of connections.  If you have connections of
+  different types, ideally you would setup your architecture such that the different types were managed by
+  different UdpManager's, such that optimal settings can be applied to both.  As always, you should not have
+  more managers than is needed (perhaps one for all client connections and one for all interserver connections).
+  Settings not specified below should be left at their default.  It is still important that you keep the GiveTime
+  frame rate reasonably high.  For high-bandwidth server to server connections, I recommend at least 20, 8 minimum.
+  If your frame rate drops below that and you are sending more than 500k/sec of data, then you better seriously
+  consider putting the UdpManager into it's own thread.  In a future release (next release probably), I plan on
+  including a threaded-wrapper version of the UdpLibrary to make this painless.  Until then, you may wish to
+  talk to the SWG team, which has already done this, and may be able to provide you with some getting-started code.
+
+  Server side settings for incoming player connections (ie. clients connecting are relatively low bandwidth)
+  (total bandwidth per connection is intended to be low)
+  -----------------------------------------------------------------------------------------------------------
+	Params::maxConnections					set as appropriate
+	Params::port							set as appropriate
+	Params::outgoingBufferSize				set to 1mb-4mb
+	Params::incomingBufferSize				set to 1mb-4mb
+	Params::keepAliveDelay					set to 15000 (15 second keep-alives generally do the trick)
+	Params::noDataTimeout					set to 46000 (46 seconds, typically just over 3 times client side keepAliveDelay)
+	Params::reliableOverflowBytes           set to 2mb (however much you are willing to let them have backlogged)
+	Params::hashTableSize					set to 10 times max expected connections
+	Params::pooledPacketMax					set to roughly 5 times max expected connections, but rarely over 10000
+	Params::crcBytes						set to 2
+	Params::bindIpAddress[32]				set as appropriate (I like to leave it blank)
+
+	Params::clockSyncDelay					leave at default of 0 (client side will do clock syncing)
+	Params::portRange                       leave at default
+	Params::packetHistoryMax				leave at default
+	Params::portAliveDelay					leave at default of 0
+	Params::replyUnreachableConnection		leave at default of true
+	Params::allowPortRemapping				leave at default of true
+	Params::allowAddressRemapping			leave at default of false
+	Params::icmpErrorRetryPeriod			leave at default of 5000
+	Params::oldestUnacknowledgedTimeout		leave at default of 90000 (or set more aggressively even, down to 30000)
+	Params::maxDataHoldTime					leave at default of 50 (or set longer up to 100 possibly)
+	Params::maxDataHoldSize					leave at default of -1 (meaning same as raw packet size)
+	Params::maxRawPacketSize				leave at default of 512
+	Params::avoidPriorityQueue				leave at default of false
+	Params::pooledPacketInitial             leave at default of 0 (or set to pooledPacketMax for extra efficiency at cost of memory)
+	Params::pooledPacketSize				leave at default of -1 (uses same size as raw packet size, this is critical)
+	Params::wrappedPoolMax                  leave at default of 1000
+	Params::processIcmpErrors               leave at default of true
+	Params::connectAttemptDelay             leave at default (irrelevant for server side)
+	Params::reliable[0]						leave all settings at defaults
+
+
+  Server-to-server settings for LAN connections (ie. connections are local on high-bandwidth)
+  (total bandwidth per connection is intended to be high)
+  (same settings used regardless of who intiates connection)
+  -----------------------------------------------------------------------------------------------------------
+	Params::maxRawPacketSize				set to 1460
+	Params::maxConnections					set as appropriate
+	Params::port							set as appropriate
+	Params::outgoingBufferSize				set to 4mb
+	Params::incomingBufferSize				set to 4mb
+	Params::keepAliveDelay					set to 15000 (15 second keep-alives generally do the trick)
+	Params::noDataTimeout					set to 61000 (61 seconds, typically just over 4 times client side keepAliveDelay)
+	Params::reliableOverflowBytes           set to 10mb (however much you are willing to let them have backlogged before disconnecting)
+	Params::hashTableSize					set to 10 times max expected connections
+	Params::pooledPacketMax					set to 5000
+	Params::crcBytes						set to 2
+	Params::bindIpAddress[32]				set as appropriate (I like to leave it blank)
+	Params::icmpErrorRetryPeriod			set to 2000 (optional)
+	Params::allowPortRemapping				set to false (optional)
+	Params::oldestUnacknowledgedTimeout		set to 30000 (longer for debugging tolerance)
+	Params::maxDataHoldTime					set to 0 (this is critical)
+	Params::reliable[].maxOutstandingBytes		set to 2mb
+	Params::reliable[].maxOutstandingPackets	set to 4000
+	Params::reliable[].resendDelayAdjust		set to 1500
+	Params::reliable[].congestionWindowMinimum  set to 50000
+
+	Params::reliable[]						leave all other settings at defaults
+	Params::clockSyncDelay					leave at default of 0 (client side will do clock syncing)
+	Params::portRange                       leave at default
+	Params::packetHistoryMax				leave at default
+	Params::portAliveDelay					leave at default of 0
+	Params::replyUnreachableConnection		leave at default of true
+	Params::allowAddressRemapping			leave at default of false
+	Params::maxDataHoldSize					leave at default of -1 (meaning same as raw packet size)
+	Params::avoidPriorityQueue				leave at default of false
+	Params::pooledPacketInitial             leave at default of 0 (or set to pooledPacketMax for extra efficiency at cost of memory)
+	Params::pooledPacketSize				leave at default of -1 (uses same size as raw packet size, this is critical)
+	Params::wrappedPoolMax                  leave at default of 1000
+	Params::processIcmpErrors               leave at default of true
+	Params::connectAttemptDelay             leave at default
+
+
+  Client side settings for player connections (ie. client is connecting over the internet to the server)
+  (total bandwidth per connection is intended to be low)
+  -----------------------------------------------------------------------------------------------------------
+	Params::maxConnections					set as appropropriate (probably something small like 5)
+	Params::port							set to 0 (let client pick port)
+	Params::outgoingBufferSize				set to 64k (default I believe)
+	Params::incomingBufferSize				set to 64k (default I believe)
+	Params::keepAliveDelay					set to 15000 (15 second keep-alives generally do the trick)
+	Params::noDataTimeout					set to 46000 (46 seconds, typically just over 3 times client side keepAliveDelay)
+	Params::reliableOverflowBytes           set to 512k (however much you are willing to let them have backlogged)
+	Params::hashTableSize					set to 10 times max connections
+	Params::clockSyncDelay					set to 60000 if you want packetloss stats or clock-sync features, otherwise 0
+	Params::pooledPacketMax					set to 50
+	Params::crcBytes						set to 2
+	Params::maxDataHoldTime					set to 20 (more agressive for client to server data generally)
+	Params::packetHistoryMax				set to 5 (to save memory on client)
+
+	Params::bindIpAddress[32]				leave at default
+	Params::portRange                       leave at default
+	Params::portAliveDelay					leave at default of 0
+	Params::replyUnreachableConnection		leave at default of true
+	Params::allowPortRemapping				leave at default of true
+	Params::allowAddressRemapping			leave at default of false
+	Params::icmpErrorRetryPeriod			leave at default of 5000
+	Params::oldestUnacknowledgedTimeout		leave at default of 90000 (or set more aggressively even, down to 30000)
+	Params::maxDataHoldTime					leave at default of 60 (or set longer up to 100 possibly)
+	Params::maxDataHoldSize					leave at default of -1 (meaning same as raw packet size)
+	Params::maxRawPacketSize				leave at default of 512
+	Params::avoidPriorityQueue				leave at default of false
+	Params::pooledPacketInitial             leave at default of 0 (or set to pooledPacketMax for extra efficiency at cost of memory)
+	Params::pooledPacketSize				leave at default of -1 (uses same size as raw packet size, this is critical)
+	Params::wrappedPoolMax                  leave at default of 1000
+	Params::processIcmpErrors               leave at default of true
+	Params::connectAttemptDelay             leave at default
+	Params::reliable[0]						leave all settings at defaults
+
+
+- added reliable-channel level coalescing support.  This is a major feature enhancements to the UdpLibrary.
+  Originally, the UdpLibrary only did coalescing at the low-level, such that it could combine together
+  unreliable, reliable, and internal data into the same physical packet.  This is still a vital and key
+  feature of the UdpLibrary.  Not coalescing up at the higher level of the reliable channel had its
+  problems: 1) it required that ACK packets on a per-logical packet basis, meaning that if
+  lots of tiny reliable packets were being sent, there was a bit more ack-overhead in the process.  This
+  overhead is generally negligable except in the most extreme circumstances.  2) it required that the
+  reliable channel object track all those outstanding packets, which proved to be a bit of a performance
+  burden.  3) it required the reliable channel object allocated LogicalPacket objects to hold onto each
+  individual application packet (in the usual case where the application wasn't directly sending
+  LogicalPacket objects).  To make matters worse in this regard, it ended up getting these objects from
+  the memory pool, which often effectively meant that tiny applications packets were stealing much
+  larger pooled packets and wasting memory.  The new scheme has the advantage that many reliable sends
+  will now be performed without an allocation and without using up a pooled packet.
+  
+  One nice effect of this change will be that a much smaller pool needs to be reserved.  Due to a
+  limitation in the low-level coalescing, if your application sends lots of medium sized packets
+  (256 to maxRawPacketSize bytes), then you may see a significant reduction in physical packets sent
+  per second.  This change may sound like it would have a drastic effect on the protocol, but that is not
+  the case, we remain protocol compatible with old version.  This is because the underlying protocol
+  has always supported the concept of a group logical packet.
+
+  The benefits of this feature will be most evident in high-bandwidth server-to-server connections.  You
+  should make sure you pooledPacketSize = maxRawPacketSize, and you should be able to reduce the size of
+  your pool substantially.
+
+  Internally, the reliable channel will coalesce things up to the fragment size, which defaults to being
+  the same as the maxRawPacketSize.  There is no hold-time for coalescing.  The next time the connection
+  is given time (next time manager is given time), if there is flow-control-window space available, it
+  will flush the coalesce buffer in an attempt to use it up.  So, it will effectively coalesce application
+  sends until there is an opening in the flow-control-window and GiveTime is called.
+
+  The only disadvantage I can see to leaving this feature enabled (it is configurable in
+  UdpManager::Params::reliable[].coalesce) is for client-side low-bandwidth connections.  In those situations,
+  it is important that the ACK traffic back to the server coalesce with application data.  This will occur
+  even if this feature is enabled, but because the low-level coalescer is incapable of coalescing packets
+  larger than 256 bytes, it is possible the reliable-sends from the client headed to the server might
+  result in more physical packets per second.  Even then, I don't see it being a performance issue,
+  so I would leave it enabled.  The configurability was largely added such that the library could be
+  configured to operate as before, just in case there were some unforseen issues that cropped up with this.
+
+  It's worth noting, that configuring the reliable channel to processOnSend will effectively circumvent
+  any coalescing that you might have been getting.
+
+- if reliable-channel coalescing is used (it defaults to ON), then the pooledPacketSize should be set
+  to the maxRawPacketSize.  This is critical to performance.  The previous recommendation of setting
+  it to the typical packet size won't work anymore, since it is now coalescing at the reliable channel
+  level, effectively increaseing the size of packet it will grab from the pool typically.
+
+- made substantial CPU-usage improvements to the reliable channel resend algorithm in situations where
+  thousands of outstanding packets needs to be supported to achieve server-to-server throughput.
+  This does not effect the protocol in any way, just uses slightly less memory to manage the process and
+  potentially substantially less CPU.
+
+- made a slight change to the reliable channel fast-recovery algorithm (based on the TCP Reno algorithm)
+  When we notice that packetloss is selective (ie. some packet after the lost packet is acked and serves
+  as a notice to do an accelerated resend on the other), we used to shrink the flow-control window
+  by 50% (as opposed to non-selective loss which completely resets it).  We now only shrink the window
+  by 33%, in an attempt to make for an even faster recovery and less hiccup.  I don't believe being this
+  aggressive will be an issue, as we know more about the nature of the circumstances than Reno does, since
+  we have selective acks.
+
+- fixed a nasty design flaw that was causing the maximum effective reliable logical packet transfer rate
+  to be limited to 256 times the number of GiveTime iterations per second.  When small packets are being
+  sent, this can turn into a serious limitation, particularly on server-to-server communications where
+  these packet rates potentially get very high.  The limit has been increased to 8192, which should be
+  plenty large for even the highest bandwidth connections.  Note: this fix causes that an additional
+  31k of stack space is used during the GiveTime call -- I am doubting this will cause anybody grief.
+
+- improved the pooled packet scheme.  The old scheme used to fall back to standard SimpleLogicalPackets
+  after it has created the maximum number it was allowed in the pool.  The new scheme always creates
+  packets that can go into the pool when they are returned (if possible size wise).  It then releases
+  packets that are returned to the pool if the pool is already at its max.  So as before when max
+  represent the max anywhere, the max now represents the max it will hold onto in the available queue.
+  This will make a big performance difference in situations where just one of many connections is
+  backlogging.  In the old scheme, a backlogging connection could eat up the entire pool, leaving
+  all other connections left doing allocs and frees of their packets.  With the new scheme, the
+  bad connection can't monopolize the pool, as when the bad connection finally clears up and release
+  all those packets, those packets will be destroyed even though they were gotten from the pool, because
+  the pool available will have likely grown as appropriate.  Between this change and the reliable
+  coalescing, the pooledPacketMax setting should be set MUCH smaller than it previously was.  I
+  wouldn't set it to over 5000, even for server-to-server connections.  Additionally, I would set
+  pooledPacketInitial to under 1000, since the vast majority of the time I don't see this ever
+  being exceeded.
+
+- changed the default setting of pooledPacketMax down to 1000 (from 2000), in order to reflect the
+  recent optimizations noted above and the lack of need for a large pool most of the time.
+
+- changed the default setting of pooledPacketSize from 256 to -1.  -1 means use whatever size the
+  maxRawPacketSize is set to.  As a general rule, you should never change this setting from this.
+  Now that the reliable channel is coalescing, all allocations from the pool are of maxRawPacketSize.
+  If you set the pool size smaller than this, then odds are the pool will be completely worthless.
+  There are some odd cases where you may wish to set it higher, depending on the nature of the
+  packets your application sends.
+
+- got rid of the deque object that was used internally to track outstanding LogicalPackets that were
+  queued up on the reliable channel.  Since we put in coalescing at the top, all packets smaller than
+  the maxRawPacketSize were getting coalesced into a larger logical packet anyways, meaning that the
+  logical packet that we owned was extremely unlikely to be shared.  If we knew for a fact that all the
+  logical packets we had queued were not shared by other connections, then we could get rid of the deque
+  object and have a much faster and simpler linked-list scheme.  Since shared packets are now so rare,
+  I decided it would be worthwhile to switch to a linked list and in situations where the logical packet
+  is shared, I create a WrapperLogicalPacket object to effectively make it appear unique from a linked-list
+  management point of view.  This wrappers are actually gotten from a pool owned by the UdpManager.  You
+  can set the size to allow this pool to grow with Params::wrappedPoolMax.  I recommend leaving this
+  value at the default of 1000, though if you are a server doing a lot of large shared packets, then it
+  may be worth your while setting this to a larger value.  This optimizations gets rid of the nasty
+  deque expansion problem that was eating up so much CPU when backlogging occurred.
+
+  Note:  This also means the PointerDeque.hpp has been removed from the UdpLibrary as it is no longer
+  used.  You can remove this object from your build.
+
+- added ack-deduping support.  This can be disabled (Params::reliable[].ackDeduping), but defaults to
+  enabled (true).  I really can't think of any reason you would ever want to turn it off.  What it does
+  is cause ack-packets in the low-level coalesce buffer to be deduped.  There are no performance
+  implications (in fact, it is faster when enabled).  How it works is if the library is sending an
+  ack-all packet and there is a previous ack-packet of some sort still sitting in the low-level
+  multi-buffer, then it will replace the existing ack instead of appending  one onto the multi-buffer.
+  In high-bandwidth situations (or if reliable coalescing is disabled), this can result in an appreciable
+  bandwidth savings.  The only situation where you might want to disable this is if for some reason you
+  were counting on the additional acks to intentionally overflow the multi-buffer and force it to send
+  rather than waiting for multi-buffer timeout.  But, that doesn't make a whole lot of sense.
+
+- changed the default value of maxDataHoldSize to -1 (used to be 512).  Setting it to -1 now causes it
+  to use the maxRawPacketSize for this.  Generally you should always be wanting to coalesce to as
+  large of a packet as is allowed.
+
+- added new configuration parameter, icmpErrorRetryPeriod.  This setting allows you to not terminate the
+  connection at the first sign of trouble (ie. an ICMP error), but instead wait for a period of time in
+  hopes that the situation will correct itself.  Normally, a single ICMP error packet is sufficient cause
+  to terminate a connection.  However, there are situations where it may be desireable to tolerate ICMP
+  errors for a few seconds as sometimes these situations resolve themselves.  In particular, the new
+  port-remapping feature (see below) requires that some tolerance be set in this regard, as ICMP errors
+  will likely occur for a short period of time while remapping is occurring.  Although it changes
+  previous behavior of the library, I have decided to make this new setting start out at 5000ms.  This
+  means that ICMP errors for port unreachable and such will not occur for at least 5 seconds, whereas
+  before they may have occurred nearly instantly.  If you want the previous behavior, setting this value
+  to 0 will cause it to disconnect on even a single ICMP error.  Once the first ICMP error is received,
+  the timer is started.  If a subsequent ICMP error comes in after the timeout period has expired, then
+  it will be processed and the connection will be closed.  Once a successful packet is received on the
+  connection, the ICMP timeout period is reset, such that a subsequent ICMP error will be treated as if
+  it were the first.
+
+- added new configuration parameter, allowPortRemapping.  This setting allows the UdpLibrary to effectively
+  change the port-number associated with a particular connection dynamically on-the-fly.  Now, normally
+  this would never happen, but sometimes a user may be going through a NAT router that feels the need to
+  change the associated mapping mid-session.  Normally when this occurs, connections are simply lost.
+  However, due to a bug in the #1 selling Linksys router whereby it does this remapping every 10 minutes,
+  we have decided to add this feature to deal with it.  This feature is also generally useful in other
+  situations.  For example, with the EQ channel-chat system, the user often goes for quite a while without
+  sending or receiving any messages.  Many NAT routers expire the port-mappings fairly quickly if data
+  is not being sent.  The usual solution to this problem is to configure it to send keep-alives, and
+  generally that works.  In the case of the EQ channel-chat, we have keep-alives configured to go out
+  every 45 seconds, which keeps 99% of NAT routers alive and happy.  The other 1% seem to expire after as
+  little as 30 seconds.  We put in an override setting in EQ to have it send the keep alives every 15
+  seconds instead, but it is a less than ideal solution as it requires the user changing things.  We 
+  don't want to configure everybody to send keep-alives that frequently, as there are 100,000 connections
+  to the server, and the keep-alives alone start to really add up.  This port remapping system will
+  effectively allow the mapping to expire and the connection never miss a beat.  See allowAddressRemapping
+  for a discussion of security concerns.  This parameter defaults to 'true' or enabled.  While this
+  feature adds some new packetting, it remains protocol compatible with old versions.  You will need to
+  upgrade both ends of the connection for this feature to be available though.
+
+- added new configuration parameter, allowAddressRemapping.  This setting is almost identical to the
+  allowPortRemapping setting, only it takes the concept one step further, and allows for the IP address
+  itself to be changed on-the-fly as well.  Normally when only port remapping is enabled, if the IP address
+  is changed, it will not be able to pick up on it.  By default, this parameter is 'false' or disabled.  It
+  is highly unlikely that under any sort of normal operating conditions this will occur.  About the only
+  reason I can think of for this is if you wanted to be so tolerant as to allow a modem user to disconnect
+  and reconnect from their ISP and maintain their connection.  The biggest danger in enabling this feature
+  is the potential for somebody to hijack somebody elses connection.  This is extremely unlikely however
+  as the UdpLibrary effectively uses a 64-bit randomly generated key to authenticate any request for
+  a remapping to occur.  To hijack a connection, somebody would have to guess what that 64-bit key value
+  is for a particular IP address.
+
+- added a new static UdpConnection::DisconnectReasonText function that will translate a disconnect reason
+  into a displayable reason-string to make logging of disconnect reasons easier to read.
+
+- put in safety checks to try and identify packets that are corrupt for some reason.  When one of these
+  packets is spotted, the application is notified via the UdpConnectionHandler::OnPacketCorrupt callback.
+  Statistics are also kept on the connection and on the manager regarding how many of these occur.  If you
+  have CRC bytes enabled, then the odds of a corrupt packet making it through the check are extremely low.
+  In this case, odds are the actual cause of the corruption is intentional packet tampering by the user;
+  that is, they modify the packet and touchup the CRC so it passes.  This is why we callback the application
+  as they may wish to log this event as a means of monitoring possible cheating.  This new callback provides
+  the application with the packet data at the time the corruption is sensed.  This means that if the
+  corruption is sensed after the decryption has occurred (say, by the multi-packet unpacker), then the
+  data passed to the application will reflect the decrypted packet.  Additionally, the callback provides
+  a reason why the packet was deemed corrupt.  If you are seeing a lot of corrupt packets for some reason,
+  it may be worth logging the reason and trying to find a pattern (I also like to log the IP of where it
+  came from, as often times bad packets tend to come from the same IP over and over, often due to
+  tampering).
+
+- added new configuration parameter, reliableOverflowBytes.  Normally, you can send an unlimited amount
+  of data to a connection and it will never overflow, instead it will queue up the data until it runs
+  out of memory and crashes.  In the past, it has been the applications responsibility to periodically
+  check how many bytes are pending using UdpConnection::TotalPendingBytes and take appropriate action.
+  This new parameter causes the UdpLibrary to do this check for the application, and if a connection
+  ever overflows this amount (all reliable channels added together), then the connection is disconnected
+  with a reason of cDisconnectReasonReliableOverflow.  The default setting for this parameter is zero, 
+  which disables this check and makes it operate as it always has.  The check for an overflow condition
+  does not occur at send time as this would result in a callback to the application at an illegal time;
+  instead, the overflow condition is checked the next time the connection object is given time.
+
+- added a new sample-program to the distribution.  This program is called 'udpstress' and simulates what
+  one might see in a backend server-to-server cluster implementation.  Each udpstress client that starts
+  up connects to one of the existing udpstress clients that is already running, and effectively adds itself
+  to the cluster.  Each node in the cluster transfers data to every other node in the cluster at a compile
+  time configurable rate.  Since everybody is connecting to everybody else, this stress program operates as
+  both a client and a server.  Unlike the other sample program, it fully takes advantage of the new
+  callbacks that were added and more accurately reflects the proper way of setting up an architecture.
+  This program is also portable to other platforms.
+
+- removed the old client/server test programs from the distribution.  The udpstress program covers both
+  client and server examples, is far more flexible for testing, and is written to take advantage of the
+  latest features, providing a better example to follow.
+
+- moved the processing of the flagged port unreachable further up in the InternalGiveTime function.  This
+  would have only effected the sparc version of the UdpLibrary and the way it handles ICMP errors.  There
+  was a bug whereby it was going through the connected give-time logic when in fact it may have been
+  disconnected by a port unreachable.  This likely didn't cause any problems, but I moved it just to be
+  safe.
+
+- added new UdpMisc::Sleep function.  This is not used by the UdpLibrary, but is used by the sample
+  applications and in general provides a portable way for applications to sleep.
+
+- made some internal optimizations that allows the UdpLibrary to avoid making an extra copy of the data
+  (in most circumstances) in order to append CRC bytes.  When coalescing is likely to occur and encryption
+  is not being used, this optimization will speed up the cost of CRC checking on the send side a fair amount.
+
+- created a new variation of the HashTable called an ObjectHashTable.  The UdpLibrary now uses this variation
+  which is optimized to assume that the contents of the hash table are pointers to objects that are derived 
+  from HashTableMember.  This allows the hash table to avoid allocations/deallocations entirely when new 
+  entries are added/removed.  UdpConnection objects make use of this optimization.  The new hash table object
+  has restrictions the old one does not, namely, its members can only ever be in one hash table, and then
+  only in it one time.  For most applications, this is not an issue.  The old version is no longer used by
+  the UdpLibrary but has been kept in the header file because some applications have started making use of it,
+  and we don't want to mess them up.
+
+- recently, the UdpLibrary has been seeing much heavier load as a server-to-server interprocess communications
+  protocol.  While it was designed to handle this sort of thing, it did have one short-sighted limitation; it
+  was only capable of transferring 4 billion logical reliable packets per session before it would fall apart.
+  Even at a very high average trasfer rate of 1000 packets per second on a single connection, it would take over
+  a month to exceed this rate.  It seemed at first that this might be a reasonable limitation, until Planetside
+  and SWG came along.  These games have interprocess packet rates that are sometimes 10 times that high, meaning
+  that critical failure could occur in only a few days in extreme circumstances.  Fixing this limitation did
+  not require a protocol change, merely some internal changes to the way packets are tracked.  You need only
+  upgrade both sides of a connection simultaneously to maintain compatibility if that particular connection
+  will exceed 4 billion packets in a single session.  There is now no limit on the amount of data that a single
+  session can send reliably.
+
+- for the Win32 version of the Clock function, I had come up with a rather clever technique to avoid threading
+  issues and clock-wrap.  Turns out the thread-local-storage scheme I was using doesn't work if the UdpLibrary
+  is stuck in a DLL.  The odds of a clock wrap that occurs once every 47 days thread-slicing between two
+  consecutive interger assignments and causing a problem are astronomically rare, so I have decided not to
+  worry about the potential issue.  What I really need is a 64-bit interlocked increment, but Windows doesn't
+  add support for that until the next version (after XP).
+
+- added new configuration parameter, processIcmpErrorsDuringNegotiating.  This boolean parameter defaults to
+  false, which was the default behavior of the UdpLibrary before this became configurable.  Setting this to 
+  true will cause a client side connection attempt to fail immediately if the server process is not running
+  (ie. doesn't have the port open).  Usually you will want to leave this at the default as often times two
+  processes that talk to each other are started at the same time, and you don't want a race-condition to cause
+  the client to fail because it happened to startup quicker than the server.
+
+- put a hard cap on the maximum allowed maxOutstandingPackets configuration value.  If this value were ever
+  set past 30000, things potentially could have fallen apart.  I can't imagine there ever being a need for this
+  many outstanding packets.  Eventually when I get the reliable-channel coalescing put in, this cap will become
+  even more meaningless.
+
+- made the maximum allowed resend delay configurable.  This allows the application to put a cap on the longest
+  it will ever wait to resend a lost packet.  Without a cap, lost-packet throttling can potentially cause the
+  resend delay to get excessively long.  You should generally leave this value alone, but tweaking with it for
+  certain internal-network connections may be desireable to optimize performance.  For example, if you know you
+  are on an internal network, then it may be safe to set this value to the larger of double the typical ping-time
+  and the longest GiveTime cycle time of either end of the connection.  Like many values, unless you really
+  know what you are doing, you probably shouldn't mess with this.  I would never set this value to less than
+  1000 for anything, but setting it to a value like 2000 might be desireable for some internal server-to-server
+  connections.  The default is 5000.  This cap has always existed in the UdpLibrary, it has just been hard-coded
+  in the past.
+
+- got rid of the temporary encryption and decryption buffers in the UdpManager and replaced with stack-based
+  buffers.  Doing this has two side effects.  1) more stack space is used, though it won't be very much.
+  2) there is now a hard-limit on how large you can set the maxRawPacketSize.  Currently that hard limit
+  is set to 16384 bytes.  I can't imagine anybody in their right mind would want to set it anywhere near
+  that high.  On some crazy chance that you did want to set it higher, you would simply need to change the
+  cHardMaxRawPacketSize constant in the header file.  In theory it could never go over 65535 anyways, since
+  that is an IP protocol hard limit.  The only implication to increasing this number is more stack space usage.
+
+- added debug signatures to the end of the encryption buffer and an assert to catch cases where user-supplied
+  encryption routines overflow the end of the destination buffer.  Have yet to see this happen, but I am
+  learning more and more that the more stuff the UdpLibrary can do to help the application find bugs in its
+  usage of the library, the better.
+
+- made sure UdpManager constructor initialized mPassThroughData to NULL.
+
+- got rid of UdpMisc::FindAvailablePort function.  The reason for getting rid of this is that any use of
+  it will almost surely be an unsafe/bad practice, as once it has found a port for you, it is entirely possible
+  that some other process on the machine may grab that port before you create a UdpManager and bind to it.  We
+  found this out the hard way in EQ.
+
+- added a new configuration option, Params::portRange.  This new parameter accomplished what FindAvailablePort
+  was supposed to do, only it does it in a safe manner.  If you wanted a to bind to a random port between
+  40000 and 40999, you would specify 'port' to be 40000 and portRange to be 1000.  Upon construction, the
+  manager would then randomly pick a port in that range and try binding to it.  It will try all ports in the
+  range before it completely fails and gives up.  You cannot specify a portRange to use if you have 'port'
+  set to zero as this makes no sense.  By default this parameter is 0, which causes it to act as it always has
+  previously.
+
+- against my better judgement, I added a GetRefCount function to the UdpConnection, UdpManager, 
+  and LogicalPacket objects.  I actually needed it on the UdpConnection object internally such that the
+  UdpManager could tell if the application had accepted a connection during an OnConnectRequest callback.
+
+- added a new disconnect reason, cDisconnectReasonConnectionRefused.  You will never actually see this reason
+  returned from GetDisconnectReason, since the object that would return it will already be destroyed so you can't
+  ask it.  Where you will actually see it is from the GetOtherSideDisconnectReason function.  When a client
+  attempts to connect to a server and that server ignores their connect request (by simply not AddRef'ing 
+  it during the OnConnectRequest callback), the server responds back to the client with a terminate-packet.  The
+  client will see the disconnect reason as cDisconnectOtherSideTerminated, but can further query to see that the
+  server explicitly refused the connection.
+
+- added a new disconnect reason, cDisconnectReasonMutualConnectError.  You will only ever see this from
+  GetDisconnectReasonOther and it is a form of connection-refusal as well.  In this case, what it means is
+  that the guy you are trying to connect to is simulatanously in the process of trying to connect to you.  The
+  odds of this happening are very rare, but since the code was able to distinguish it from other situations, I
+  figured it was worth clarifying if it ever did happen.
+
+- added a new disconnect reason, cDisconnectReasonConnectingToSelf.  This is identical to the MutualConnectError
+  and occurs whenever you try to establish a connection to yourself.  This is somewhat more likely, and in fact
+  was added to the library because it actually happened.  For the sake of others who might run into this, I will
+  give a brief description of how we managed to get bit by it.  We had enabled ICMP error processing during
+  connection-negotiation, such that we could instantly tell if the server were down.  Our client application would
+  then fail the connection, and immediately try again.  Each time it tried, it picked the next available port.
+  The client in this case was another server process that happened to be running on the same box as the server
+  it was trying to connect to.  The server it was trying to connect to was down. The server it was trying to
+  connect to was supposed to be listening on port 44452.  The application-level retry loop was very tight with
+  no delay, and eventually (30 seconds or so), it had managed to cycle through enough ports that the one it
+  randomly picked (next available) was 44452.  This effectively made it connect to itself, which actually caused
+  the library to eventually crash.  This was SWG btw.
+
+- fixed bug in CRC calculation whereby it was applying the encrypt code in a byte-order dependent manner.  Nobody
+  actually found this bug since nobody is running on big-endian based hardware.  There may be other endian issues
+  that have yet to be tested, but in general the library is supposed to handle endian issues.  Internally, all
+  protocols and such are done in network-byte-order (motorola big-endian order that is)
+
+- added new api-function UdpConnection::GetOtherSideDisconnectReason().  When a connection is terminated, if the 
+  GetDisconnectReason function returns to you the value cDisconnectReasonOtherSideTerminated, then you will be able to
+  call this new function and find out what the other-sides reason was for disconnecting.  While this latest version of
+  the library remains backwards protocol compatible, this new API feature will only be available if both sides of the
+  connection are using the latest version of the library.  If the other side is not using the latest version, then
+  this function will return cDisconnectReasonNone, meaning that it doesn't know.  Likewise, if this function is ever
+  called when the primary disconnect reason is not OtherSideTerminated, then it will return None.  This should make
+  tracking client-disconnects easier in situations where you don't have easy access to the client that is having the 
+  problem.
+
+- added new api-function UdpConnection::SetSilentDisconnect(bool silent).  This function allows the application to tell
+  a connection that it should not notify the other end of the connection when it terminates (by sending the usual terminate
+  packet to the other side).  This was actually added for internal reasons such that we didn't reply to a terminate-packet
+  from the other side with a terminate packet of our own; however, it was thought that in some circumstances it may
+  be desireable to let the other side languish and have to time-out, rather than us explicitly telling them that we
+  have shutdown our side of the connection.  An example of wanting to do this might be if you were testing timeout
+  functionality, or if you wanted to dump a cheater hard without telling them explicitly that they had been disconnected.
+
+- added statistics to track how many socket-overflow errors occurred.  A socket overflow error can be caused if the
+  socket-buffer size is too small for the overall datarate that the manager is trying to send (which could very well
+  happen on a busy server if you gave it a small buffer.  The net result is packetloss, which will cause extra resends
+  later on (for reliable data), etc.  If you have a fairly big outgoing socket buffer size, then this may be caused
+  if the application is spamming too much unreliable data out the pipe.  Remember, unreliable data is not flow-controlled
+  in any way, so if the server instantly dumps 500k of unreliable data to all connections combined and the server only
+  has a 256k outgoing socket buffer, then you are going to lose a healthy chunk of that data.  This statistic can be
+  used to determine if you have this problem occurring on a frequent basis.
+
+- made UdpManagerHandler::OnConnectRequest non-pure-virtual (ie. provided a default implementation).  It used to be the
+  case that the only reason you would want a UdpManagerHandler is if you were listening for connections, now it is quite
+  likely that you will want one for user-supplied encyrption on the client side, so it was thought that we really should
+  provide a default implementation that basically ignored incoming connection requests.
+
+
+-----------------------------------------------------------------------------------------------------------------
+3/7/2003
+-----------------------------------------------------------------------------------------------------------------
+- Added new configuration parameter to reliable channels UdpManager::Params::reliable[].congestionWindowMinimum.  It is very
+  unlikely that you would want to change this parameter from its default value of zero.  What this parameter does is allow
+  you to control how small (in bytes) the flow-control congestion window is able to shrink.  How flow control works is that
+  as connections get congested, they slow down sending data by controlling how much outstanding unacknowledged data there
+  is.  The congestion-window itself represents how much data this is, and it changes constantly as appropriate.  When packets
+  are getting lost it shrinks.  This new parameter added here lets you control how small you will let it shrink in response
+  to bad connection conditions.  The UdpLibrary will never let the congestion-window shrink below the size of a single
+  physical packet (512 bytes by default), so all values for this setting below maxRawPacketSize are meaningless.  Instead,
+  the purpose of this setting is to allow you to set this minimum higher than that.  Setting this number higher can result
+  in the connection getting flooded beyond its capacity, as it may not be able to slow itself down enough to meet
+  current line conditions.
+  
+  A situation where you may want to toy with this number is in a game (surprise), where you expect to be the only 
+  process using bandwidth in the system, and you don't really care to be 'friendly' to other connections running 
+  on the system.  Normally, if a modem-user is playing the game and has an TCP transfer going on in the background,
+  then the TCP connection and the UdpLibrary connection will both effectively settle-in on using about half the available
+  bandwidth.  That is, the flow-control algorithms used by the UdpLibrary and TCP are such that over a fairly short period
+  of time, they will both settle in on a happy split.  However, if half-the-bandwidth was equal to a 2k window-size, and
+  the UdpLibrary was configured to have a minimum window size of 3k, then the UdpLibrary would not scale down.  Because
+  the TCP connection is willing to scale down further, it would, and you would effectively end up with a 3k/1k split
+  with TCP kindly taking a backseat to the UdpLibrary (of course, if you had put two 3k-configured UdpLibrary connections
+  in this same environment, the net result would be massive/wasteful packetloss).
+
+  The advantage of setting a higher minimum is just the scenario described above, you can effectively configure your
+  application to be a bandwidth pig at the expense of other connections in the system; like I said, sometimes this is
+  desireable.  Another advantage of having a larger minimum window size is that it allows the connection to more
+  quickly scale-up to optimal speed in situations where packets are lost, or there are long stalls in the outgoing
+  packet stream.  So, if the game is plugging away at 500 bytes per second and has a window size of a minimum of 3k, then
+  when a sudden burst of data transfer is needed for something, it can burst a good chunk of it all at once and not
+  wait for the flow control window to scale up via the slow-start algorithm (which really should be called the fast-start
+  algorithm).
+
+  Another case where you might want to set this higher, is if you know for a fact that the connection is always going
+  to be very high quality (internal ethernet).  In those situation, you may want to set the minimum window size to 30k
+  or so, again, such that transfers get up to full-speed quicker.
+
+  Basically, you can look at this value as the guaranteed bandwidth that you want the connection to claim.  The effects of
+  playing with this setting are going to be very difficult to quantify, but if anybody does decide to try playing with it
+  and notices an appreciable difference (good or bad), I would appreciate hearing about it, just so I know when others ask
+  me about it.
+
+- Added new helper function UdpMisc::FindAvailablePort(int startPortScan, int endPortScan), that will find you a randomly
+  available port in the specified range, or return 0 if no available port was found.  This can be used in situations where
+  you want the server to be listening on a random port in a particular range.  Sometimes it is nice to limit the random
+  port selection to a particular range as it allows easier configuration of firewalls.  It's worth noting that when it
+  finds an available port, it does not reserve it, but rather releases it and returns which one it is.  It is entirely
+  possible that the port could be claimed by somebody else before you effectively bind to it.  A better way of handling
+  this situation would be to actually create UdpManager's giving them a random listenPort in the range and then checking
+  the UdpManager::GetErrorCondition to see if it successfully bound and try again if not.  In this way, you don't have to
+  worry about your port getting stolen.  This helper function was added merely to handle a situation that was unique to
+  Everquest where we did not have control of the underlying communications library in order to add this functionality.
+
+- API CHANGE: UdpManager::GetHostByName has been moved and made a static function of UdpMisc.  This allows you to do this
+  function without creating a UdpManager.
+
+- API CHANGE: UdpConnection::Disconnect no longer gives the application the option of not being notified via OnTerminated for
+  the disconnect event.  The application can only specify a flushTimeout.  When the application does specify a flushTimeout
+  the OnTerminated callback does not occur until the actual connection is fully disconnected (by either timing out on the flush
+  time, or successfully sending all the pending data and terminating).  While the connection is in a cStatusDisconnectPending
+  state, it is possible for some other event (like an ICMP error for example) to cause the connection to switch to a
+  cStatusDisconnected state before all pending data is sent.
+
+- API CHANGE: OnTerminated callback will now be called ANYTIME a UdpConnection object switches to a cStatusDisconnected state,
+  regardless of the reason.  Once a UdpConnection is in a cStatusDisconnected state, it will always remain as such.  Since
+  newly created UdpConnection objects start out in a non-disconnected state (they are either connected or negotiating to start
+  with), all UdpConnection objects created are guaranteed to eventually receive one and only-one OnTerminated callback.  In 
+  previous versions of the library, a connection that was still negotiating (trying to connect) would not call OnTerminated
+  if it failed, now it will.  In this manner, it will be easier and more clear for an application to maintain a strict balance
+  between connection creation and destruction.  Furthermore, connections that are explicitly terminated by an application
+  call to Disconnect will now callback via OnTerminated (if necessary).
+
+- API CHANGE: OnConnectComplete callback is now only called when a connection is successfully established (as initiated by an
+  EstablishConnection call).  Previously, any negotiating connection would callback via this function when it left the
+  negotiating state (either succeed or fail).
+
+- API CHANGE: moved user-supplied encryption callbacks from the UdpConnectionHandler to the UdpManagerHandler.  If you are
+  using the user-supplied encryption callbacks, then you will likely need to make some minor changes to your code, by creating
+  a handler object for the manager and moving the callback routines to there.  This should in no way effect the type of
+  encryption you can do as you will still have access to the UdpConnection object.  The purpose of this change was to deal
+  with a bug whereby the encryption routines could have been called on before the application had an opportunity to set
+  a connection-specific handler.
+
+- made API and library more const safe.  There are likely a few other places where I could have used const that I did not, I
+  am sure they will all get tracked down eventually.
+
+- fixed bug where in theory an infinite loop situation could occur.  This could have happened in a situation where one
+  connection was bumping another connection to the top of the priority queue and vice-versa during priority-queue processing.
+  This is the second time this issue has come up, so this time I put in a more comprehensive fix.  Now, the priority queue
+  will refuse to let any connection schedule itself for processing time sooner than 1 ms after the current processing cutoff
+  line.  This will also help to deal with issues where the clock might go backwards (though in theory that won't happen now
+  either).
+
+- documented the UdpHandler.hpp file more thoroughly to describe what the various callback functions do.
+
+- fixed a bug where the congestion-window used for flow control was able to shrink down to zero when certain rare packet-loss
+  patterns occurred.  It turns out that if you are under heavy flow and the timing mechanism used by the library goes
+  backwards it can cause this to happen.  This only happened on Linux which uses the real time clock for timing, and the system
+  clock was changed while the program was running.  The fix prevents the congestion-window from dropping below the size of
+  a single packet.  (Thanks Thomas Farthing for help in finding this one)
+
+- changed the Linux version of the UdpMisc::Clock function to compensate for a backwards moving clock caused by the system
+  time being changed mid-application.  There is still and issue with time jumping forward when the clock is changed, but
+  that will tend to cause less problems.  If anybody knows a relatively portable way of getting millisecond accurate timing
+  that isn't relative to the real-time clock under Linux (something equivalent to Windows GetTickCount), let me know.
+  (copied Vince Harron's time-correction routine for this purpose).
+
+- changed the Windows version of the Clock function to better handle clock-wrap in situations where there are multiple
+  threads in the process calling the function at the same time.  (used thread-local-storage to solve the issue)
+
+- enhanced user-supplied encryption/decryption callback functions such that if they return -1 it is treated as an
+  error-condition and the packet is thrown away by the UdpLibrary.  This could occur if the application detected during 
+  decryption that something wasn't right.  Perhaps somebody tampered with the packet, or it got corrupted on-route yet 
+  still managed to make it through the UDP header checksum and any UdpLibrary CRC checks that might have been in place.
+
+- fixed bug in explicit bind where it was getting the network byte-ordering wrong (thanks Justin Randall for finding this one).
+
+- fixed a bug where the OnTerminated callback was not being called in situations where an existing connection was terminated
+  due to a subsequent new connect-request coming from the same IP and port.  Basically, the InternalDisconnect function was
+  being called and told not to bother notifying the application of the event...I have no idea why I would have told it not
+  to notify the application of termination for this reason, but it is now fixed.
+
+- added direct winsock2 support.  If you want the UdpLibrary to use version winsock v2.2, then you should define the 
+  symbol UDPLIBRARY_WINSOCK2.  This will cause it to use the winsock2.h header files and request version 2.2 of winsock
+  on WSAStartup.  Since the library itself doesn't make use of any winsock2-only features, it really doesn't buy you much
+  to do this.  The exception is if other parts of your program are using winsock2 functionality for some reason, you may
+  have to define this in order to successfully compile, since the winsock.h and winsock2.h headers conflict.
+
+- modified the hashtable template class and gave it the ability to iterate through its contents with WalkFirst and WalkNext.
+  This feature isn't actually used by the UdpLibrary, but some other stuff I am working on that shares that hash table object
+  needed it.
+
+- fixed some code issues that were causing level 4 warnings (all future releases will be checked against level 4 warnings now)
+
+- fixed problem where NULL was being implicitly converted to a UdpIpAddress inside of GetHostByName
+
+
+-----------------------------------------------------------------------------------------------------------------
+11/26/2002
+-----------------------------------------------------------------------------------------------------------------
+- thanks to Ben Hulse for porting the library to Solaris/sparc.  His changes have been rolled into the master distribution.
+  The ICMP error processing on this platform is done in yet another way from the other platforms.  When you attempt
+  to send data to a destination that has previously returned and ICMP unreachable error, the sendto function fails.  Given
+  that we use the same port for multiple destinations and that hundreds of outgoing packets to other connections could have
+  occurred before we send to the one that returned the error, I suspect this feature may not be working under Solaris.  I
+  have seem some references on the web that indicate that UDP sockets do not receive ICMP errors unless they are connected
+  (which obviously we can't do).  I didn't immediately see a way that this could work; though, I think it would be worth
+  trying to do it the basically the same way Windows does on the recvfrom call.
+
+- we have discovered that ICMP errors are not being forwarded up to the application under Windows NT and Windows 98.  These
+  operating systems echo back ICMP errors as appropriate, but applications running on these platforms will not receive
+  them on the other end.  Windows 2000/XP do not appear to have this problem.  Our NT testing was using service-pack 6.
+
+- fixed bug in replyUnreachableConnection processing.  The net result is that the library should more accurately
+  detect when a connection has gone dead in situations where the server has shutdown and restarted again fairly quickly.
+
+- optimized the code dealing with removing a connection from the manager.  In previous versions of the library this required
+  a linear search through all connections as they were tracked with a single linked list.  They are now tracked with a
+  double linked list such that they can be removed without the search.  This change gets rid of the last linear operation in
+  the library relative to the number of the connections (in normal processing).
+
+- removed the UDPLIBRARY_SAME_ENDIAN flag.  This turned out to be a source of confusion and in practice probably should
+  never have been used anyways.  It was merely an optimization that allowed the integer packing routine to operate more
+  quickly in situation where both ends of the connection were guaranteed to be the same byte-order platform.
+
+- added function UdpManager::GetHostByName, which does a DNS lookup to translate a name into an IP address.  Even though
+  functions such as EstablishConnection will automatically do the DNS lookup if necessary, it is recommended that the 
+  application do this translation themselves on startup if the architecture is such that the connection might be established 
+  multiple times.  The reason for this is the lookup is a blocking call and it saves having to do it multiple times potentially.
+
+- added support for binding the socket used to a particular IP address (UdpManager::Params::bindIpAddress)
+  Normally, and by default, the library will bind the socket to any address in the machine.  This setting should
+  not be messed with unless you really know what you are doing.  In multi-homed machines it is generally NOT
+  necessary to bind to a particular address, even if there are firewall issues involved, and even if you want
+  to limit traffic to a particular network (firewalls do a better job of serving that purpose).  If you are having
+  problems communicating with a server on a multi-homed machine and think this might solve the problem, think again.
+  You most likely need to configure the OS to route data appropriately, or make sure that internal network clients
+  are connecting to the machine via the machines internal IP address (or vice versa).  The only reason I have come up
+  with to bind to a specific IP is for security reasons above and beyond those that would normally be provided by
+  a firewall.
+
+- added configuration parameter UdpManager::Params::processIcmpErrors to turn on/off ICMP error processing.  By default
+  ICMP error processing will be enabled.  If you are having problems with false ICMP errors causing disconnections, then
+  you may want to disable this option.  False ICMP errors can occur when a router along the way momentarily goes down
+  but is traffic is quickly re-routed, such that termination of the connection wasn't really necessary (at least, that's
+  my theory).
+
+- added configuration parameter UdpManager::Params::connectAttemptDelay.  During connection negotiation, the client will
+  periodically send the server connect-attempt packets until the server acknowledges the request for a connection.  This
+  value represents how frequently the client sends the connect-attempt packets.  By default this is set to 1000 and as a 
+  general rule, should not be changed.  The reason this configuration parameter was added was such that I could slow down
+  the attempt-rate used by clients of the EQ channel-server.  At peak, the channel server will have upwards of 90,000
+  simultaneous connections.  Additionally, there will be up to 2000 people who are attempting to connect but cannot (most
+  likely due to a firewall issue on their end).  These 2000 people will continously try to connect for 30 seconds, sending
+  the channel-server a packet once per second, resulting in an extra 2000 packets/second coming into the channel server from
+  people who will never be able to form a connection.  Since packetloss is relatively rare and rapid connection establishment
+  is not critical, I wanted to slow down the rate at which these connection-attempts flooded the server.
+
+- included <stdio.h> to get the definition of NULL.
+
+- added carriage return to end of some header files to prevent warnings from gcc compiler
+
+- removed an assert that could happen in normal processing after all.  Turns out that some ICMP error packets will show
+  as coming from port 0 (presumeably when the entire IP address is not reachable?).  We have no way of doing an IP-only
+  base connection query without looping through every connection, which we really don't want to do, so for now we are
+  ignoring ICMP error packets that have a port of 0.  The appropriate behavior would probably be to terminate all
+  connections that came from that IP address.  This doesn't appear to happen very often though; we had the EQ Channel Server
+  running for 3 hours with 80,000 connections before it happened for the first time.  ICMP processing to accellerate
+  disconnection recognition is really a bit of a luxury, so I don't feel too bad ignoring this rare case.
+
+
+-----------------------------------------------------------------------------------------------------------------
+10/3/2002	
+-----------------------------------------------------------------------------------------------------------------
+- added new function UdpConnection::IncomingBytesLastSecond(), which returns the number of raw bytes the connection object
+  has received in the last second (accurate to within 25ms).
+
+- made sure ScheduleTimeNow was never executed during a GiveTime call.  If it was, then the net result would potentially be
+  an immediate re-giving of time again, which I am thinking could possible create an infinite processing loop.
+
+- added new function UdpManager::GetErrorCondition(), which returns an enum ErrorCondition value (see header file).  The
+  only error conditions that it currently checks for is the ability to create and bind the socket.  If you are using a fixed
+  port and are concerned that somebody else (like another copy of the program running) might already have it, then you should
+  check the error condition after constructing the UdpManager object.
+
+
+-----------------------------------------------------------------------------------------------------------------
+9/18/2002
+-----------------------------------------------------------------------------------------------------------------
+- fixed problem where it was unable to establish a new connection because the server-side thought it already had a connection.
+  This actually would not happen except under very unique circumstances.  In particular, you had to establish a connection
+  to the server, then, using the same UdpManager object, establish another connection to the same server.  It is illegal
+  to have multiple connections between the same two UdpManagers, as the resultant UdpConnection objects would effectively
+  have the same ip/port combo's, effectively making it impossible for the UdpManager to know who incoming data was coming
+  from.  The problem arose when the client had actually terminated one of the connections, but the server was unaware of it.
+  Then, the next conenct-attempt would simply be ignored since the server would think it already had a connection to that
+  ip/port.  You would think that the server would eventually timeout the old connection object, but the problem was that
+  the new connect-attempts (that were being ignored) were actually refreshing the no-data-timeout on the existing connection.
+  This effectively put it in a state where the client could never re-establish the connection.
+
+  This would actually only occur if the second-connection attempt was using the same UdpManager as it had for the first
+  connection, or if the UdpManager it was using had been assigned the same port-number again (either by explicit override,
+  or by dumb-luck).  The fix for this is to have the existing connection terminate if it gets a new connect-attempt that
+  is using a different encrypt-code.  When this set of circumstances happens and is the cause for a connection to be
+  terminated, the disconnect-reason will be set to cDisconnectReasonNewConnectionAttempt.
+
+  On a side note, since clients generally only have one outgoing connection for a given manager, it is generally a good
+  idea to have the UdpManager created and destroyed along with the connection. Each time the UdpManager is re-created, it
+  picks a new port to use, which effectively eliminates these issues.  This is also a good reason not to explicitly
+  set the Params::port on client side connections, but instead leave it at 0, so the library will let the OS pick a random
+  port (that presumeably hasn't been used recently).
+
+  The situation where this bug first appeared was one where the client was actually using the same UdpManager to connect
+  to dozens of servers simultaneously, so re-making the UdpManager wasn't really an option, since all the other connections
+  would still be operating.
+
+- got rid of C-style callback functions.  If you are currently using this style of callback you will need to convert
+  your code over to using handlers.  I don't think anybody was using user-supplied encryption/compression routines
+  yet, but those have been removed as C-style callbacks as well and added to the UdpConnectionHandler class.  See the
+  UdpLibrary.doc file or the udpserver.cpp sample code for a description on how to use handler based callbacks.  A quick
+  and dirty way of converting an existing C-style callback implementation into a handler based one would be to use the
+  following class:
+
+	class MyHandler : public UdpManagerHandler, public UdpConnectionHandler
+	{
+		public:
+			inline virtual void OnConnectRequest(UdpConnection *con) { AppConnectRequest(NULL, con); }
+			inline virtual void OnRoutePacket(UdpConnection *con, const uchar *data, int dataLen) { AppRoutePacket(NULL, con, data, dataLen); }
+			inline virtual void OnConnectComplete(UdpConnection *con) { AppConnectComplete(NULL, con); }
+			inline virtual void OnTerminated(UdpConnection *con) { AppTerminated(NULL, con); }
+	};
+
+  Where the AppXXXXXXXXX functions are functions you had previously passed in as callback functions in the UdpManager::Params.
+  The only thing lost is there is not a UdpManager mainPassThrough pointer anymore (first parameter to the ConnectRequest 
+  callback in the old scheme), but odds are it wasn't used anyways.  Finally, you need to create an instance of the above
+  class and set it up as the UdpManager::Params::handler for the UdpManager, and call UdpConnection::SetHandler(...) for
+  each newly created connection as well (just after either EstablishConnection or on the server-side in the OnConnectRequest
+  function).
+
+  The above dummy-handler is primarily intended to handle converting existing code that uses the old method. New code
+  should generally have one handler object for the UdpManager and a seperate handler object for each UdpConnection created.
+  Again, see the udpserver.cpp code for an example of this should be set up.
+
+- when reliable data is sent, it remains in the queue until it is acknowledged by the other side.  When you query
+  the reliable channel status, you can find out the age of the oldest piece of data in the queue that has been sent
+  yet has not been acknowledged yet.  As a general rule, if things are operating correctly, it should be very rare
+  for something that has been sent to not be acknowledged within a few seconds, even if resending had to occur.
+  Eventually, the sender could use this statistic to determine that the other side is no longer talking and terminate
+  the connection.  In past version of the UdpLibrary, the sending-application has checked this statistic itself.  A new
+  parameter has been added UdpManager::Params::oldestUnacknowledgedTimeout. This parameter will cause the UdpLibrary 
+  to monitor this for you and automatically change the connection to a disconnected state when the value goes over 
+  this setting (in milliseconds) (0 means do not perform this check at all)  The default is set fairly liberally, 
+  on client-side connections, you could safely set this to as low as 30 seconds (30000) allowing for quicker realization 
+  of lost connections.  Often times the connection will realize it is dead much quicker for other reasons.
+  When disconnected due to this, the disconnect reason is set to cDisconnectReasonUnacknowledgedTimeout
+
+- added UdpManager::Params::replyUnreachableConnection.  When this parameter is set to true (the default), it causes the 
+  UdpManager to reply back to destinations with unreachable-connection error packets when the server does not have a 
+  UdpConnection object representing the destination.  The purpose of this is to allow a client who has had its connection
+  terminated by the server to quickly realize that the server no longer considers the connection valid.  Normally the
+  client would be told when the server terminated the connection, but that termination notice can get lost leaving a client
+  thinking it is connected for longer than it should.  See the header file for this new parameter for more details.  
+  (note: the client can sort of sense this is occurring now by monitoring the oldestUnacknowledgedAge in the reliable
+  channel status, this just makes it occur quickly instead of having to time-out).
+
+
+-----------------------------------------------------------------------------------------------------------------
+8/26/2002
+-----------------------------------------------------------------------------------------------------------------
+- when I fixing the bug below, I also took the liberty of having the UdpConnection object hold a reference to the
+  UdpManager during processing, such that it would handle the case where the UdpManager was deleted during a callback
+  as well.  The problem is, I made the same mistake that caused me to mess with the code in the first place, that is,
+  referencing the mUdpManager pointer after a callback.  But the release still needs to take place, even if we lose
+  our link to the UdpManager due to a disconnect, so to fix it, I have the UdpConnection object hold its reference to
+  the UdpManager in a stack variable (effectively).
+
+
+-----------------------------------------------------------------------------------------------------------------
+8/23/2002
+-----------------------------------------------------------------------------------------------------------------
+- fixed bug where during a UdpConnection::GiveTime call, the mUdpManager member could become NULL (if the application
+  did a hard-disconnect during a callback function), and the GiveTime function later on used the mUdpManager pointer
+  without checking it.  I think in practice this would have only happened if the application did a hard Disconnect call
+  during the processing of an incoming reliable application packet.  Whatever the case, I have went through the code
+  and verified that mUdpManager is checked for NULL everywhere it could possibly be used after a callback.
+
+- added the ability to modify the keep-alive delay on a per-connection basis (see UdpConnection::SetKeepAliveDelay)
+
+- fixed some compiler warnings/errors for the Linux compile (I don't actually compile the Linux version, so I count on
+  those who do to tell me when I break things :).
+
+
+-----------------------------------------------------------------------------------------------------------------
+8/19/2002
+-----------------------------------------------------------------------------------------------------------------
+- added a UdpConnection::GetDisconnectReason function that returns the reason that a connection was terminated.
+
+- fixed bug where it wasn't tracking the duplicate-packet-received statistic correctly
+
+- added two new parameters for configuring reliable-channels.  I now allow you to set the resendDelayAdjust and the 
+  resendDelayPercent.  These two values allow you to fine-tune the resending algorithm to make the channel either more or
+  less aggressive about correcting lost packets.  On some channels, you may be willing to unnecessarily send the packet twice
+  to ensure that it gets there as soon as possible; whereas on other channels that are less critical, you may be willing
+  to tolerate a slower correction time to avoid sending something you might not need to.  See header-file for details on these
+  parameter values.
+
+- changed several of the UdpMisc functions to take void* instead of uchar*.  This was to make it easier for applications to
+  use these helper functions to hand-pack packets in order to be byte-ordering and structure-packing safe.
+
+- added string-hashing functions to the hashtable.hpp file, since I have found myself using the hash table object in a lot
+  of places for strings and it seemed generally useful.
+
+- added the ability to force the UdpManager to pre-allocate a certain portion of the packet pool.  You might want to do this
+  if you are very concerned about memory fragmentation and you know for sure that you are going to be using a certain minimum
+  number of packets from the pool anyways.  The new parameter is UdpManager::Params::pooledPacketInitial.
+
+- modified the ReliableChannel object to get temporary packets from the pool instead of allocating them.  It uses temporary
+  LogicalPackets to hold onto incoming data that arrives out of order.  Again, if you are not configuring the UdpManager to
+  have a pool and having your application use it as well, you are doing yourself a huge disservice.
+
+- changed the logical-packet queue to expand itself 64 packet-pointers at a time instead of 1024 at a time.  This effectively
+  reduces the minimum connection footprint by almost 4k at the cost of having to expand this buffer on the fly if the number
+  of queued logical packets ever exceeds 64.  Most of the time this expansion will not have to occur, if I find otherwise in
+  some application, I will make the expansion rate of this queue a setting instead of hardcoded.
+
+- added a slightly more efficient, though not quite as effective non-buffer based Xor encryption method.  I ended up adding
+  this as I am trying to avoid the 512 bytes/connection overhead of the XorBuffer method.  This should be good enough for
+  most situations, we are just trying to make the packet-stream look like work to hack to the casual hacker.  This small amount
+  of memory saved actually turns out to be critical for the application I am doing as I am trying to get 200,000 players
+  connected to a single server.
+
+
+-----------------------------------------------------------------------------------------------------------------
+7/1/2002
+-----------------------------------------------------------------------------------------------------------------
+- added a new 'interations' statistic to the UdpManagerStatistics.  This represents how many times UdpManager::GiveTime has
+  been called.  Divide this by elapsedTime to get an average number of times per second GiveTime is called.  This should
+  generally be at least 10 or else you are likely creating too much processing-induced-lag (as I call it).  A similar statistic
+  has been added to UdpConnectionStatistics
+
+- changed code to ignore ICMP port unreachable errors while in cStatusNegotiating mode. This was necessary in order to prevent
+  a client who happened to startup moments before the server did from aborting it's connection attempt because the port wasn't
+  open yet when the first packet went out.
+
+- added a new UdpManager::Params::portAliveDelay parameter which is intended to be used on the client side to keep the NAT or
+  firewall port alive without having to actually send the server unnecessary keep alive packets.  This is very similar to the 
+  keep alive delay, but serves a completely different purpose and may not have the desired effect on all platforms.  The purpose
+  of the keepAliveDelay is generally to keep data flowing to the server so it knows that the client is still there.  In this 
+  manner if the server doesn't get data within a certain period of time, it can know that the connection is probably dead.
+  Sometimes it is the case that the server does not need to be kept alive, or at least kept alive very often (like for a chat 
+  server perhaps where nobody is talking much).  For some people, it may be necessary to send data more frequently in order to 
+  keep their NAT mapping fresh, or their firewall software happy.  However, we don't want to be in a situation where our server 
+  is receiving a lot more data than it needs to just so these people can keep their port open.  I have seen NAT's that lose 
+  mappings in as short as 20 seconds.  What this feature does is a bit tricky.  It changes the time-to-live (TTL) for a special 
+  keep-alive packet to some small value (5) which is enough for the packet to get past local firewalls and NAT's, but not make 
+  it all the way to our server.  In this manner, the port gets kept alive, but we don't waste bandwidth with these packets.
+  These special packets are not counted statistically in any way and they do not reset any timers of any kind.  Their sole 
+  purpose is to keep the port alive on the client side.  Any other data (including standard keepAlive packets will reset the 
+  timer for this packet, so obviously the portAliveDelay must be smaller than the keepAliveDelay in order to be meaningful.
+  By default this feature is off.  It's worth noting that the client-side will receive-back an ICMP TTL-expired packet; however,
+  the client will simply ignore it.  It is unknown as to whether all NAT's will ignore the ICMP return packet, it is assumed
+  that they will.  You should not set this value too aggressively as the returning ICMP packets will be taking up valuable
+  incoming bandwidth on the client side, even though they have no effect on our end at all.
+
+  (update: we put this live on EQ and it fixed the problem for a lot of people; however, it also caused a different small
+  set of players to start having problems...probably firewalls or NATs that interpret the ICMP error packet as a reason to
+  shut down the port/mapping.  Anyways, I am not sure it is a viable option because of this.  You could make it an advanced
+  user option, but clearly it isn't the fool-proof solution we had hoped it would be.)
+
+- added an optional parameter to UdpConnection::Disconnect as to whether it should callback the application via OnTerminated
+  to notify of it of this Disconnect call.  In either case, the callback would only occur if connection had previously
+  been in a cStatusConnected state.  This api enhancement was primarily added for internal purposes, though it will
+  allow the application to receive OnTerminated callbacks when it explicitly calls Disconnect itself (if it so desires)
+
+- added the ability for the library to auto-terminate connections that are not receiving data.  This feature is supported
+  via the UdpManager::Params::noDataTimeout setting.  The timeout can also be overridden/controlled on a per-connection
+  basis via the UdpConnection::SetNoDataTimeout and UdpConnection::GetNoDataTimeout functions.  Setting the timeout to
+  zero (the default) causes the connections to never auto-disconnect due to not receiving data.
+
+- added UdpManager::GetHandler and UdpConnection::GetHandler calls (added for completeness, not currently used by anybody)
+
+- some minor changes to the non-windows version so it compiled cleaner.
+
+- made it so keep-alive packets do not cause UdpConnection objects to be rescheduled in the priority queue.  They really
+  don't need to reschedule things since the worst thing that can happen is it might get processing time sooner than it
+  might otherwise need to.  But scheduling it for immediate processing time just makes that worse if you think about it.
+
+
+-----------------------------------------------------------------------------------------------------------------
+5/15/2002
+-----------------------------------------------------------------------------------------------------------------
+- added the ability to have a Disconnect'ed connection continue processing until there is no more data outstanding
+  on any of the reliable channels.  The UdpConnection::Disconnect function now takes a 'flushTimeout' value, which is
+  how long (in milliseconds) the connection will attempt to finish sending queued reliable data before giving up.  If
+  the application specifies a flushTimeout of zero (the default), then the connection is immediately terminated as before.
+
+  When the application specifies a timeout, the connection status is changed to cStatusDisconnectPending.  From the
+  applications point of view the connection should be thought of as disconnected the moment the call is made.  The
+  connection will never callback the application again to deliver data and it will not allow the application to Send
+  any more data on the connection.  About all the application can with the connection is query its various status', or
+  force an immediate disconnect by calling Disconnect again giving it no flush timeout.
+
+  It is generally thought that the application will call Disconnect with a timeout and then immediately Release the
+  connection and have nothing else to do with it again.  This is how it is intended to work.  The Release by the application
+  will not actually free the connection if there is still data pending to be sent.
+  
+  Internally how this works is when the application calls Disconnect with a timeout, the status of the connection
+  is changed to cStatusDisconnectPending.  The connection object registers itself with the UdpManager telling it 
+  to keep a reference to the connection until the connection status changes to cStatusDisconnected.  The connection will 
+  be given scheduled time by the UdpManager as before and when the connection has no more reliable data to send, or when
+  its 'flushTime' expires, the connection will change itself to a cStatusDisconnected state, at which point the UdpManager
+  will 'Release' its reference to the connection and the connection will actually be deleted.  So, take the following
+  code for example:
+
+	void ApplicationFunction()
+	{
+		myConnection->Send(cUdpChannelReliable, data, 100000);	// send 100,000 byte packet
+		myConnection->Disconnect(30000);		// disconnect us, but give it up to 30 seconds to get any pending reliable data sent
+		myConnection->Release();				// we are finished with this connection
+		myConnection = NULL;
+	}
+
+  The above code will not block and will deliver the 100k packet if it can manage to do it in the 30 second timeframe.
+  Releasing the UdpManager while there is pending disconnects will result in everybody being disconnected immediately
+  and the data will not be delivered.
+
+- added a new function UdpConnection::TotalPendingBytes(), which returns the total number of reliable-bytes that
+  are outstanding.  When this returns zero, you can be assured that all data on all reliable channels has been successfully
+  delivered.  (note: this is same as adding up ChannelStatus::totalPendingBytes on all reliable channels)
+
+- added a GetStatistics function to the internally used hash-table object (in case anybody is using it externally for their
+  own purposes.  The UdpLibrary itself does not make use of the statistics.
+
+
+-----------------------------------------------------------------------------------------------------------------
+5/9/2002
+-----------------------------------------------------------------------------------------------------------------
+- seeded the CRC algorithm with the negotiated encryption key, such that the CRC values calculated for packets cannot
+  be easily calculated by off the shelf CRC algorithms (to prevent packet tampering).  This gives us some level of
+  protection without the huge disadvantage of encryption which is 1) potentially slow, and 2) encrypting of a typical
+  data stream reduces how effective modems hardware compress.  In Infantry, we found turning encryption on (where the
+  data did not change size) significantly lagged modem users.  For this reason, encryption should likely only be used
+  in conjunction with compression.  General byte-level compression itself is probably sufficient encryption for out needs.
+
+- added OnCrcReject handler function.  This function is only available if a handler object is used (there is no callback
+  equivalent right now...if somebody wants one, let me know; but, I would encourage everybody to switch over to handler based
+  callbacks instead).  Whenever a packet is rejected due to a CRC error, this function is called to report the incident to
+  the application.  Corrupt packets are fairly rare as they must first get through the 16 bit checksum that the UDP packet
+  inherently puts on it.  If it makes it through that, then our CRC check will probably catch it.  The reason why an
+  application would want to know this, is because there is a very good chance that the corruption was caused by somebody
+  intentionally trying to tamper with the packet data, but not touching up the CRC on the end.  The application may want
+  to take note of the IP address and if too many corrupt packets come from the same IP, consider banning the player for
+  cheating.
+
+- made manager check the protocol version for compatibility before creating an associated UdpConnection object.  This prevents
+  the application from seeing connections that may later be rejected because of protocol version incompatibility.
+
+- tweaked the flow control algorithm a bit.  The two main changes were 1) selective acks now adjust the congestion window
+  differently similar to the TCP Reno algorithm, and 2) The slow start threshhold was reset when the pipe went dead (before
+  we only reset the congestion window, but this resulted in a circumstance whereby the slow-start threshhold once low would
+  never be able to go back up.
+
+- modified the resend-timer to not take into account the amount of outstanding data in the window.  It turns out that
+  this adjustments is redundant in that the slow-start flow control mechanisms will ramp things up to speed in a manner
+  such that the average ack time will grow longer as the window gets bigger as appropriate.
+
+- Added a new parameter to the reliable channel configuration.  ReliableConfig::processOnSend if 'true' will configure that 
+  particular reliable channel to do processing on sent packets at the time they are sent instead of waiting until the next
+  UdpManager::GiveTime call.  Normally the application will want to leave this at its default value of 'false' because it
+  is more efficient on CPU usage, since it can avoid doing all the ReliableChannel::GiveTime processing on a per-sent packet
+  basis by delaying it until the next global GiveTime.  The downside of delaying is that it is often the case that the next
+  GiveTime simply causes the reliable packet to get moved into the multi-buffer inside the UdpConnection object.  Then another
+  GiveTime a bit later finally sends it.
+  
+  Setting this value to 'true' is similar to issuing a FlushChannels command after each reliable Send (with the 
+  exception that rather than giving every channel and the UdpConnection object time, it only has to give the channel
+  doing the send time).
+
+  This feature is most useful when you are on the client side and the overhead of processing the packet on-send 
+  will not add up to much, compared to what the server-side has to do managing thousands of connections.  Most clients
+  should probably set this to 'true', since timeliness of sent packets generally exceeds any need for code efficiency on
+  the client side in this regard.
+
+  It's worth noting that the reliable channel object ends up scheduling time for the connection the next GiveTime, 
+  regardless of how this value is set.
+
+  If you have the multi-buffer set to 0 (no multibuffering) and you have this parameter set to 'true', then the actual
+  send of a physical packet will end up occuring during your reliable-send call (assuming there is room in the reliable
+  flow control window for the packet to go out at that time).  As a reminder, I don't recommend setting the multibuffer
+  to zero, even on the client side, because it effectively circumvents the mechanism by which ACK packets get combined
+  and piggy-backed on other packets (ie. every ACK would end up taking its own physical packet).  A better approach I feel
+  is to have a multibuffer and then do explicit FlushMultiBuffer calls after sends.  In this manner, ACK's still have some
+  chance of piggy-backing as they will wait around until the next send call (or the multibuffer timeout).
+
+- fixed a tiny problem whereby packets that were rejected due to CRC mismatches were not causing the connection receiving
+  them to schedule itself for processing time as it probably should.  In practice this didn't really effect anything.
+
+- added a (UdpConnection *) parameter to the UdpConnectionHandler callback functions.  This was done such that an application
+  could setup one object as the handler for multiple connections and be able to distinguish between which connection the
+  callback was coming from.  You will have to change your handler functions appropriately to make them compile, and odds
+  are you will be able to simply ignore the incoming UdpConnection parameter.
+
+- added UdpManager::GetPassThroughData and UdpManager::SetPassThroughData calls to allow application to change the pass through
+  data after construction (makes it more consistent with the way UdpConnection objects work as well)
+
+- made it negotiate the maxRawPacketSize between the client and server side during connection establishment.  It will actually
+  end up using the smaller of the two values specified on the client or server side.  In this manner, the server can be
+  configured to support 1k packets (for example) and some client could be configured to only support 512 byte packets and they
+  would still be able to talk to each other (they would end up doing all talking with 512 byte packets in this case).  This 
+  will prevent the client and server from accidentally getting configured differently and then refusing to talk to each other.  
+  It will also allow clients who are behind networks that can only handle tiny packets to be configured to talk in the smaller
+  chunks to support that.  You will have to update both ends of the connection with this code in order for them to talk, since
+  this change effected the initial negotiation process.
+
+
+-----------------------------------------------------------------------------------------------------------------
+4/12/2002
+-----------------------------------------------------------------------------------------------------------------
+- Removed the Handler base class declarations from being nested and put them in their own header file such that we could avoid
+  having to expose the entire UdpLibrary header everywhere (along with all it's baggage).  You can now only include UdpHandler.hpp
+  to get these declarations, which have now been named UdpConnectionHandler and UdpManagerHandler.
+
+- Removed the nesting of ConnectionStatistics and ManagerStatistics, they are now UdpConnectionStatistics and UdpManagerStatistics.
+
+- Optimized the UdpLibrary.hpp header file to avoid including stuff we really didn't need to.  In particular, with a few trivial
+  changes, we managed to be able to avoid including any other header files (including winsock.h).  The only file we could not
+  get rid of including is stddef.h, which has the offsetof() macro that we need in the hashtable.hpp template implementation.
+
+- merged latest Linux implementation into main distribution.  Hopefully I didn't change anything in the Linux implementation in
+  doing so as I have not tested it.
+
+
+-----------------------------------------------------------------------------------------------------------------
+4/9/2002
+-----------------------------------------------------------------------------------------------------------------
+- switched UdpManager over to an AddRef/Release scheme as well.  This is to allow the application to release/delete the UdpManager
+  during a callback as well.  Internally the UdpManager keeps a reference to itself when it calls back the application, such
+  that the actual delete doesn't occur until the UdpManager is safely off the stack.
+
+- added UdpManager::SetHandler function.  Normally the handler for the UdpManager is set in the UdpManager::Params and passed to the
+  constructor; however, I wanted to let the application change or get rid of the handler if needed.  In particular, if the application
+  has set the handler to a particular object, and that object gets deleted before the manager, then that object should clear itself
+  from being the handler for the manager by setting the handler to NULL (presumeably).  In particular, it is probably a good idea
+  to get in the habit of having handler objects set and clear themselves on construction and destruction as appropriate, for both
+  UdpConnection and UdpManager handlers.  For example, this is the best way to set things up (similar things should be done
+  for UdpManagers):
+
+		class Player : public UdpConnection::Handler;
+
+		Player::Player(UdpConnection *con)
+		{
+			mConnection = con;
+			mConnection->AddRef();
+			mConnection->SetHandler(this);
+		}
+
+		Player::~Player()
+		{
+			mConnection->SetHandler(NULL);
+			mConnection->Disconnect();
+			mConnection->Release();
+		}
+
+  Clearing the Handler on destruction is probably not necessary, but on the odd chance that somebody else has a reference to
+  your object and it lives on, it would seem to be a safe practice.  In particular, during callbacks the connection will actually keep
+  a reference to itself momentarily.  The Disconnect call should keep it from every trying to call you back, but clearing the
+  handler is a good safety step to be sure.
+
+- fixed bugged array delete in PriorityQueue.
+
+- fixed another bug in the ICMP handling that prevented the application from deleting the connection during that callback.
+
+- changed ICMP processing such that it would not quit trying to poll packets when it got an ICMP error return.  I am not sure if
+  Windows avoids sending ICMP error results via recvfrom if there are legit packets in the queue or not, but just in case, this
+  change will make it handle the situation slightly better.
+
+
+-----------------------------------------------------------------------------------------------------------------
+4/8/2002	
+-----------------------------------------------------------------------------------------------------------------
+- added ICMP port-unreachable support.  This will allow the sending end of a connection to quickly determine that the other side
+  has terminated servicing its port for some reason.  Again, props to Justin for this idea.  I tested it and it appears to work.
+
+- changed UdpConnection objects to be AddRef/Release based.  This effectively meant we could get rid of the UDPGIFT ownership
+  passing paradigm because ownership is now a function of having a reference to it.  This means that when you are called back
+  and given a UdpConnection object from a ConnectRequest callback, you must AddRef it if you intend to keep a hold of it; otherwise
+  it will be destroyed by the UdpManager when the callback returns.  If you have an existing application you must remember to put
+  the AddRef in the callback, otherwise your connection will be destroyed immediately after it is created.  The compiler will give you
+  errors for the destructors which need to be changed as noted below.
+  
+  Similarly, the application should Disconnect() and Release() the UdpConnection object when it is done using it and wants 
+  it to go away.  This change was needed such that the application would be free to delete the connection object 
+  during packet processing inside a callback.  The UdpManager keeps a reference to the object during packet processing 
+  and releases it when done.  The problem was that the callback to the application to route the packet came from deep 
+  inside the UdpConnection object which was being destoryed.  Because the UdpConnection object may be breaking apart
+  a multi-packet at the time the application releases the UdpConnection object, it will continue to route the remaining parts of the
+  multi-packet, as it has no idea that the application no longer wants to receive them.  The application may have released its reference
+  to the UdpConnection, but the UdpManager maintains a reference until the raw packet is finished processing.  What this means is that
+  if the application wants to ensure that when it releases the UdpConnection object that it also prevents all future callbacks from that
+  connection, it must also call UdpConnection::Disconnect before calling Release().  The bottom line is the proper way for the application
+  to destroy a connection during packet processing is to call Disconnect() and Release().  A Disconnected UdpConnection object will
+  never callback the application to route a packet.
+
+- fixed UdpMisc::Clock such that if different threads were calling it at the same time and got time sliced away, it wouldn't accidentally 
+  double-increment or miscalculate in some way the next stamp.
+
+- Justin Randall modified library to compile properly under Linux and his changes have been included into official distribution.
+  The sample client/server programs are still WIN32 specific.
+
+
+-----------------------------------------------------------------------------------------------------------------
+4/2/2002
+-----------------------------------------------------------------------------------------------------------------
+- made API const safe for most things.
+
+- added support for using object-based handler objects instead of callback functions for notifications.  See the header file
+  under Params::handler and UdpConnection::SetHandler for more details on how these work.  The UdpLibrary.doc file has been updated 
+  to talk briefly about them as well.  The UdpServer sample application included in the distribution has been modified to use 
+  handlers instead of callbacks by default as well.
+
+- changed hashtable template interface slightly.  It now has a simpler FindFirst/FindNext interface, avoiding the need to expose
+  the linked-list implementation details.
+
+
+-----------------------------------------------------------------------------------------------------------------
+3/24/2002
+-----------------------------------------------------------------------------------------------------------------
+- added a pooled memory manager for logical packets to the UdpManager object.  This should virtually eliminate
+  allocations for the vast majority of usage if configured properly.  Using the UdpManager::CreatePacket is now the recommended
+  method for allocating logical packets to send since it will use the pool automatically if possible.
+
+- implemented function UdpConnection::OutgoingBytesLastSecond (replaces the unimplemented BytesInLastSecond)
+
+- added new FlushChannels function which allows the application to force all channels (particularly reliable ones) to send
+  out any queued data that they have time for immediately, instead of waiting for the next time they get processing time.
+
+- added new totalBytesPending statistic to the ChannelStatus, so you could tell for certainty that everything had made it
+
+- tweaked resend-time calculation...I will probably toy with this for a while til I am perfectly happy with it.
+
+- moved clock-sync packet sending ahead of reliable-queue packet processing to better the odds of getting a fast ping.
+
+
+-----------------------------------------------------------------------------------------------------------------
+3/22/2002
+-----------------------------------------------------------------------------------------------------------------
+- optimized the flow-control window algorithm for our unique situation.  Basically, I changed it so that the window-size does not
+  increase when the application is pacing the data rate itself such that the window is not getting filled.  The problem was that
+  a slow stream from the application would give the flow-control mechanism the impression that packets were never being lost and it
+  would keep increasing it's window size forever.  Then if the application suddenly dumped a huge chunk of data into the pipe, the large
+  window size would cause the client to get seriously over-flooded.  This is one area where TCP falls flat on its face as well.
+  For more information on this flow-optimization, search for the mMaxxedOutCurrentWindow variable in the implementation and read the 
+  associated comments.
+
+- fixed nasty bug where UdpReliableChannel::mLastTimeStampAcknowledged was not being initialized.  This potentially caused the
+  first reliable packet sent to think that it had been ack-accelerated by a later packet and resent a second time.  What made the bug
+  really nasty is that would resend this packet over and over again very very rapidly until it had been acknowledged.  But because
+  the packet had been sent more than once, it would not use that packets last send stamp to reseed the accelleration stamp.  This meant
+  that the next reliable packet sent experienced the same problem.  The net effect was a ton of traffic and 80% packetloss to the destination.
+  I'm surprised this did not show up more in testing, but it should be fixed now.
+
+- fixed bug where it would crash if the timeout expired on EstablishConnection call (optional feature)
+- fixed bug in trickle channels where they were sending faster than the specified trickle rate
+- fixed bug in UdpConnection::LastReceive(...) (the version added last rev, accidentally compared the wrong stamp)
+- added more ChannelStatus statistics (not real useful, but they have some gee-wiz value)
+
+
+-----------------------------------------------------------------------------------------------------------------
+3/12/2002
+-----------------------------------------------------------------------------------------------------------------
+- enhanced UdpManager::GiveTime to allow it to be told to process only 1 physical packet out of the socket per call.  See the docs
+  for GiveTime for an explanation of when this might be useful.
+
+- added support for reliable-channel specific fragment sizes (as opposed to using maxRawPacketSize for all channels).  See the docs
+  for ReliableConfig::fragmentSize for details on when you might want to do this.
+
+- fixed bug whereby a client-side connection could possibly try and process a packet before it received the connection confirmation
+  This was a serious problem, but would only happen if the very first communication a client/server did originated from the server
+  side and the connection confirmation packet had been lost, and encryption was being used.
+
+- changed UdpMisc::CreateQuickLogicalPacket to allow it to take a NULL primary pointer (ie. just allocate space)
+
+- added a UdpConnection::LastReceive function that takes the current time as a parameter, this saves the connection having
+  to poll the clock to accomplish this, which can add up if you are looping through a ton of connections just to check this info
+
+- moved several functions into the header as inline implementations for performance
+
+
+-----------------------------------------------------------------------------------------------------------------
+3/8/2002
+-----------------------------------------------------------------------------------------------------------------
+- Fixed bug in UdpConnection::GetLocalPort, it was incorrectly returning the port number in network-byte-order
+- Added a UdpConnection::GetUdpManager call to get the UdpManager associated with a connection
+- initialized UdpConnection's pass-through pointer to NULL
+- got rid of UdpManager::Initialize and UdpManager::Terminate.  These functions weren't needed after all since WSAStartup/WSACleanup do ref-counting.
+  You can now simply create the UdpManager immediately and it will take care of it.
+
+
+-----------------------------------------------------------------------------------------------------------------
+3/6/2002
+-----------------------------------------------------------------------------------------------------------------
+- UdpManager::ManagerStatistics::elapsedTime changed to milliseconds from seconds.
+- Added bytesSent tracking to UdpConnection::ConnectionStatistics
+- changed all byte and packet count tracking to 64-bit values to prevent rollover. (cleaned up stat tracking code internally while at it)
+- fixed an off-by-one bug in statistics where it was improperly counting the clock-reflect packet it had just sent when calculating packet-loss statistics
+- added a UdpManager::GetLocalPort call to complement the GetLocalIp call (oversight, it should have been there all along).
+- documentation continues to be fleshed out (still a lot of sections missing though, UdpManager::GiveTime section is worth reading)
+
+
+-----------------------------------------------------------------------------------------------------------------
+3/5/2002	
+-----------------------------------------------------------------------------------------------------------------
+- Added two new callback functions, one for when an EstablishConnection
+  call either succeeds or fails and one for when the connection is
+  is terminated by the other end.  EstablishConnection function used for
+  establishing client-side connections now takes a timeout value for how
+  long it should attempt to establish the connection.  Both are completely optional
+  if the application wishes to have callback notification of these events.
+
+- Fixed compiler incompatibility with MSVC 7.0 (template friend function related)
+- Fixed compiler level 4 warnings for unused parameters
+- Modified the resend protocol to throttle back resend times when packetloss
+  occurs to prevent unnecessary spamming on truely link-dead connections.
+
+
+-----------------------------------------------------------------------------------------------------------------
+2/26/2002
+-----------------------------------------------------------------------------------------------------------------
+- Initial release of library to EQ2 team (only)
+  Documentation not yet finished, see header file comments for full documentation.
+
+
+-----------------------------------------------------------------------------------------------------------------
+Distribution Files
+-----------------------------------------------------------
+UdpLibrary.cpp			- main source file
+UdpLibrary.hpp			- main include file
+UdpHandler.hpp			- include needed to be a handler-only
+hashtable.hpp			- include file needed internally
+priority.hpp			- include file needed internally
+udpstress.cpp			- sample application (acts as both client and server)
+UdpLibrary.doc			- documentation file
+UdpLibraryRelease.txt	- this file

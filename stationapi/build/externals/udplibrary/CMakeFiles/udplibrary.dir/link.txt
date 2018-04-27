@@ -1,0 +1,2 @@
+/usr/bin/ar qc libudplibrary.a  CMakeFiles/udplibrary.dir/UdpLibrary.cpp.o
+/usr/bin/ranlib libudplibrary.a

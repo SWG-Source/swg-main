@@ -1,0 +1,1 @@
+/usr/bin/c++    -std=c++14 -Wno-write-strings   CMakeFiles/stationapi_tests.dir/main.cpp.o  -o ../bin/stationapi_tests -rdynamic ../src/stationapi/libstationapi.a 
