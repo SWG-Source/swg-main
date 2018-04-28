@@ -131,7 +131,7 @@ echo -e "\033[1;32m";
 read -p "******************************************************************
 G++ ONLY COMPILE METHOD!!!
 This secton of script will compile the src to binaries. The new
-binaries will be located in /home/swg/swg-main/build/bin
+binaries will be located in /root/swg-main/build/bin
 ******************************************************************
 ******************************************************************
 Do you want to recompile the server code (C++) (GCC) now? (y/n) " response
@@ -144,9 +144,9 @@ if [[ $response =~ ^(yes|y| ) ]]; then
                 export ORACLE_HOME=/usr/lib/oracle/12.2/client;
                 export JAVA_HOME=/usr/java;
                 export ORACLE_SID=swg;
-                rm -rf /home/swg/swg-main/build
-                mkdir /home/swg/swg-main/build
-	        mkdir /home/swg/swg-main/build/bin
+                rm -rf /root/swg-main/build
+                mkdir /root/swg-main/build
+	        mkdir /root/swg-main/build/bin
 	        cd $basedir/build
 
 	if [ $(arch) == "x86_64" ]; then
@@ -179,7 +179,7 @@ fi
 #read -p "******************************************************************
 #CLANG ONLY COMPILER METHOD!!!
 #This secton of script will compile the src to binaries. The new
-#binaries will be located in /home/swg/swg-main/build/bin
+#binaries will be located in /root/swg-main/build/bin
 #******************************************************************
 #******************************************************************
 #Do you want to recompile the server code (C++) (CLANG) now? (y/n) " response
@@ -192,9 +192,9 @@ fi
 #                export ORACLE_HOME=/usr/lib/oracle/12.2/client;
 #                export JAVA_HOME=/usr/java;
 #                export ORACLE_SID=swg;
-#                rm -rf /home/swg/swg-main/build
-#                mkdir /home/swg/swg-main/build
-#	        mkdir /home/swg/swg-main/build/bin
+#                rm -rf /root/swg-main/build
+#                mkdir /root/swg-main/build
+#	        mkdir /root/swg-main/build/bin
 #	        cd $basedir/build
 #
 #        if type clang &> /dev/null; then
