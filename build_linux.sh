@@ -516,9 +516,7 @@ response=${response,,}
 if [[ $response =~ ^(yes|y| ) ]]; then
 cd /root/swg-main/data/sku.0/sys.client
 mkdir compiled
-cd compiled
-mkdir game
-ln -s root/swg-main/clientdata /root/swg-main/data/sku.0/sys.client/compiled/game/
+ln -s /root/swg-main/clientdata/ /root/swg-main/data/sku.0/sys.client/compiled/
 fi
 echo -e "\033[1;33m";
 echo "Congratulations build_linux script is complete!"
