@@ -131,7 +131,7 @@ echo -e "\033[1;32m";
 read -p "******************************************************************
 G++ ONLY COMPILE METHOD!!!
 This secton of script will compile the src to binaries. The new
-binaries will be located in /root/swg-main/build/bin
+binaries will be located in /home/swg/swg-main/build/bin
 ******************************************************************
 ******************************************************************
 Do you want to recompile the server code (C++) (GCC) now? (y/n) " response
@@ -144,9 +144,9 @@ if [[ $response =~ ^(yes|y| ) ]]; then
                 export ORACLE_HOME=/usr/lib/oracle/12.2/client;
                 export JAVA_HOME=/usr/java;
                 export ORACLE_SID=swg;
-                rm -rf /root/swg-main/build
-                mkdir /root/swg-main/build
-	        mkdir /root/swg-main/build/bin
+                rm -rf /home/swg/swg-main/build
+                mkdir /home/swg/swg-main/build
+	        mkdir /home/swg/swg-main/build/bin
 	        cd $basedir/build
 
 	if [ $(arch) == "x86_64" ]; then
@@ -179,7 +179,7 @@ fi
 #read -p "******************************************************************
 #CLANG ONLY COMPILER METHOD!!!
 #This secton of script will compile the src to binaries. The new
-#binaries will be located in /root/swg-main/build/bin
+#binaries will be located in /home/swg/swg-main/build/bin
 #******************************************************************
 #******************************************************************
 #Do you want to recompile the server code (C++) (CLANG) now? (y/n) " response
@@ -192,9 +192,9 @@ fi
 #                export ORACLE_HOME=/usr/lib/oracle/12.2/client;
 #                export JAVA_HOME=/usr/java;
 #                export ORACLE_SID=swg;
-#                rm -rf /root/swg-main/build
-#                mkdir /root/swg-main/build
-#	        mkdir /root/swg-main/build/bin
+#                rm -rf /home/swg/swg-main/build
+#                mkdir /home/swg/swg-main/build
+#	        mkdir /home/swg/swg-main/build/bin
 #	        cd $basedir/build
 #
 #        if type clang &> /dev/null; then
@@ -230,7 +230,7 @@ fi
 echo -e "\033[1;36m";
 read -p "******************************************************************
 This section of script will add your VM's IP to NGE Server configs  
-New configs will be built in /root/swg-main/exe/linux 
+New configs will be built in /home/swg/swg-main/exe/linux 
 ******************************************************************
 ******************************************************************
 Do you want to build the config environment now? (y/n) " response
@@ -462,7 +462,7 @@ response=${response,,}
          if [[ $response =~ ^(yes|y| ) ]]; then
             cd $basedir/stationapi
             ./build.sh
-            mv -T /root/swg-main/stationapi/build/bin /root/swg-main/chat
+            mv -T /home/swg/swg-main/stationapi/build/bin /home/swg/swg-main/chat
             cd $basedir
 fi
 
@@ -514,9 +514,9 @@ This section will link your clientdata folder to sys.client in the server
 Do you want to create the symlink for the clientdata folder? (y/n) " response
 response=${response,,}
 if [[ $response =~ ^(yes|y| ) ]]; then
-cd /root/swg-main/data/sku.0/sys.client
+cd /home/swg/swg-main/data/sku.0/sys.client
 mkdir compiled
-ln -s /root/swg-main/clientdata/ /root/swg-main/data/sku.0/sys.client/compiled/
+ln -s /home/swg/swg-main/clientdata/ /home/swg/swg-main/data/sku.0/sys.client/compiled/
 fi
 echo -e "\033[1;33m";
 echo "Congratulations build_linux script is complete!"

@@ -67,9 +67,9 @@ unset JAVA_HOME;
 export ORACLE_HOME=/usr/lib/oracle/12.2/client;
 export JAVA_HOME=/usr/java;
 export ORACLE_SID=swg;
-rm -rf /root/swg-main/build
-mkdir /root/swg-main/build
-mkdir /root/swg-main/build/bin
+rm -rf /home/swg/swg-main/build
+mkdir /home/swg/swg-main/build
+mkdir /home/swg/swg-main/build/bin
 cd $basedir/build
 export LDFLAGS=-L/usr/lib32
 export CMAKE_PREFIX_PATH="/usr/lib32:/lib32:/usr/lib/i386-linux-gnu:/usr/include/i386-linux-gnu"
@@ -96,7 +96,7 @@ PATH=$oldPATH
 
 cd $basedir/stationapi
 ./build.sh
-mv -T /root/swg-main/stationapi/build/bin /root/swg-main/chat
+mv -T /home/swg/swg-main/stationapi/build/bin /home/swg/swg-main/chat
 cd $basedir
 
 
