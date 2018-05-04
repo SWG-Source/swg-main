@@ -77,18 +77,18 @@ if [[ $response =~ ^(yes|y| ) ]]; then
 	#prepare environment to run data file builders
 	oldPATH=$PATH
 	PATH=$basedir/build/bin:$PATH
-	
+
 	$basedir/utils/build_miff.sh
-	
+
 	buildTemplates=true
-	
+
 	PATH=$oldPATH
 fi
 
 read -p "Do you want to build the datatables (.tab)? (y/n) " response
 response=${response,,}
 if [[ $response =~ ^(yes|y| ) ]]; then
-	prepare environment to run data file builders
+	#prepare environment to run data file builders
 	oldPATH=$PATH
 	PATH=$basedir/build/bin:$PATH
 
@@ -99,9 +99,9 @@ if [[ $response =~ ^(yes|y| ) ]]; then
 	else
 	  $basedir/utils/build_tab.sh
 	fi
-	
+
 	buildTemplates=true
-	
+
 	PATH=$oldPATH
 fi
 
@@ -119,16 +119,16 @@ if [[ $response =~ ^(yes|y| ) ]]; then
 	else
 	  $basedir/utils/build_tpf.sh
 	fi
-	
+
 	buildTemplates=true
-	
+
 	PATH=$oldPATH
 fi
 
 if [[ $buildTemplates = false ]]; then
 	read -p "Do you want to build the Object Template or Quest CRC files? (y/n) " response
 	response=${response,,}
-	if [[ $response =~ ^(yes|y| ) ]]; then		
+	if [[ $response =~ ^(yes|y| ) ]]; then
 		buildTemplates=true
 	fi
 fi
@@ -152,23 +152,23 @@ if [[ $buildTemplates = true ]]; then
 		echo "Enter the database password "
 		read DBPASSWORD
 	fi
-	
+
 	#prepare environment to run data file builders
 	oldPATH=$PATH
 	PATH=$basedir/build/bin:$PATH
-	
+
 	$basedir/utils/build_object_template_crc_string_tables.py
 	$basedir/utils/build_quest_crc_string_tables.py
-	
+
 	cd $basedir/src/game/server/database
-	
+
 	echo "Loading template list"
-	
+
 	perl ./templates/processTemplateList.pl < $basedir/dsrc/sku.0/sys.server/built/game/misc/object_template_crc_string_table.tab > $basedir/build/templates.sql
 	sqlplus ${DBUSERNAME}/${DBPASSWORD}@${DBSERVICE} @$basedir/build/templates.sql > $basedir/build/templates.out
-	
+
 	templatesLoaded=true
-	
+
 	cd $basedir
 	PATH=$oldPATH
 fi
