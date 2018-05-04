@@ -1,0 +1,8 @@
+build/*
+chat/*
+clientdata/*
+configs/*
+data/*
+dsrc/*
+exe/*
+src/*
