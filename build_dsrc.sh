@@ -129,7 +129,7 @@ if [[ $buildTemplates = false ]]; then
 	read -p "Do you want to build the Object Template or Quest CRC files? (y/n) " response
 	response=${response,,}
 	if [[ $response =~ ^(yes|y| ) ]]; then
-		buildTemplates=true
+		$buildTemplates=true
 	fi
 fi
 
