@@ -1,2 +1,0 @@
-/usr/bin/ar qc libstationapi.a  CMakeFiles/stationapi.dir/NodeClient.cpp.o CMakeFiles/stationapi.dir/StreamUtils.cpp.o CMakeFiles/stationapi.dir/StringUtils.cpp.o
-/usr/bin/ranlib libstationapi.a
