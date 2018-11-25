@@ -32,12 +32,12 @@ echo -e "\033[1;31m";
 echo -e "\033[1;36m";
 read -p "What is your GIT username (so we can get the code correctly): " response
 GIT_USER=${response,,}
-GIT_URL=https://${GIT_USER}@bitbucket.org/theswgsource/
-GIT_REPO_DEPEND=${GIT_URL}dependencies-1.2.git
-GIT_REPO_SRC=${GIT_URL}src-1.2.git
-GIT_REPO_DSRC=${GIT_URL}dsrc-1.2.git
-GIT_REPO_CONFIG=${GIT_URL}configs-1.2.git
-GIT_REPO_CLIENTDATA=${GIT_URL}clientdata-1.2.git
+GIT_URL=https://${GIT_USER}@github.com/SWG-Source/
+GIT_REPO_DEPEND=${GIT_URL}dependencies.git
+GIT_REPO_SRC=${GIT_URL}src.git
+GIT_REPO_DSRC=${GIT_URL}dsrc.git
+GIT_REPO_CONFIG=${GIT_URL}configs.git
+GIT_REPO_CLIENTDATA=${GIT_URL}clientdata.git
 
 # specify git branches for each repo
 GIT_REPO_DEPEND_BRANCH=master
@@ -68,7 +68,7 @@ This section of the build script will install latest dependencies
 			source /etc/profile.d/java.sh
 			source /etc/profile.d/oracle.sh
 			touch $basedir/.setup
-			
+
 			echo "Please login and out or reboot as changes have been made to your PATH "
 		fi
 	fi
@@ -76,8 +76,8 @@ fi
 
 echo -e "\033[1;36m";
 read -p "******************************************************************
-This section of script will pull latest src/dsrc from our bitbucket 
-repo. https://bitbucket.org/theswgsource
+This section of script will pull latest src/dsrc from our github
+repo. https://github.com/SWG-Source
 ******************************************************************
 ******************************************************************
 Do you want to pull/update git? (y/n) " response
@@ -140,7 +140,7 @@ if [[ $response =~ ^(yes|y| ) ]]; then
 
                 unset ORACLE_HOME;
                 unset ORACLE_SID;
-                unset JAVA_HOME;   
+                unset JAVA_HOME;
                 export ORACLE_HOME=/usr/lib/oracle/12.2/client;
                 export JAVA_HOME=/usr/java;
                 export ORACLE_SID=swg;
@@ -165,8 +165,8 @@ if [[ $response =~ ^(yes|y| ) ]]; then
 	fi
 
 	make -j$(nproc)
- 
-        # This option strips the bins of debug to make smaller size 
+
+        # This option strips the bins of debug to make smaller size
 	if [[ $MODE =~ ^(Release) ]]; then
 		strip -s bin/*
 	fi
@@ -188,7 +188,7 @@ fi
 #
 #                unset ORACLE_HOME;
 #                unset ORACLE_SID;
-#                unset JAVA_HOME;   
+#                unset JAVA_HOME;
 #                export ORACLE_HOME=/usr/lib/oracle/12.2/client;
 #                export JAVA_HOME=/usr/java;
 #                export ORACLE_SID=swg;
@@ -200,7 +200,7 @@ fi
 #        if type clang &> /dev/null; then
 #	        export CC=clang
 #		export CXX=clang++
-#        fi	
+#        fi
 #
 #	if [ $(arch) == "x86_64" ]; then
 #        	export LDFLAGS=-L/usr/lib32
@@ -218,8 +218,8 @@ fi
 #	fi
 #
 #	make -j$(nproc)
-# 
-#        # This option strips the bins of debug to make smaller size 
+#
+#        # This option strips the bins of debug to make smaller size
 #	if [[ $MODE =~ ^(Release) ]]; then
 #		strip -s bin/*
 #	fi
@@ -229,8 +229,8 @@ fi
 #fi
 echo -e "\033[1;36m";
 read -p "******************************************************************
-This section of script will add your VM's IP to NGE Server configs  
-New configs will be built in /home/swg/swg-main/exe/linux 
+This section of script will add your VM's IP to NGE Server configs
+New configs will be built in /home/swg/swg-main/exe/linux
 ******************************************************************
 ******************************************************************
 Do you want to build the config environment now? (y/n) " response
@@ -246,7 +246,7 @@ if [[ $response =~ ^(yes|y| ) ]]; then
 #		exit
 #	fi
 #
-        
+
 	echo "Enter your IP address (LAN for port forwarding or internal, outside IP for DMZ)"
 	read HOSTIP
 
@@ -287,7 +287,7 @@ if [[ $response =~ ^(yes|y| ) ]]; then
 fi
 echo -e "\033[2;32m";
 read -p "******************************************************************
-This section of script will compile your /dsrc to /data. It will 
+This section of script will compile your /dsrc to /data. It will
 basically convert your Java scripts, tabs & tpf to .iff that server
 will be able to read.
 NOTE: It will do all the conversions at once, or you can skip this
@@ -302,7 +302,7 @@ if [[ $response =~ ^(yes|y| ) ]]; then
 	oldPATH=$PATH
 	PATH=$basedir/build/bin:$PATH
 
-	read -p "Do you wanna use multicore scripts or the safe option? 
+	read -p "Do you wanna use multicore scripts or the safe option?
 Recommended you use safe for this VM operation.(multi/safe) " response
          response=${response,,}
         if [[ $response =~ ^(multi|m| ) ]]; then
@@ -352,11 +352,11 @@ fi
 #	#prepare environment to run data file builders
 #	oldPATH=$PATH
 #	PATH=$basedir/build/bin:$PATH
-#	
+#
 #	$basedir/utils/build_miff.sh
-#	
+#
 #	buildTemplates=true
-#	
+#
 #	PATH=$oldPATH
 #fi
 #
@@ -374,9 +374,9 @@ fi
 #	else
 #	  $basedir/utils/build_tab.sh
 #	fi
-#	
+#
 #	buildTemplates=true
-#	
+#
 #	PATH=$oldPATH
 #fi
 #
@@ -394,16 +394,16 @@ fi
 #	else
 #	  $basedir/utils/build_tpf.sh
 #	fi
-#	
+#
 #	buildTemplates=true
-#	
+#
 #	PATH=$oldPATH
 #fi
 #
 #if [[ $buildTemplates = false ]]; then
 #	read -p "Do you want to build the Object Template or Quest CRC files? (y/n) " response
 #	response=${response,,}
-#	if [[ $response =~ ^(yes|y| ) ]]; then		
+#	if [[ $response =~ ^(yes|y| ) ]]; then
 #		buildTemplates=true
 #	fi
 #fi
@@ -427,23 +427,23 @@ fi
 #		echo "Enter the database password "
 #		read DBPASSWORD
 #	fi
-#	
+#
 #	#prepare environment to run data file builders
 #	oldPATH=$PATH
 #	PATH=$basedir/build/bin:$PATH
-#	
+#
 #	$basedir/utils/build_object_template_crc_string_tables.py
 #	$basedir/utils/build_quest_crc_string_tables.py
-#	
+#
 #	cd $basedir/src/game/server/database
-#	
+#
 #	echo "Loading template list"
-#	
+#
 #	perl ./templates/processTemplateList.pl < $basedir/dsrc/sku.0/sys.server/built/game/misc/object_template_crc_string_table.tab > $basedir/build/templates.sql
 #	sqlplus ${DBUSERNAME}/${DBPASSWORD}@${DBSERVICE} @$basedir/build/templates.sql > $basedir/build/templates.out
-#	
+#
 #	templatesLoaded=true
-#	
+#
 #	cd $basedir
 #	PATH=$oldPATH
 #fi

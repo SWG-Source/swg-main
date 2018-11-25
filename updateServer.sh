@@ -31,12 +31,12 @@ echo -e "\033[1;31m";
 
 
 GIT_USER=${response,,}
-GIT_URL=https://${GIT_USER}@bitbucket.org/theswgsource/
-GIT_REPO_DEPEND=${GIT_URL}dependencies-1.2.git
-GIT_REPO_SRC=${GIT_URL}src-1.2.git
-GIT_REPO_DSRC=${GIT_URL}dsrc-1.2.git
-GIT_REPO_CONFIG=${GIT_URL}configs-1.2.git
-GIT_REPO_CLIENTDATA=${GIT_URL}clientdata-1.2.git
+GIT_URL=https://${GIT_USER}@github.com/SWG-Source/
+GIT_REPO_DEPEND=${GIT_URL}dependencies.git
+GIT_REPO_SRC=${GIT_URL}src.git
+GIT_REPO_DSRC=${GIT_URL}dsrc.git
+GIT_REPO_CONFIG=${GIT_URL}configs.git
+GIT_REPO_CLIENTDATA=${GIT_URL}clientdata.git
 GIT_REPO_DEPEND_BRANCH=master
 GIT_REPO_SRC_BRANCH=master
 GIT_REPO_DSRC_BRANCH=master
@@ -63,7 +63,7 @@ MODE=Release
 
 unset ORACLE_HOME;
 unset ORACLE_SID;
-unset JAVA_HOME;   
+unset JAVA_HOME;
 export ORACLE_HOME=/usr/lib/oracle/12.2/client;
 export JAVA_HOME=/usr/java;
 export ORACLE_SID=swg;

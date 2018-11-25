@@ -30,21 +30,22 @@ echo -e "\033[1;33m|___/  \_/\_/  \___| |___/\___/ \_,_||_|  \__|\___|  \_/ |_|(
 echo -e "\033[1;31m";
 
 echo -e "\033[1;36m";
-read -p "What is your GIT username (so we can get the code correctly): " response
-GIT_USER=${response,,}
-GIT_URL=https://${GIT_USER}@bitbucket.org/theswgsource/
-GIT_REPO_DEPEND=${GIT_URL}dependencies-1.2.git
-GIT_REPO_SRC=${GIT_URL}src-1.2.git
-GIT_REPO_DSRC=${GIT_URL}dsrc-1.2.git
-GIT_REPO_CONFIG=${GIT_URL}configs-1.2.git
-GIT_REPO_CLIENTDATA=${GIT_URL}clientdata-1.2.git
+#Commenting this for now... This script doesn't pull anyways.
+#read -p "What is your GIT username (so we can get the code correctly): " response
+#GIT_USER=${response,,}
+#GIT_URL=https://${GIT_USER}@github.com/SWG-Source/
+#GIT_REPO_DEPEND=${GIT_URL}dependencies.git
+#GIT_REPO_SRC=${GIT_URL}src.git
+#GIT_REPO_DSRC=${GIT_URL}dsrc.git
+#GIT_REPO_CONFIG=${GIT_URL}configs.git
+#GIT_REPO_CLIENTDATA=${GIT_URL}clientdata.git
 
 # specify git branches for each repo
-GIT_REPO_DEPEND_BRANCH=master
-GIT_REPO_SRC_BRANCH=master
-GIT_REPO_DSRC_BRANCH=master
-GIT_REPO_CONFIG_BRANCH=master
-GIT_REPO_CLIENTDATA_BRANCH=master
+#GIT_REPO_DEPEND_BRANCH=master
+#GIT_REPO_SRC_BRANCH=master
+#GIT_REPO_DSRC_BRANCH=master
+#GIT_REPO_CONFIG_BRANCH=master
+#GIT_REPO_CLIENTDATA_BRANCH=master
 
 
 echo -e "\033[2;31m******************************************************************
