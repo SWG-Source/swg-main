@@ -30,8 +30,8 @@ echo -e "\033[1;33m|___/  \_/\_/  \___| |___/\___/ \_,_||_|  \__|\___|  \_/ |_|(
 echo -e "\033[1;31m";
 
 
-GIT_USER=${response,,}
-GIT_URL=https://${GIT_USER}@github.com/SWG-Source/
+#GIT_USER=${response,,}
+GIT_URL=https://github.com/SWG-Source/
 GIT_REPO_DEPEND=${GIT_URL}dependencies.git
 GIT_REPO_SRC=${GIT_URL}src.git
 GIT_REPO_DSRC=${GIT_URL}dsrc.git
