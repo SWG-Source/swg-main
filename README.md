@@ -162,4 +162,4 @@ To start the server after building, execute the following script:
 
 Point your login.cfg in your game folder (on you client machine, NOT the VM) to the IP address of the Virtual Machine such that you can connect successfully.
 
-AND YOUR DONE!
+AND YOU'RE DONE!
