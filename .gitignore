@@ -4,6 +4,7 @@ clientdata/
 configs/
 data/
 dsrc/
+dependencies/
 exe/
 src/
 !stationapi/src/

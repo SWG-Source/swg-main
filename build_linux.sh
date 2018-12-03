@@ -57,19 +57,27 @@ This section of the build script will install latest dependencies
 !!!ONLY RUN ONCE!!! Do you want to install dependencies (y/n)?" response
 		response=${response,,} # tolower
 		if [[ $response =~ ^(yes|y| ) ]]; then
-			if [ ! -d $basedir/dependencies ]; then
-				git clone -b $GIT_REPO_DEPEND_BRANCH $GIT_REPO_DEPEND dependencies
-			else
-				cd $basedir/dependencies
-				git pull
-				cd $basedir
-			fi
-			$basedir/utils/init/debian.sh
-			source /etc/profile.d/java.sh
-			source /etc/profile.d/oracle.sh
-			touch $basedir/.setup
+			if [[ $(git lfs install) = *"Git LFS initialized." ]]; then
+				if [ ! -d $basedir/dependencies ]; then
+					git clone -b $GIT_REPO_DEPEND_BRANCH $GIT_REPO_DEPEND dependencies
+					cd $basedir/dependencies
+					git lfs install
+					git lfs pull
+				else
+					cd $basedir/dependencies
+					git pull
+					git lfs pull
+					cd $basedir
+				fi
+				$basedir/utils/init/debian.sh
+				source /etc/profile.d/java.sh
+				source /etc/profile.d/oracle.sh
+				touch $basedir/.setup
 
-			echo "Please login and out or reboot as changes have been made to your PATH "
+				echo "Please login and out or reboot as changes have been made to your PATH "
+			else
+				echo "Please install Git LFS and try again."
+			fi
 		fi
 	fi
 fi
