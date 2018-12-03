@@ -6,6 +6,7 @@ data/
 dsrc/
 exe/
 src/
+!stationapi/src/
 stationapi/build/
 stationapi/externals/
 .setup
