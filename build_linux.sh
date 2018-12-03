@@ -63,6 +63,7 @@ This section of the build script will install latest dependencies
 					cd $basedir/dependencies
 					git lfs install
 					git lfs pull
+					cd $basedir
 				else
 					cd $basedir/dependencies
 					git pull
