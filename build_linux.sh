@@ -153,9 +153,9 @@ if [[ $response =~ ^(yes|y| ) ]]; then
                 export ORACLE_HOME=/usr/lib/oracle/12.2/client;
                 export JAVA_HOME=/usr/java;
                 export ORACLE_SID=swg;
-                rm -rf /home/swg/swg-main/build
-                mkdir /home/swg/swg-main/build
-	        mkdir /home/swg/swg-main/build/bin
+                rm -rf $basedir/build
+                mkdir $basedir/build
+	        mkdir $basedir/build/bin
 	        cd $basedir/build
 
 	if [ $(arch) == "x86_64" ]; then
@@ -471,7 +471,7 @@ response=${response,,}
          if [[ $response =~ ^(yes|y| ) ]]; then
             cd $basedir/stationapi
             ./build.sh
-            mv -T /home/swg/swg-main/stationapi/build/bin /home/swg/swg-main/chat
+            mv -T $basedir/stationapi/build/bin $basedir/chat
             cd $basedir
 fi
 
@@ -523,9 +523,9 @@ This section will link your clientdata folder to sys.client in the server
 Do you want to create the symlink for the clientdata folder? (y/n) " response
 response=${response,,}
 if [[ $response =~ ^(yes|y| ) ]]; then
-cd /home/swg/swg-main/data/sku.0/sys.client
+cd $basedir/data/sku.0/sys.client
 mkdir compiled
-ln -s /home/swg/swg-main/clientdata/ /home/swg/swg-main/data/sku.0/sys.client/compiled/
+ln -s $basedir/clientdata/ $basedir/data/sku.0/sys.client/compiled/
 fi
 echo -e "\033[1;33m";
 echo "Congratulations build_linux script is complete!"
