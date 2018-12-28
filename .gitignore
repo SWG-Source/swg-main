@@ -7,6 +7,7 @@ dsrc/
 dependencies/
 exe/
 src/
+miff/
 !stationapi/src/
 stationapi/build/
 stationapi/externals/

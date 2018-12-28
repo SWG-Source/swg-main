@@ -1,0 +1,418 @@
+<project name="SWGBuild" default="init" basedir="/home/swg/swg-main">
+	<import file="git_targets.xml" />
+	<description>
+		This build file will build all aspects of the SWG Source Code.  Created by Cekis (cekisswg@gmail.com).
+	</description>
+	<!-- Property File -->
+	<property file = "build.properties"/>
+	
+	<!-- Global Properties -->	
+	<property name="build" location="${basedir}/build"/>
+	<!-- Database Service Name is derived to make it easier in the properties file -->
+	<property name="service_name" value="//${server_ip_address}/${db_service}"/>
+	
+	<!-- Setup Source Directories -->
+	<property name="exe" location="${basedir}/exe"/>
+	<property name="src" location="${basedir}/src"/>
+	<property name="dsrc" location="dsrc" relative="true" basedir="${basedir}"/>
+	<property name="data" location="data" relative="true" basedir="${basedir}"/>
+	<property name="clientdata" location="${basedir}/clientdata"/>
+	<property name="configs" location="configs" relative="true" basedir="${basedir}"/>
+	
+	<!-- Setup Key Game Directories -->
+	<property name="dsrc_server" location="${dsrc}/sku.0/sys.server/compiled/game"/>
+	<property name="dsrc_shared" location="${dsrc}/sku.0/sys.shared/compiled/game"/>
+	<property name="data_server" location="${data}/sku.0/sys.server/compiled/game"/>
+	<property name="data_shared" location="${data}/sku.0/sys.shared/compiled/game"/>
+	<property name="data_client" location="${data}/sku.0/sys.client/compiled"/>
+	
+	<!-- Setup CRC Files to load into the database -->
+	<property name="object_crc_file" location="${dsrc}/sku.0/sys.server/built/game/misc/object_template_crc_string_table.tab"/>
+	<property name="templates_sql_file" location="${build}/templates.sql"/>
+	
+	<!-- Define where most of our compiled tools will live -->
+	<property name="tools_home" location="${build}/bin"/>
+	<property name="bin_home" location="${exe}/linux/bin"/>
+	<property environment="env"/>
+	
+	<!-- The init target handles the environment setup - not much to do but create directories -->
+	<target name="init">
+		<tstamp/>
+		<mkdir dir="${build}"/>
+		<mkdir dir="${data_server}"/>
+		<mkdir dir="${data_shared}"/>
+		<mkdir dir="${data_client}"/>
+	</target>
+	
+	<target name="swg" description="builds the entire SWG codebase for the first run" depends="clean,git_all_update,update_configs,create_database,compile">
+	</target>
+	
+	<!-- Clean simply calls the other clean targets -->
+	<target name="clean" depends="clean_src,clean_dsrc,init">
+	</target>
+	
+	<!-- Delete the SRC Build folder -->
+	<target name="clean_src">
+		<echo>Cleaning the SRC build directory.</echo>
+		<delete dir="${build}" verbose="false"/>
+	</target>
+	
+	<!-- Delete the DSRC Build folder -->
+	<target name="clean_dsrc">
+		<echo>Cleaning the DSRC directory.</echo>
+		<delete dir="${data}" verbose="false"/>
+	</target>
+	
+	<!-- Delete the DSRC Build folder -->
+	<target name="clean_java">
+		<echo>Cleaning the DSRC script directory.</echo>
+		<delete dir="${data_server}/script" verbose="false"/>
+	</target>
+	
+	<!-- Gets the architecture we're on - uses old way of getting it from original build_linux.sh script -->
+	<target name="get_arch">
+		<exec executable="arch" dir="." outputproperty="arch"/>
+		<condition property="compile.x86">
+			<equals arg1="${arch}" arg2="x86_64"/>
+		</condition>
+		<echo>Architecture is ${arch}</echo>
+		<condition property="is_debug_build">
+			<equals arg1="${src_build_type}" arg2="Debug"/>
+		</condition>
+		<echo>Creating a ${src_build_type} build</echo>
+	</target>
+	
+	<!-- Gets the number of processors at our disposal -->
+	<target name="get_num_procs">
+		<exec executable="nproc" dir="." outputproperty="nproc"/>
+		<echo>We have ${nproc} processors (cores) to use.</echo>
+	</target>
+	
+	<!-- Calls git on all of our source folders -->
+	<target name="git_all_update" description="go refresh all of our repos" depends="check_git_dirs,clone_src,git_src,clone_dsrc,git_dsrc,clone_clientdata,git_clientdata,clone_configs,git_configs">
+	</target>
+	
+	<target name="check_git_dirs" description="checks and sets values if directories exist or not">
+		<condition property="src.exists">
+			<available file="${src}" type="dir"/>
+		</condition>
+		<condition property="dsrc.exists">
+			<available file="${dsrc}" type="dir"/>
+		</condition>
+		<condition property="clientdata.exists">
+			<available file="${clientdata}" type="dir"/>
+		</condition>
+		<condition property="configs.exists">
+			<available file="${configs}" type="dir"/>
+		</condition>
+	</target>
+	
+	<target name="update_configs" description="updates the configuration files with the desired settings" if="firstrun" depends="clone_configs">
+		<replace dir="${exe}" propertyFile="${basedir}/build.properties">
+			<include name="**/*.cfg"/>
+			<replacefilter token="CLUSTERNAME" property="cluster_name"/>
+			<replacefilter token="HOSTIP" property="server_ip_address"/>
+			<replacefilter token="DBUSERNAME" property="db_username"/>
+			<replacefilter token="DBSERVICE" value="//${server_ip_address}/${db_service}"/>
+			<replacefilter token="DBPASSWORD" property="db_password"/>
+		</replace>
+	</target>
+	
+	<!-- Calls git on our SRC folder -->
+	<target name="clone_src" description="go get the source from swg source" unless="${src.exists}" depends="check_git_dirs">
+		<git-clone-pull repository="${src_repo}" dest="${src}" branch="${src_branch}"/>
+	</target>
+	<target name="git_src" description="go get the source from swg source" if="${src.exists}" depends="check_git_dirs">
+		<git-pull dir="${src}" branch="${src_branch}"/>
+	</target>
+	
+	<!-- Calls git on our DSRC folder -->
+	<target name="clone_dsrc" description="go get server dsrc from swg source" unless="${dsrc.exists}" depends="check_git_dirs">
+		<git-clone-pull repository="${dsrc_repo}" dest="${dsrc}" branch="${dsrc_branch}"/>
+	</target>
+	<target name="git_dsrc" description="go get server dsrc from swg source" if="${dsrc.exists}" depends="check_git_dirs">
+		<git-pull dir="${dsrc}" branch="${dsrc_branch}"/>
+	</target>
+	
+	<!-- Calls git on our CLIENTDATA folder -->
+	<target name="clone_clientdata" description="go get clientdata from swg source" unless="${clientdata.exists}" depends="check_git_dirs">
+		<git-clone-pull repository="${clientdata_repo}" dest="${clientdata}" branch="${clientdata_branch}"/>
+		<mkdir dir="${exe}/linux/logs"/>
+	</target>
+	<target name="git_clientdata" description="go get clientdata from swg source" if="${clientdata.exists}" depends="check_git_dirs">
+		<git-pull dir="${clientdata}" branch="${clientdata_branch}"/>
+	</target>
+	
+	<!-- Calls git on our CONFIGS folder -->
+	<target name="clone_configs" description="go get server configs from swg source" unless="${configs.exists}" depends="check_git_dirs">
+		<git-clone-pull repository="${configs_repo}" dest="${configs}" branch="${configs_branch}"/>
+		<copy todir="${basedir}/exe">
+			<fileset dir="${configs}"/>
+		</copy>
+	</target>
+	<target name="git_configs" description="got get server config files from swg source" if="${configs.exists}" depends="check_git_dirs">
+		<git-pull dir="${configs}" branch="${configs_branch}"/>
+	</target>
+	
+	<!-- Creates the Make files for our SRC that will be used during compile stage (Intel) -->
+	<target name="prepare_src_x86" depends="init,get_arch" description="prepare server code - Intel" if="compile.x86">
+		<exec executable="cmake" dir="${build}" failonerror="true">
+			<env key="PATH" value="${env.PATH}:${tools_home}"/>
+			<env key="CC" value="clang"/>
+			<env key="CXX" value="clang++"/>
+			<env key="LDFLAGS" value="-L/usr/lib32"/>
+			<env key="CMAKE_PREFIX_PATH" value="/usr/lib32:/lib32:/usr/lib/i386-linux-gnu:/usr/include/i386-linux-gnu"/>
+			<arg value="-DCMAKE_C_FLAGS=-m32"/>
+			<arg value="-DCMAKE_CXX_FLAGS=-m32"/>
+			<arg value="-DCMAKE_EXE_LINKER_FLAGS=-m32"/>
+			<arg value="-DCMAKE_MODULE_LINKER_FLAGS=-m32"/>
+			<arg value="-DCMAKE_SHARED_LINKER_FLAGS=-m32"/>
+			<arg value="-DCMAKE_BUILD_TYPE=${src_build_type}"/>
+			<arg value="${src}"/>
+		</exec>
+	</target>	
+	
+	<!-- Creates the Make files for our SRC that will be used during compile stage (Non-Intel) -->
+	<target name="prepare_src" depends="init,get_arch" description="compile server code - non Intel" unless="compile.x86">
+		<exec executable="cmake" dir="${build}" failonerror="true">
+			<env key="PATH" value="${env.PATH}:${tools_home}"/>
+			<env key="CC" value="clang"/>
+			<env key="CXX" value="clang++"/>
+			<arg value="-DCMAKE_BUILD_TYPE=${src_build_type}"/>
+			<arg value="${src}"/>
+		</exec>
+	</target>
+	
+	<target name="strip_src" unless="${is_debug_build}" description="removes debugging information from release builds, making them smaller">
+		<exec executable="strip" dir="${build}">
+			<arg value="-d"/>
+			<arg value="bin/*"/>
+		</exec>
+	</target>
+	
+	<!-- Compiles the SRC (C++) code -->
+	<target name="compile_src" description="compile server code" depends="init,prepare_src,prepare_src_x86,get_num_procs,strip_src">
+		<exec executable="make" dir="${build}" failonerror="true">
+			<arg value="-j${nproc}"/>
+		</exec>
+	</target>
+	
+	<!-- Compiles the DSRC (Java) code -->
+	<target name="compile_java" depends="init" description="compile java code">
+		<javac srcdir="${dsrc_server}" destdir="${data_server}" includeantruntime="false" classpath="${data_server}" encoding="utf8" sourcepath="${dsrc_server}" debug="true" deprecation="on">
+			<compilerarg value="-Xlint:-options"/>
+		</javac>
+		<antcall target="create_symlinks"/>
+	</target>
+	
+	<!-- Compiles all code necessary for server execution -->
+	<target name="compile" depends="compile_src,compile_java,compile_miff,compile_tpf,compile_tab,load_templates">
+	</target>
+	
+	<!-- Compiles all .mif files -->
+	<target name="compile_miff">
+		<fileset id="miff_files" dir="${dsrc}" includes="**/*.mif"/>
+		<touch mkdirs="true" verbose="false">
+		  <fileset refid="miff_files"/>
+		  <mapper type="glob" from="*.mif" to="${data}/*/.tmp" />
+		</touch>
+		<delete>
+		  <fileset dir="${data}" includes="**/.tmp"/>
+		</delete>
+		<apply executable="./Miff" dir="${tools_home}" dest="${data}" parallel="false" type="file">
+			<env key="PATH" value="${env.PATH}:${tools_home}"/>
+			<arg value="-i"/>
+			<srcfile prefix="&quot;" suffix="&quot;"/>
+			<arg value="-o"/>
+			<targetfile prefix="&quot;" suffix="&quot;"/>
+			<fileset refid="miff_files"/>
+			<mapper type="glob" from="*.mif" to="*.iff"/>
+		</apply>
+		<antcall target="cleanup"/>
+	</target>
+	
+	<!-- Compiles all .tab files -->
+	<target name="compile_tab">
+		<property name="server_datatables" location="${dsrc_server}/datatables"/>
+		<property name="shared_datatables" location="${dsrc_shared}/datatables"/>
+		<property name="include_datatables" location="${shared_datatables}/include"/>
+		<touch mkdirs="true" verbose="false">
+			<fileset dir="${dsrc}" includes="**/*.tab"/>
+			<mapper type="glob" from="*.tab" to="${data}/*/.tmp" />
+		</touch>
+		<delete>
+			<fileset dir="${data}" includes="**/.tmp"/>
+		</delete>
+		<apply executable="./DataTableTool" dir="${tools_home}" dest="${data}" parallel="false" type="file" failonerror="true">
+			<env key="PATH" value="${env.PATH}:${tools_home}"/>
+			<arg value="-i"/>
+			<srcfile prefix="&quot;" suffix="&quot;"/>
+			<arg value="-- -s SharedFile"/>
+			<arg value="searchPath10=${data_shared}"/>
+			<arg value="searchPath10=${data_server}"/>
+			<arg value="searchPath10=${data_server}"/>
+			<fileset dir="${dsrc}" includes="**/*.tab" excludes="**/object_template_crc_string_table.tab,**/quest_crc_string_table.tab"/>
+			<mapper type="glob" from="*.tab" to="*.iff"/>
+		</apply>
+		<antcall target="cleanup"/>
+	</target>
+	
+	<!-- Compiles all Template Files (.tpf) -->
+	<target name="compile_tpf" description="compile the template files (*.tpf) into .iff">
+		<touch mkdirs="true" verbose="false">
+			<fileset dir="${dsrc}" includes="**/*.tpf"/>
+			<mapper type="glob" from="*.tpf" to="${data}/*/.tmp" />
+		</touch>
+		<delete>
+			<fileset dir="${data}" includes="**/.tmp"/>
+		</delete>
+		<apply executable="${tools_home}/TemplateCompiler" dir="${basedir}" dest="${basedir}" parallel="false" type="file" failonerror="false" relative="true">
+			<env key="PATH" value="${env.PATH}:${tools_home}"/>
+			<arg value="-compile"/>
+			<srcfile/>
+			<fileset dir="${basedir}" includes="${dsrc}/**/*.tpf"/>
+			<mapper type="glob" from="${dsrc}/*.tpf" to="${data}/*.iff"/>
+		</apply>
+		<antcall target="load_templates"/>
+		<antcall target="cleanup"/>
+	</target>
+	
+	<!-- Creates the Object Template CRC file -->
+	<target name="build_object_template_crc" description="creates the object template crc file">
+		<exec executable="utils/build_object_template_crc_string_tables.py" dir="${basedir}">
+			<env key="PATH" value="${env.PATH}:${tools_home}"/>
+        </exec>
+	</target>
+	
+	<!-- Creates the Quest CRC file -->
+	<target name="build_quest_crc" description="creates the quest crc file">
+		<exec executable="utils/build_quest_crc_string_tables.py" dir="${basedir}">
+			<env key="PATH" value="${env.PATH}:${tools_home}"/>
+        </exec>
+	</target>
+	
+	<!-- Creates SQL (insert statements) to get all the CRC Templates into the database -->
+	<target name="process_templates" description="generates sql from generated crc files" depends="build_object_template_crc,build_quest_crc">
+		<exec executable="perl" dir="${basedir}/src/game/server/database/templates" input="${object_crc_file}" output="${templates_sql_file}">
+			<env key="PATH" value="${env.PATH}:${tools_home}"/>
+			<arg value="processTemplateList.pl"/>
+        </exec>
+	</target>
+	
+	<!-- Executes the generated Template CRC SQL in SQL*Plus -->
+	<target name="load_templates" description="loads generated templates into the database" depends="process_templates">
+		<exec executable="sqlplus" dir="${build}">
+			<arg value="${db_username}/${db_password}@${service_name}"/>
+			<arg value="@${templates_sql_file}"/>
+        </exec>
+	</target>
+	
+	<!-- Target used to create database tables -->
+	<target name="create_database" description="creates database tables from existing sql scripts" if="firstrun">
+		<replace file="build.properties" token="firstrun = true" value="firstrun = false"/>
+		<exec executable="perl" dir="${basedir}/src/game/server/database/build/linux">
+			<env key="PATH" value="${env.PATH}:${tools_home}"/>
+			<arg value="database_update.pl"/>
+			<arg value="--username=${db_username}"/>
+			<arg value="--password=${db_password}"/>
+			<arg value="--service=${service_name}"/>
+			<arg value="--goldusername=${db_username}"/>
+			<arg value="--loginusername=${db_username}"/>
+			<arg value="--createnewcluster"/>
+			<arg value="--packages"/>
+        </exec>
+	</target>
+	
+	<!-- Target used to delete database tables - change properties file "firstrun" from "false" to "true" to enable execution -->
+	<target name="drop_database" description="creates database tables from existing sql scripts" if="firstrun">
+		<replace file="build.properties" token="firstrun = true" value="firstrun = false"/>
+		<exec executable="perl" dir="${basedir}/src/game/server/database/build/linux">
+			<env key="PATH" value="${env.PATH}:${tools_home}"/>
+			<arg value="database_update.pl"/>
+			<arg value="--username=${db_username}"/>
+			<arg value="--password=${db_password}"/>
+			<arg value="--service=${service_name}"/>
+			<arg value="--goldusername=${db_username}"/>
+			<arg value="--loginusername=${db_username}"/> 
+			<arg value="--drop"/>
+			<arg value="--packages"/>
+        </exec>
+	</target>
+	
+	<target name="create_symlinks" if="firstrun">
+		<symlink link="${basedir}/data/sku.0/sys.client/compiled/clientdata" resource="${clientdata}"/>
+		<symlink link="${basedir}/exe/linux/bin" resource="${tools_home}"/>
+	</target>
+	
+	<target name="start" description="starts the server" depends="create_symlinks,stop">
+		<exec executable="bin/LoginServer" dir="${exe}/linux">
+			<arg value="--"/>
+			<arg value="@servercommon.cfg &amp;"/>
+		</exec>
+		<exec executable="sleep" dir="${exe}/linux">
+			<arg value="5"/>
+		</exec>
+		<exec executable="bin/TaskManager" dir="${exe}/linux">
+			<arg value="--"/>
+			<arg value="@servercommon.cfg"/>
+		</exec>
+	</target>
+	
+	<target name="stop" description="stops the login server">
+		<exec executable="killall" dir="${basedir}">
+			<arg value="LoginServer"/>
+		</exec>
+		<exec executable="killall" dir="${basedir}">
+			<arg value="CentralServer"/>
+		</exec>
+		<exec executable="killall" dir="${basedir}">
+			<arg value="ChatServer"/>
+		</exec>
+		<exec executable="killall" dir="${basedir}">
+			<arg value="CommoditiesServer"/>
+		</exec>
+		<exec executable="killall" dir="${basedir}">
+			<arg value="ConnectionServer"/>
+		</exec>
+		<exec executable="killall" dir="${basedir}">
+			<arg value="CustomerServiceServer"/>
+		</exec>
+		<exec executable="killall" dir="${basedir}">
+			<arg value="LogServer"/>
+		</exec>
+		<exec executable="killall" dir="${basedir}">
+			<arg value="MetricsServer"/>
+		</exec>
+		<exec executable="killall" dir="${basedir}">
+			<arg value="PlanetServer"/>
+		</exec>
+		<exec executable="killall" dir="${basedir}">
+			<arg value="ServerConsole"/>
+		</exec>
+		<exec executable="killall" dir="${basedir}">
+			<arg value="SwgDatabaseServer"/>
+		</exec>
+		<exec executable="killall" dir="${basedir}">
+			<arg value="SwgGameServer"/>
+		</exec>
+		<exec executable="killall" dir="${basedir}">
+			<arg value="TransferServer"/>
+		</exec>
+		<exec executable="killall" dir="${basedir}">
+			<arg value="TaskManager"/>
+		</exec>
+	</target>
+	
+	<!-- Cleans up empty folders from the build folder -->
+	<target name="cleanup" description="Clean up">
+		<delete includeemptydirs="true">
+			<fileset dir="${data}">
+				<and>
+					<size value="0"/>
+					<type type="dir"/>
+				</and>
+			</fileset>
+		</delete>
+	</target>
+	
+</project>

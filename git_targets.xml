@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="git_targets"  basedir="." >
+	<!-- ===============================
+	              Git tasks
+	==================================== -->
+  <macrodef name = "git">
+	  <attribute name = "command" />
+	  <attribute name = "dir" default = "" />
+	  <element name = "args" optional = "true" />
+	  <sequential>
+	    <echo message = "git @{command}" />
+	    <exec executable = "git" dir = "@{dir}"  failonerror="true">
+	      <arg value = "@{command}" />
+	      <args/>
+	    </exec>
+	  </sequential>
+	</macrodef>
+	<macrodef name = "git-clone-pull">
+	  <attribute name = "repository" />
+	  <attribute name = "dest" />
+	  <attribute name = "branch" />
+	  <sequential>
+	    <git command = "clone">
+	      <args>
+	        <arg value = "@{repository}" />
+          <arg line = "-b @{branch}" />
+	        <arg value = "@{dest}" />
+	      </args>
+	    </git>
+	    <git-pull branch="@{branch}"  dir="@{dest}" />
+	  </sequential>
+	</macrodef>
+	<macrodef name = "git-pull">
+	  <attribute name = "dir" />
+	  <attribute name = "branch" />
+	  <sequential>
+	    <echo>Pulling @{dir}, branch: @{branch}</echo>
+	    <git command = "pull" dir="@{dir}" >
+	      <args>
+	        <arg value = "origin" />
+	        <arg value = "@{branch}" />
+	      </args>
+	    </git>
+	  </sequential>
+	</macrodef>
+	<macrodef name = "git-push">
+	  <attribute name = "dir" />
+	  <attribute name = "branch" />
+	  <sequential>
+	    <echo>Pushing @{dir} to @{branch}</echo>
+	    <git command = "push" dir="@{dir}" >
+	      <args>
+	        <arg value = "origin" />
+	        <arg value = "@{branch}" />
+	      </args>
+	    </git>
+	  </sequential>
+	</macrodef>
+	<macrodef name = "git-checkout">
+	  <attribute name = "branch" />
+	  <attribute name = "dir" />
+	  <sequential>
+	    <echo>Checking out @{branch} branch</echo>
+	    <git command="checkout" dir="@{dir}">
+	      <args>
+	        <arg value="@{branch}" />
+	      </args>
+	    </git>
+	  </sequential>
+	</macrodef>
+  <macrodef name = "git-commit">
+    <attribute name = "comment" />
+    <attribute name = "file" />
+    <attribute name = "dir" />
+    <attribute name = "branch" />
+    <sequential>
+      <echo>Commiting @{file} to git on branch @{branch}</echo>
+      <git command="add" dir="@{dir}">
+        <args>
+          <arg value="@{file}" />
+        </args>
+      </git>
+      <git command="commit" dir="@{dir}">
+        <args>
+          <arg value="@{file}" />
+          <arg line="-m '${comment}'" />
+        </args>
+      </git>
+      <git-push branch="${branch}" dir="@{dir}" />
+    </sequential>
+  </macrodef>
+  <macrodef name = "git-tag">
+   <attribute name = "comment" />
+   <attribute name = "dir" />
+   <attribute name = "version" />
+   <sequential>
+	   <if>
+	   	<isset property="dont_zip" />
+	   	<then/>
+	   	<else>
+	     <echo>Tagging @{dir} @{version} </echo>
+	     <git command="tag" dir="@{dir}">
+	       <args>
+	         <arg line="-a @{version}" />
+	         <arg line="-m '@{comment}'" />
+	       </args>
+	     </git>
+	     <git-push branch="@{version}" dir="@{dir}" />
+		  </else>
+		</if>
+    </sequential>
+  </macrodef>
+
+<!--
+	<target name="git_tag">
+	  <git command="tag" dir="staging/${extn}">
+	    <args>
+	      <arg line="-a ${next_version}" />
+	      <arg line="-m '${comment}'" />
+	    </args>
+	  </git>
+        <git-push-tag branch="${next_version}" dir="staging/${extn}" />
+	</target>-->
+
+		<!-- ===============================
+	              Modman tasks
+	==================================== -->
+	
+	<macrodef name="modman">
+	  <attribute name="command" />
+	  <attribute name="dir" default="" />
+	  <element name="args" optional="true" />
+	  <sequential>
+	    <echo message="modman @{command} in @{dir}" />
+	    <exec executable="modman" dir="@{dir}">
+	      <arg value="@{command}" />
+	      <args/>
+	    </exec>
+	  </sequential>
+	</macrodef>
+	
+	<macrodef name="modman-clone">
+	  <attribute name="repos" />
+	  <attribute name="dest" />
+	  <attribute name="branch" />
+	  <sequential>
+	    <modman command="clone" dir="@{dest}">
+	      <args>
+	        <arg value="@{repos}" />
+          <arg line="--branch @{branch}" />
+	      </args>
+	    </modman>
+	  </sequential>
+	</macrodef>
+
+	<macrodef name="modman-clone-overlay">
+	  <attribute name="extn" />
+	  <attribute name="dest" />
+	  <attribute name="branch" />
+	  <attribute name="repos" />
+	  <sequential>
+    	<echo>Cloning @{extn} with branch @{branch} (named: @{extn}@{branch})</echo>
+	    <modman command="clone" dir="@{dest}">
+	      <args>
+	      	<arg value="@{extn}@{branch}" />
+	        <arg value="@{repos}" />
+          <arg line="--branch @{branch}" />
+	      </args>
+	    </modman>
+	  </sequential>
+	</macrodef>
+	
+	<macrodef name="modman-update">
+	  <attribute name="dir" />
+	  <attribute name="extn" />
+	  <sequential>
+      <echo>Updating @{dir}, extn: @{extn}</echo>
+	    <modman command="update" extn="@{extn}" dir="@{dest}" />
+	  </sequential>
+	</macrodef>
+
+
+</project>
