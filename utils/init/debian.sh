@@ -38,14 +38,14 @@ sudo ln -s /opt/jdk1.8.0_152 /usr/java
 # nuke old versions
 sudo rm -rf /usr/lib/oracle &> /dev/null
 
-if [ $arch == "i386" ]; then 
+if [ $arch == "i386" ]; then
 	sudo alien -i oracle-instantclient12.2-basiclite-12.2.0.1.0-1.i386.rpm
 	sudo alien -i oracle-instantclient12.2-devel-12.2.0.1.0-1.i386.rpm
-	sudo alien -i oracle-instantclient12.1-sqlplus-12.1.0.2.0-1.i386.rpm
+	sudo alien -i oracle-instantclient12.2-sqlplus-12.2.0.1.0-1.i386.rpm
 else
 	sudo alien -i --target=amd64 oracle-instantclient12.2-basiclite-12.2.0.1.0-1.i386.rpm
 	sudo alien -i --target=amd64 oracle-instantclient12.2-devel-12.2.0.1.0-1.i386.rpm
-	sudo alien -i --target=amd64 oracle-instantclient12.1-sqlplus-12.1.0.2.0-1.i386.rpm
+	sudo alien -i --target=amd64 oracle-instantclient12.2-sqlplus-12.2.0.1.0-1.i386.rpm
 fi
 
 # set env vars
