@@ -1,5 +1,11 @@
 #/bin/bash
 
+get_current_branch()
+{
+	git --git-dir=dsrc/.git symbolic-ref HEAD | sed -e 's,.*/\(.*\),\1,'
+}
+CBRANCH=$(get_current_branch)
+
 DIR="$( dirname "${BASH_SOURCE[0]}" )"
 WDIR="$(pwd)" #working dir (normally /home/swg/swg-main )
 
@@ -33,7 +39,7 @@ for filename in $filenames; do
 	         items[$k]=1 #add $k to our list to compile (at the end of the script)
 	      done < <(grep -Rinwl . -e $l) #find all scripts using the variable "$l"
 	      cd $WDIR #cd back to working directory after grep
-	   done < <(git --git-dir=$WDIR/dsrc/.git --work-tree=$WDIR/dsrc diff origin/master -U0 | grep -o "public static final .*=") #find all 'public static final' declarations in our changed scripts vs origin/master
+	   done < <(git --git-dir=$WDIR/dsrc/.git --work-tree=$WDIR/dsrc diff origin/$CBRANCH -U0 | grep -o "public static final .*=") #find all 'public static final' declarations in our changed scripts vs origin/$CBRANCH
     fi
 
     if [[ ! -z $result ]]; then
