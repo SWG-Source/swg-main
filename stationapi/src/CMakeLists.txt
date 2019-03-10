@@ -1,2 +1,0 @@
-add_subdirectory(stationapi)
-add_subdirectory(stationchat)
