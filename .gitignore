@@ -3,11 +3,9 @@ chat/
 clientdata/
 configs/
 data/
-dsrc/
 dependencies/
+dsrc/
 exe/
 src/
-!stationapi/src/
-stationapi/build/
-stationapi/externals/
+stationapi/
 .setup
