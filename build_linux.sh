@@ -128,7 +128,8 @@ if [[ $response =~ ^(yes|y| ) ]]; then
 		git pull
 		cd $basedir
 	fi
-	if [ ! -d $basedir/stationapi ]; then
+	if [ ! -d $basedir/stationapi/.git ]; then
+		rm -rf $basedir/stationapi
 		git clone -b $GIT_REPO_STATIONAPI_BRANCH $GIT_REPO_STATIONAPI stationapi
 	else
 		cd $basedir/stationapi
