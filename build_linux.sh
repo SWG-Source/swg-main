@@ -38,6 +38,7 @@ GIT_REPO_SRC=${GIT_URL}src.git
 GIT_REPO_DSRC=${GIT_URL}dsrc.git
 GIT_REPO_CONFIG=${GIT_URL}configs.git
 GIT_REPO_CLIENTDATA=${GIT_URL}clientdata.git
+GIT_REPO_STATIONAPI=${GIT_URL}stationapi.git
 
 # specify git branches for each repo
 GIT_REPO_DEPEND_BRANCH=master
@@ -45,6 +46,7 @@ GIT_REPO_SRC_BRANCH=master
 GIT_REPO_DSRC_BRANCH=master
 GIT_REPO_CONFIG_BRANCH=master
 GIT_REPO_CLIENTDATA_BRANCH=master
+GIT_REPO_STATIONAPI_BRANCH=master
 
 echo -e "\033[1;31m";
 if [ ! -f $basedir/.setup ]; then
@@ -123,6 +125,14 @@ if [[ $response =~ ^(yes|y| ) ]]; then
 		git clone -b $GIT_REPO_CLIENTDATA_BRANCH $GIT_REPO_CLIENTDATA clientdata
 	else
 		cd $basedir/clientdata
+		git pull
+		cd $basedir
+	fi
+	if [ ! -d $basedir/stationapi/.git ]; then
+		rm -rf $basedir/stationapi
+		git clone -b $GIT_REPO_STATIONAPI_BRANCH $GIT_REPO_STATIONAPI stationapi
+	else
+		cd $basedir/stationapi
 		git pull
 		cd $basedir
 	fi
