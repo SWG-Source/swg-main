@@ -1,11 +1,8 @@
 build/
 chat/
-clientdata/
 configs/
 data/
 dependencies/
-dsrc/
-exe/
-src/
-stationapi/
+miff/
 .setup
+local.properties

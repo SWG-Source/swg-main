@@ -1,0 +1,17 @@
+[submodule "stationapi"]
+	path = stationapi
+	url = https://github.com/SWG-Source/stationapi.git
+[submodule "dsrc"]
+	path = dsrc
+	url = https://github.com/SWG-Source/dsrc.git
+[submodule "src"]
+	path = src
+	url = https://github.com/SWG-Source/src.git
+[submodule "clientdata"]
+	path = clientdata
+	url = https://github.com/SWG-Source/clientdata.git
+[submodule "exe"]
+	path = exe
+	url = https://github.com/SWG-Source/configs.git
+	ignore = dirty
+
