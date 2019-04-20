@@ -21,8 +21,8 @@
 	<property name="src" location="${basedir}/src"/>
 	<property name="dsrc" location="dsrc" relative="true" basedir="${basedir}"/>
 	<property name="data" location="data" relative="true" basedir="${basedir}"/>
-	<property name="chat_home" location="${basedir}/stationapi"/>
-	<property name="chat_build" location="${chat_home}/build"/>
+	<property name="stationapi" location="${basedir}/stationapi"/>
+	<property name="chat_build" location="${stationapi}/build"/>
 	<property name="clientdata" location="${basedir}/clientdata"/>
 	<property name="configs" location="configs" relative="true" basedir="${basedir}"/>
 
@@ -126,6 +126,7 @@
 		<git-checkout branch="${dsrc_branch}" dir="${dsrc}"/>
 		<git-checkout branch="${configs_branch}" dir="${basedir}/exe"/>
 		<git-checkout branch="${clientdata_branch}" dir="${clientdata}"/>
+		<git-checkout branch="${stationapi_branch}" dir="${stationapi}"/>
 	</target>
 
 	<target name="update_configs" description="updates the configuration files with the desired settings" if="firstrun">
@@ -186,8 +187,8 @@
 	
 	<!-- Prepares the Station API (chat server) code for building -->
 	<target name="prepare_chat" description="prepares the chat server structure for building">
-		<copy todir="${chat_home}/externals/udplibrary">
-			<fileset dir="${chat_home}/udplibrary"/>
+		<copy todir="${stationapi}/externals/udplibrary">
+			<fileset dir="${stationapi}/udplibrary"/>
 		</copy>
 	</target>
 	
