@@ -127,7 +127,7 @@
 	</target>
 	
 	<target name="git_update_submod_src" description="Checkout the src branch" depends="git_update_submod_src_check" if="src_branch_is_set">
-		<git-checkout branch="${src_branch}" dir="${src}" if="src_branch"/>
+		<git-checkout branch="${src_branch}" dir="${src}"/>
 	</target>
 	
 	<target name="git_update_submod_dsrc_check" description="Check if the dsrc_branch property is set">
@@ -137,7 +137,7 @@
 	</target>
 	
 	<target name="git_update_submod_dsrc" description="Checkout the dsrc branch" depends="git_update_submod_dsrc_check" if="dsrc_branch_is_set">
-		<git-checkout branch="${dsrc_branch}" dir="${dsrc}" if="dsrc_branch"/>
+		<git-checkout branch="${dsrc_branch}" dir="${dsrc}"/>
 	</target>
 	
 	<target name="git_update_submod_configs_check" description="Check if the configs_branch property is set">
@@ -147,7 +147,7 @@
 	</target>
 	
 	<target name="git_update_submod_configs" description="Checkout the configs branch" depends="git_update_submod_configs_check" if="configs_branch_is_set">
-		<git-checkout branch="${configs_branch}" dir="${basedir}/exe" if="configs_branch"/>
+		<git-checkout branch="${configs_branch}" dir="${basedir}/exe"/>
 	</target>
 	
 	<target name="git_update_submod_clientdata_check" description="Check if the clientdata_branch property is set">
@@ -157,7 +157,7 @@
 	</target>
 	
 	<target name="git_update_submod_clientdata" description="Checkout the clientdata branch" depends="git_update_submod_clientdata_check" if="clientdata_branch_is_set">
-		<git-checkout branch="${clientdata_branch}" dir="${clientdata}" if="clientdata_branch"/>
+		<git-checkout branch="${clientdata_branch}" dir="${clientdata}"/>
 	</target>
 	
 	<target name="git_update_submod_stationapi_check" description="Check if the stationapi_branch property is set">
@@ -167,7 +167,7 @@
 	</target>
 	
 	<target name="git_update_submod_stationapi" description="Checkout the stationapi branch" depends="git_update_submod_stationapi_check" if="stationapi_branch_is_set">
-		<git-checkout branch="${stationapi_branch}" dir="${stationapi}" if="stationapi_branch"/>
+		<git-checkout branch="${stationapi_branch}" dir="${stationapi}"/>
 	</target>
 	
 	<target name="git_update_submods" description="Pull down the sub-modules for swg-main">
