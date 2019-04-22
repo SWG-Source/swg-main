@@ -120,13 +120,63 @@
 		<echo>We have ${nproc} processors (cores) to use.</echo>
 	</target>
 	
+	<target name="git_update_submod_src_check" description="Check if the src_branch property is set">
+		<condition property="src_branch_is_set" else="false">
+			<isset property="src_branch"/>
+		</condition>
+	</target>
+	
+	<target name="git_update_submod_src" description="Checkout the src branch" depends="git_update_submod_src_check" if="src_branch_is_set">
+		<git-checkout branch="${src_branch}" dir="${src}" if="src_branch"/>
+	</target>
+	
+	<target name="git_update_submod_dsrc_check" description="Check if the dsrc_branch property is set">
+		<condition property="dsrc_branch_is_set" else="false">
+			<isset property="dsrc_branch"/>
+		</condition>
+	</target>
+	
+	<target name="git_update_submod_dsrc" description="Checkout the dsrc branch" depends="git_update_submod_dsrc_check" if="dsrc_branch_is_set">
+		<git-checkout branch="${dsrc_branch}" dir="${dsrc}" if="dsrc_branch"/>
+	</target>
+	
+	<target name="git_update_submod_configs_check" description="Check if the configs_branch property is set">
+		<condition property="configs_branch_is_set" else="false">
+			<isset property="configs_branch"/>
+		</condition>
+	</target>
+	
+	<target name="git_update_submod_configs" description="Checkout the configs branch" depends="git_update_submod_configs_check" if="configs_branch_is_set">
+		<git-checkout branch="${configs_branch}" dir="${basedir}/exe" if="configs_branch"/>
+	</target>
+	
+	<target name="git_update_submod_clientdata_check" description="Check if the clientdata_branch property is set">
+		<condition property="clientdata_branch_is_set" else="false">
+			<isset property="clientdata_branch"/>
+		</condition>
+	</target>
+	
+	<target name="git_update_submod_clientdata" description="Checkout the clientdata branch" depends="git_update_submod_clientdata_check" if="clientdata_branch_is_set">
+		<git-checkout branch="${clientdata_branch}" dir="${clientdata}" if="clientdata_branch"/>
+	</target>
+	
+	<target name="git_update_submod_stationapi_check" description="Check if the stationapi_branch property is set">
+		<condition property="stationapi_branch_is_set" else="false">
+			<isset property="stationapi_branch"/>
+		</condition>
+	</target>
+	
+	<target name="git_update_submod_stationapi" description="Checkout the stationapi branch" depends="git_update_submod_stationapi_check" if="stationapi_branch_is_set">
+		<git-checkout branch="${stationapi_branch}" dir="${stationapi}" if="stationapi_branch"/>
+	</target>
+	
 	<target name="git_update_submods" description="Pull down the sub-modules for swg-main">
 		<git-update-submods dir="${basedir}"/>
-		<git-checkout branch="${src_branch}" dir="${src}" if="src_branch"/>
-		<git-checkout branch="${dsrc_branch}" dir="${dsrc}" if="dsrc_branch"/>
-		<git-checkout branch="${configs_branch}" dir="${basedir}/exe" if="configs_branch"/>
-		<git-checkout branch="${clientdata_branch}" dir="${clientdata}" if="clientdata_branch"/>
-		<git-checkout branch="${stationapi_branch}" dir="${stationapi}" if="stationapi_branch"/>
+		<antcall target="git_update_submod_src"/>
+		<antcall target="git_update_submod_dsrc"/>
+		<antcall target="git_update_submod_configs"/>
+		<antcall target="git_update_submod_clientdata"/>
+		<antcall target="git_update_submod_stationapi"/>
 	</target>
 
 	<target name="update_configs" description="updates the configuration files with the desired settings" if="firstrun">
