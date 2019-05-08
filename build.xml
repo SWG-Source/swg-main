@@ -14,7 +14,7 @@
 	<property name="build" location="${basedir}/build"/>
 
 	<!-- Database Service Name is derived to make it easier in the properties file -->
-	<property name="service_name" value="//${ADDR4}/${db_service}"/>
+	<property name="service_name" value="//127.0.0.1/${db_service}"/>
 
 	<!-- Setup Source Directories -->
 	<property name="exe" location="${basedir}/exe"/>
@@ -185,7 +185,7 @@
 			<replacefilter token="CLUSTERNAME" property="cluster_name"/>
 			<replacefilter token="HOSTIP" value="${ADDR4}"/>
 			<replacefilter token="DBUSERNAME" property="db_username"/>
-			<replacefilter token="DBSERVICE" value="service_name"/>
+			<replacefilter token="DBSERVICE" property="service_name"/>
 			<replacefilter token="DBPASSWORD" property="db_password"/>
 		</replace>
 	</target>
