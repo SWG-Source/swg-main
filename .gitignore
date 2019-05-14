@@ -6,3 +6,4 @@ dependencies/
 miff/
 .setup
 local.properties
+*.log
