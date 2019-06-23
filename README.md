@@ -1,4 +1,4 @@
-# SWGSource V2.0 (version pending) Build Instructions
+# SWGSource V2.0 Build Instructions
 
 ## Credit
 Credit the StellaBellum team (DarthArgus, Cekis, SilentGuardian, Ness, SwgNoobs, DevCodex) for making their repositories open.  All source is forked from
