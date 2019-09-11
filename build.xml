@@ -525,5 +525,20 @@
 			</fileset>
 		</delete>
 	</target>
+	
+	<target name="git_update_main" description="Checkout the swg-main branch" >
+		<git-pull dir="${basedir}" branch="${swg_main_branch}"/>
+	</target>
+	
+	<target name="git_update_submods_to_latest_commit" description="Updates all submodules to the latest remote repository commit">
+		<exec executable="git" dir="${basedir}">
+			<arg value="submodule"/>
+			<arg value="foreach"/>
+			<arg line="'(git checkout master; git pull)&amp;'"/>
+		</exec>
+	</target>
+	
+	<target name="update_swg" description="Updates the entire codebase with latest from the remote repositories and recompiles" depends="git_update_main,git_update_submods_to_latest_commit,compile">
+	</target>
 
 </project>
