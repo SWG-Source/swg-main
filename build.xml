@@ -451,8 +451,8 @@
 	</target>
 
 	<target name="create_symlinks">
-		<symlink link="${basedir}/data/sku.0/sys.client/compiled/clientdata" resource="${clientdata}"/>
-		<symlink link="${basedir}/exe/linux/bin" resource="${tools_home}"/>
+		<symlink link="${basedir}/data/sku.0/sys.client/compiled/clientdata" resource="${clientdata}" overwrite="true"/>
+		<symlink link="${basedir}/exe/linux/bin" resource="${tools_home}" overwrite="true"/>
 	</target>
 
 	<target name="start" description="starts the server" depends="create_symlinks,stop">
