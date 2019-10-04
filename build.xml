@@ -36,6 +36,20 @@
 	<!-- Setup CRC Files to load into the database -->
 	<property name="object_crc_file" location="${dsrc}/sku.0/sys.server/built/game/misc/object_template_crc_string_table.tab"/>
 	<property name="templates_sql_file" location="${build}/templates.sql"/>
+	
+	<!-- ACM Customization directories and related properties -->
+	<property name="perl_tools" location="${basedir}/tools" />
+	<property name="swgperllib" location="${perl_tools}/perllib" />
+	
+	<property name="treexlat" value="${build}/treefile-xlat.dat" description="treefileLookupDataFileName"/>
+	
+	<property name="custinfo" value="${build}/custinfo-raw.dat" description="unoptimizedCustomizationInfoFileName" />
+	<property name="custopt" value="${build}/custinfo-raw-optimized.dat" description="optimizedCustomizationInfoFileName" />
+	
+	<property name="artlog" value="art-asset-customization-report.log" />
+	<property name="acmmif" value="${dsrc_shared}/customization/asset_customization_manager.mif" />
+	<property name="cimmif" value="${dsrc_shared}/customization/customization_id_manager.mif" />
+	<property name="acmiff" value="${data_shared}/customization/asset_customization_manager.iff" />
 
 	<!-- Define where most of our compiled tools will live -->
 	<property name="tools_home" location="${build}/bin"/>
@@ -456,14 +470,11 @@
 	</target>
 
 	<target name="start" description="starts the server" depends="create_symlinks,stop">
-		<exec executable="bin/LoginServer" dir="${exe}/linux">
+		<exec executable="bin/TaskManager" dir="${exe}/linux" spawn="true">
 			<arg value="--"/>
-			<arg value="@servercommon.cfg &amp;"/>
+			<arg value="@servercommon.cfg"/>
 		</exec>
-		<exec executable="sleep" dir="${exe}/linux">
-			<arg value="5"/>
-		</exec>
-		<exec executable="bin/TaskManager" dir="${exe}/linux">
+		<exec executable="bin/LoginServer" dir="${exe}/linux">
 			<arg value="--"/>
 			<arg value="@servercommon.cfg"/>
 		</exec>
@@ -539,7 +550,107 @@
 		</exec>
 	</target>
 	
+	<!-- Call this to simply update SWG when you want your code updated to the latest version -->
 	<target name="update_swg" description="Updates the entire codebase with latest from the remote repositories and recompiles" depends="git_update_main,git_update_submods_to_latest_commit,compile">
 	</target>
+	
+	<!-- Begin ACM Related Targets -->
+	<target name="copy-files">
+		<echo>Step 1: Copy customization data files from repo.</echo>
+		<copy todir="${build}">
+			<fileset dir="${dsrc_shared}/customization">
+				<include name="*.tab"/>
+			</fileset>
+			<fileset dir="${dsrc_shared}/datatables/mount">
+				<include name="logical_saddle_name_map.tab"/>
+				<include name="saddle_appearance_map.tab"/>
+			</fileset>
+		</copy>
+	</target>
+	
+	<target name="create-lookup-table">
+		<echo>Step 2: Scanning clientdata and creating the Tree File Lookup Table.</echo>
+		<fileset id="shared" dir="${clientdata}">
+			<include name="**/*"/>
+			<exclude name="*.md"/>
+		</fileset>
+		<pathconvert pathsep=":0${line.separator}" property="assets" refid="shared">
+			<map from="${clientdata}/" to="e "/>
+		</pathconvert>
+		<concat destfile="${treexlat}"><header filtering="no" trim="yes">p ${clientdata}/:0</header>${line.separator}${assets}:0${line.separator}</concat>
+	</target>
+	
+	<target name="collect-info">
+		<echo>Step 3a: Collecting information on customizable assets from our clientdata.</echo>
+		<exec executable="perl" dir="${perl_tools}" output="${custinfo}">
+			<env key="PERL5LIB" value="${env.PERL5LIB}:${swgperllib}"/>
+            <arg value="collectAssetCustomizationInfo.pl"/>
+			<arg value="-t"/>
+			<arg value="${treexlat}"/>
+        </exec>
+		<echo>Step 3b: Adding manual variable usage.</echo>
+		<concat destfile="${custinfo}" append="true">
+			<path path="${dsrc_shared}/customization/force_add_variable_usage.dat" />
+			<filterchain>
+				<striplinecomments>
+					<comment value="#"/>
+				</striplinecomments>
+			</filterchain>
+		</concat>
+	</target>
+	
+	<target name="optimize-info">
+		<echo>Step 4a: Creating an optimized customizations info file.</echo>
+		<exec executable="perl" dir="${perl_tools}">
+			<env key="PERL5LIB" value="${env.PERL5LIB}:${swgperllib}"/>
+            <arg value="buildAssetCustomizationManagerData.pl"/>
+            <arg value="-a"/>
+			<arg value="${artlog}"/>
+			<arg value="-i"/>
+			<arg value="${custinfo}"/>
+			<arg value="-r"/>
+			<arg value="-t"/>
+			<arg value="${treexlat}"/>
+        </exec>
+		<echo>Step 4b: Sorting and removing duplicate entries from the optimized file.</echo>
+		<copy file="${custopt}" tofile="${custopt}.sort">
+			<filterchain>
+			   <sortfilter />
+			   <uniqfilter />
+			</filterchain>
+		</copy>
+		<move file="${custopt}.sort" tofile="${custopt}"/>
+	</target>
+	
+	<target name="build-acm-data">
+		<echo>Step 5: Building the ACM MIF data file</echo>
+		<exec executable="perl" dir="${perl_tools}">
+			<env key="PERL5LIB" value="${env.PERL5LIB}:${swgperllib}"/>
+            <arg value="buildAssetCustomizationManagerData.pl"/>
+			<arg value="-i"/>
+			<arg value="${custopt}"/>
+			<arg value="-o"/>
+			<arg value="${acmmif}"/>
+			<arg value="-m"/>
+			<arg value="${cimmif}"/>
+			<arg value="-t"/>
+			<arg value="${treexlat}"/>
+        </exec>
+	</target>
+	
+	<target name="miff-acm">
+		<echo>Step 6: Building the ACM IFF (final step)</echo>
+		<exec executable="./Miff" dir="${tools_home}">
+			<env key="PATH" value="${env.PATH}:${tools_home}"/>
+			<arg value="-i"/>
+			<arg value="&quot;${acmmif}&quot;"/>
+			<arg value="-o"/>
+			<arg value="&quot;${acmiff}&quot;"/>
+		</exec>
+	</target>
+	
+	<target name="build-acm" depends="copy-files,create-lookup-table,collect-info,optimize-info,build-acm-data,miff-acm">
+	</target>
+	<!-- End ACM Related targets -->
 
 </project>
