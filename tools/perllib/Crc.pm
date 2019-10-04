@@ -72,15 +72,15 @@ sub calculate
 	my $string = $_[0];
 	return 0 if ($string eq "");
 
-	my $crc_init = hex("0xffffffff");
+	my $crc_init = hex("0xffffffff") & 0xffffffff;
 	my $crc = $crc_init;
 
 	foreach (split(//, $string))
 	{
-		$crc = $crctable[(($crc>>24) ^ ord($_)) & 255] ^ ($crc << 8);
+		$crc = ($crctable[(($crc>>24) ^ ord($_)) & 255] ^ ($crc << 8) & 0xffffffff);
 	}
-	
-	return $crc ^ $crc_init;
+
+	return $crc ^ $crc_init & 0xffffffff;
 }
 
 # =====================================================================
