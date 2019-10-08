@@ -269,20 +269,21 @@ sub collectData
 
 	# Constants.
 	my $vehicleDataP4Root = "//depot/swg/$branch/dsrc/sku.0/sys.shared/compiled/game/customization/";
+	my $buildRoot = "//home/swg/swg-main/build/";
 	
 	# Load up the vehicle customizations to associate with every ridable vehicle.
-	my $customizationsFileName = "vehicle_customizations.tab"; #Perforce::findOnDiskFileName($vehicleDataP4Root . "vehicle_customizations.tab");
+	my $customizationsFileName = $buildRoot."vehicle_customizations.tab"; #Perforce::findOnDiskFileName($vehicleDataP4Root . "vehicle_customizations.tab");
 	loadVehicleCustomizations($customizationsFileName);
 
 	# Load up mapping of vehicle .sat appearance (invisible) to vehicle saddle appearance (visible).
 	# This is a one-to-many mapping.
 	my $saddleDataP4Root = "//depot/swg/$branch/dsrc/sku.0/sys.shared/compiled/game/datatables/mount/";
-	my $logicalSaddleNameMapFileName = "logical_saddle_name_map.tab"; #Perforce::findOnDiskFileName($saddleDataP4Root . "logical_saddle_name_map.tab");
-	my $saddleAppearanceMapFileName = "saddle_appearance_map.tab"; #Perforce::findOnDiskFileName($saddleDataP4Root . "saddle_appearance_map.tab");
+	my $logicalSaddleNameMapFileName = $buildRoot."logical_saddle_name_map.tab"; #Perforce::findOnDiskFileName($saddleDataP4Root . "logical_saddle_name_map.tab");
+	my $saddleAppearanceMapFileName = $buildRoot."saddle_appearance_map.tab"; #Perforce::findOnDiskFileName($saddleDataP4Root . "saddle_appearance_map.tab");
 	buildSatLinkageMap($logicalSaddleNameMapFileName, $saddleAppearanceMapFileName);
 	
 	# Add appropriate variable declarations for each vehicle appearance listed in the vehicle appearances table.
-	my $appearanceTableFileName = "vehicle_appearances.tab"; #Perforce::findOnDiskFileName($vehicleDataP4Root . "vehicle_appearances.tab");
+	my $appearanceTableFileName = $buildRoot."vehicle_appearances.tab"; #Perforce::findOnDiskFileName($vehicleDataP4Root . "vehicle_appearances.tab");
 	applyCustomizationsToVehicles($appearanceTableFileName);
 }
 
