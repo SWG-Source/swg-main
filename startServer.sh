@@ -1,3 +1,5 @@
+ant stop
+
 #!/bin/bash
 
 cd exe/linux
