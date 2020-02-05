@@ -1,6 +1,6 @@
-ant stop
-
 #!/bin/bash
+
+ant stop
 
 cd exe/linux
 
