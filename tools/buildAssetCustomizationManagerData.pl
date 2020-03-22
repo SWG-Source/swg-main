@@ -1125,6 +1125,7 @@ sub writeAssetCrcToAssetIdIndexTable
 
 		die "tfiala must update format: valid unique asset id range blown" if ($assetId > 0xFFFF);
 
+		printf $outputFile "//name:  %s\n", $assetName;
 		printf $outputFile "\t\t\tuint32  %u\n", $assetCrc;
 		printf $outputFile "\t\t\tuint16  %u\n", $assetId;
 		print  $outputFile "\n";

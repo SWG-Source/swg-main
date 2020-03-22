@@ -1,5 +1,7 @@
 #!/bin/bash
 
+ant stop
+
 cd exe/linux
 
 export LLVM_PROFILE_FILE="output-%p.profraw"
