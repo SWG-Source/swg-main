@@ -555,7 +555,7 @@
 	</target>
 	
 	<!-- Begin ACM Related Targets -->
-	<target name="copy_files">
+	<target name="copy-files">
 		<echo>Step 1: Copy customization data files from repo.</echo>
 		<copy todir="${build}">
 			<fileset dir="${dsrc_shared}/customization">
@@ -568,7 +568,7 @@
 		</copy>
 	</target>
 	
-	<target name="create_lookup_table">
+	<target name="create-lookup-table">
 		<echo>Step 2: Scanning clientdata and creating the Tree File Lookup Table.</echo>
 		<fileset id="shared" dir="${clientdata}">
 			<include name="**/*"/>
@@ -580,7 +580,7 @@
 		<concat destfile="${treexlat}"><header filtering="no" trim="yes">p ${clientdata}/:0</header>${line.separator}${assets}:0${line.separator}</concat>
 	</target>
 	
-	<target name="collect_info">
+	<target name="collect-info">
 		<echo>Step 3a: Collecting information on customizable assets from our clientdata.</echo>
 		<exec executable="perl" dir="${perl_tools}" output="${custinfo}">
 			<env key="PERL5LIB" value="${env.PERL5LIB}:${swgperllib}"/>
@@ -599,7 +599,7 @@
 		</concat>
 	</target>
 	
-	<target name="optimize_info">
+	<target name="optimize-info">
 		<echo>Step 4a: Creating an optimized customizations info file.</echo>
 		<exec executable="perl" dir="${perl_tools}">
 			<env key="PERL5LIB" value="${env.PERL5LIB}:${swgperllib}"/>
@@ -612,16 +612,7 @@
 			<arg value="-t"/>
 			<arg value="${treexlat}"/>
         </exec>
-		<echo>Step 4b: Adding manual variable usage.</echo>
-		<concat destfile="${custopt}" append="true">
-			<path path="${dsrc_shared}/customization/force_add_variable_usage.dat" />
-			<filterchain>
-				<striplinecomments>
-					<comment value="#"/>
-				</striplinecomments>
-			</filterchain>
-		</concat>
-		<echo>Step 4c: Sorting and removing duplicate entries from the optimized file.</echo>
+		<echo>Step 4b: Sorting and removing duplicate entries from the optimized file.</echo>
 		<copy file="${custopt}" tofile="${custopt}.sort">
 			<filterchain>
 			   <sortfilter />
@@ -631,7 +622,7 @@
 		<move file="${custopt}.sort" tofile="${custopt}"/>
 	</target>
 	
-	<target name="build_acm_data">
+	<target name="build-acm-data">
 		<echo>Step 5: Building the ACM MIF data file</echo>
 		<exec executable="perl" dir="${perl_tools}">
 			<env key="PERL5LIB" value="${env.PERL5LIB}:${swgperllib}"/>
@@ -647,7 +638,7 @@
         </exec>
 	</target>
 	
-	<target name="miff_acm">
+	<target name="miff-acm">
 		<echo>Step 6: Building the ACM IFF (final step)</echo>
 		<exec executable="./Miff" dir="${tools_home}">
 			<env key="PATH" value="${env.PATH}:${tools_home}"/>
@@ -658,7 +649,7 @@
 		</exec>
 	</target>
 	
-	<target name="build_acm" depends="copy_files,create_lookup_table,collect_info,optimize_info,build_acm_data,miff_acm">
+	<target name="build-acm" depends="copy-files,create-lookup-table,collect-info,optimize-info,build-acm-data,miff-acm">
 	</target>
 	<!-- End ACM Related targets -->
 
