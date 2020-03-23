@@ -50,6 +50,7 @@
 	<property name="acmmif" value="${dsrc_shared}/customization/asset_customization_manager.mif" />
 	<property name="cimmif" value="${dsrc_shared}/customization/customization_id_manager.mif" />
 	<property name="acmiff" value="${data_shared}/customization/asset_customization_manager.iff" />
+	<property name="cimiff" value="${data_shared}/customization/customization_id_manager.iff" />
 
 	<!-- Define where most of our compiled tools will live -->
 	<property name="tools_home" location="${build}/bin"/>
@@ -555,6 +556,15 @@
 	</target>
 	
 	<!-- Begin ACM Related Targets -->
+	<target name="cleanup_acm">
+		<echo>Preface: Clean up any existing files so we don't get wires crossed.</echo>
+		<delete>
+			<fileset dir="${build}" includes="*.tab,*.dat"/>
+			<fileset dir="${dsrc_shared}/customization" includes="asset_customization_manager.mif,customization_id_manager.mif"/>
+			<fileset dir="${data_shared}/customization" includes="asset_customization_manager.iff,customization_id_manager.iff"/>
+		</delete>
+	</target>
+	
 	<target name="copy_files">
 		<echo>Step 1: Copy customization data files from repo.</echo>
 		<copy todir="${build}">
@@ -649,7 +659,12 @@
 		</exec>
 	</target>
 	
-	<target name="build_acm" depends="copy_files,create_lookup_table,collect_info,optimize_info,build_acm_data,miff_acm">
+	<target name="copy_acm" description="Copies the completed file to our clientdata folder as well so clientdata stays up to date.">
+		<copy file="${acmiff}" tofile="${clientdata}/customization/asset_customization_manager.iff"/>
+		<copy file="${cimiff}" tofile="${clientdata}/customization/customization_id_manager.iff"/>
+	</target>
+	
+	<target name="build_acm" depends="cleanup_acm,copy_files,create_lookup_table,collect_info,optimize_info,build_acm_data,miff_acm,copy_acm">
 	</target>
 	<!-- End ACM Related targets -->
 
