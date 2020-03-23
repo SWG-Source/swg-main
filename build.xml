@@ -649,7 +649,7 @@
 	</target>
 	
 	<target name="miff_acm">
-		<echo>Step 6: Building the ACM IFF (final step)</echo>
+		<echo>Step 6: Building the ACM IFF</echo>
 		<exec executable="./Miff" dir="${tools_home}">
 			<env key="PATH" value="${env.PATH}:${tools_home}"/>
 			<arg value="-i"/>
@@ -659,12 +659,23 @@
 		</exec>
 	</target>
 	
+	<target name="miff_cim">
+		<echo>Step 6a: Building the CIM IFF (final step)</echo>
+		<exec executable="./Miff" dir="${tools_home}">
+			<env key="PATH" value="${env.PATH}:${tools_home}"/>
+			<arg value="-i"/>
+			<arg value="&quot;${cimmif}&quot;"/>
+			<arg value="-o"/>
+			<arg value="&quot;${cimiff}&quot;"/>
+		</exec>
+	</target>
+	
 	<target name="copy_acm" description="Copies the completed file to our clientdata folder as well so clientdata stays up to date.">
 		<copy file="${acmiff}" tofile="${clientdata}/customization/asset_customization_manager.iff"/>
 		<copy file="${cimiff}" tofile="${clientdata}/customization/customization_id_manager.iff"/>
 	</target>
 	
-	<target name="build_acm" depends="cleanup_acm,copy_files,create_lookup_table,collect_info,optimize_info,build_acm_data,miff_acm,copy_acm">
+	<target name="build_acm" depends="cleanup_acm,copy_files,create_lookup_table,collect_info,optimize_info,build_acm_data,miff_acm,miff_cim,copy_acm">
 	</target>
 	<!-- End ACM Related targets -->
 
