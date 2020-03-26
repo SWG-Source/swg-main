@@ -560,7 +560,7 @@
 		<echo>Preface: Clean up any existing files so we don't get wires crossed.</echo>
 		<delete>
 			<fileset dir="${build}" includes="*.tab,*.dat"/>
-			<fileset dir="${dsrc_shared}/customization" includes="asset_customization_manager.mif,customization_id_manager.mif"/>
+			<fileset dir="${dsrc_shared}/customization" includes="asset_customization_manager.mif"/>
 			<fileset dir="${data_shared}/customization" includes="asset_customization_manager.iff,customization_id_manager.iff"/>
 		</delete>
 	</target>
@@ -570,6 +570,7 @@
 		<copy todir="${build}">
 			<fileset dir="${dsrc_shared}/customization">
 				<include name="*.tab"/>
+				<include name="customization_id_manager.mif"/>
 			</fileset>
 			<fileset dir="${dsrc_shared}/datatables/mount">
 				<include name="logical_saddle_name_map.tab"/>
