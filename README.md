@@ -19,7 +19,7 @@ When the GIT repository has been cloned successfully, open the swg-main director
 
 ## Building
 ### Requirements
-- Java 8 (1.8_u101)
+- Java 11 (11.0.2)
 - Apache ANT 1.9+
 
 First and foremost, IF YOU DO NOT HAVE ANT INSTALLED ALREADY, you'll need to install Apache ANT (at least version 1.9) on your VM.  ANT is required for the build process to run successfully.  ANT
