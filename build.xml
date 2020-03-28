@@ -23,7 +23,7 @@
 	<property name="data" location="data" relative="true" basedir="${basedir}"/>
 	<property name="stationapi" location="${basedir}/stationapi"/>
 	<property name="chat_build" location="${stationapi}/build"/>
-	<property name="clientdata" location="${basedir}/clientdata"/>
+	<property name="serverdata" location="${basedir}/serverdata"/>
 	<property name="configs" location="configs" relative="true" basedir="${basedir}"/>
 
 	<!-- Setup Key Game Directories -->
@@ -165,14 +165,14 @@
 		<git-checkout branch="${configs_branch}" dir="${basedir}/exe"/>
 	</target>
 	
-	<target name="git_update_submod_clientdata_check" description="Check if the clientdata_branch property is set">
-		<condition property="clientdata_branch_is_set" else="false">
-			<isset property="clientdata_branch"/>
+	<target name="git_update_submod_serverdata_check" description="Check if the serverdata_branch property is set">
+		<condition property="serverdata_branch_is_set" else="false">
+			<isset property="serverdata_branch"/>
 		</condition>
 	</target>
 	
-	<target name="git_update_submod_clientdata" description="Checkout the clientdata branch" depends="git_update_submod_clientdata_check" if="clientdata_branch_is_set">
-		<git-checkout branch="${clientdata_branch}" dir="${clientdata}"/>
+	<target name="git_update_submod_serverdata" description="Checkout the serverdata branch" depends="git_update_submod_serverdata_check" if="serverdata_branch_is_set">
+		<git-checkout branch="${serverdata_branch}" dir="${serverdata}"/>
 	</target>
 	
 	<target name="git_update_submod_stationapi_check" description="Check if the stationapi_branch property is set">
@@ -190,7 +190,7 @@
 		<antcall target="git_update_submod_src"/>
 		<antcall target="git_update_submod_dsrc"/>
 		<antcall target="git_update_submod_configs"/>
-		<antcall target="git_update_submod_clientdata"/>
+		<antcall target="git_update_submod_serverdata"/>
 		<antcall target="git_update_submod_stationapi"/>
 	</target>
 
@@ -466,7 +466,7 @@
 	</target>
 
 	<target name="create_symlinks">
-		<symlink link="${basedir}/data/sku.0/sys.client/compiled/clientdata" resource="${clientdata}" overwrite="true"/>
+		<symlink link="${basedir}/data/sku.0/sys.client/compiled/serverdata" resource="${serverdata}" overwrite="true"/>
 		<symlink link="${basedir}/exe/linux/bin" resource="${tools_home}" overwrite="true"/>
 	</target>
 
@@ -580,19 +580,19 @@
 	</target>
 	
 	<target name="create_lookup_table">
-		<echo>Step 2: Scanning clientdata and creating the Tree File Lookup Table.</echo>
-		<fileset id="shared" dir="${clientdata}">
+		<echo>Step 2: Scanning serverdata and creating the Tree File Lookup Table.</echo>
+		<fileset id="shared" dir="${serverdata}">
 			<include name="**/*"/>
 			<exclude name="*.md"/>
 		</fileset>
 		<pathconvert pathsep=":0${line.separator}" property="assets" refid="shared">
-			<map from="${clientdata}/" to="e "/>
+			<map from="${serverdata}/" to="e "/>
 		</pathconvert>
-		<concat destfile="${treexlat}"><header filtering="no" trim="yes">p ${clientdata}/:0</header>${line.separator}${assets}:0${line.separator}</concat>
+		<concat destfile="${treexlat}"><header filtering="no" trim="yes">p ${serverdata}/:0</header>${line.separator}${assets}:0${line.separator}</concat>
 	</target>
 	
 	<target name="collect_info">
-		<echo>Step 3a: Collecting information on customizable assets from our clientdata.</echo>
+		<echo>Step 3a: Collecting information on customizable assets from our serverdata.</echo>
 		<exec executable="perl" dir="${perl_tools}" output="${custinfo}">
 			<env key="PERL5LIB" value="${env.PERL5LIB}:${swgperllib}"/>
             <arg value="collectAssetCustomizationInfo.pl"/>
@@ -671,9 +671,9 @@
 		</exec>
 	</target>
 	
-	<target name="copy_acm" description="Copies the completed file to our clientdata folder as well so clientdata stays up to date.">
-		<copy file="${acmiff}" tofile="${clientdata}/customization/asset_customization_manager.iff"/>
-		<copy file="${cimiff}" tofile="${clientdata}/customization/customization_id_manager.iff"/>
+	<target name="copy_acm" description="Copies the completed file to our serverdata folder as well so serverdata stays up to date.">
+		<copy file="${acmiff}" tofile="${serverdata}/customization/asset_customization_manager.iff"/>
+		<copy file="${cimiff}" tofile="${serverdata}/customization/customization_id_manager.iff"/>
 	</target>
 	
 	<target name="build_acm" depends="cleanup_acm,copy_files,create_lookup_table,collect_info,optimize_info,build_acm_data,miff_acm,miff_cim,copy_acm">
