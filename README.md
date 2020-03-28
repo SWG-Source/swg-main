@@ -34,7 +34,10 @@ will be included in the next VM build, but for now here are the steps to do so m
 non-standard error message about how build.xml is missing.  If JAVA_HOME isn't set correctly, you'll get an error about that too.
 
 ### Starting the Build Process
-To complete building, kick off the build script from your swg-main directory by typing in: ```ant swg```
+To complete building, kick off the build script from your swg-main directory by typing in: 
+```
+ant swg
+```
 
 The build process is fully configured in the build.properties file.  There is no need to touch this file unless you have a fully customized version that you
 would like to run.  For starters, just don't worry about touching it.
@@ -70,17 +73,23 @@ ANT build script. Here is some information about the specific targets in ANT bui
 #### Compiling the mIFF files
 The "compile_miff" target will compile all *.mif files into *.iff binary files.
 
-		```ant compile_miff```
+```
+ant compile_miff
+```
 
 #### Compiling the Datatable files
 The "compile_tab" target will compile all the *.tab files into *.iff binary files:
 
-		```ant compile_tab```
+```
+ant compile_tab
+```
 
 #### Compiling Template Files
 The "compile_tpf" target will compile all the *.tpf files into *.iff binary files:
 
-		```ant compile_tpf```
+```
+ant compile_tpf
+```
 
 If you have built the TPF files in this step (i.e. you didn't skip this step) then the target will also attempt to recreate the Object Template and Quest CRC
 tables and subsequently will attempt to push those changes to the database since this will also be required.  A GREAT feature to have when creating new template files
@@ -89,7 +98,9 @@ or changing existing ones.
 Again... if you wish to do a multiple of these things, you can string multiple targets together like so (not all 3 are required and they can be added in any order as
 ANT handles any dependencies already):
 
-```ant compile_miff compile_tab compile_tpf```
+```
+ant compile_miff compile_tab compile_tpf
+```
 
 This particular command will first build the MIFF files, then compile the TAB files, then compile and load the Template Files into the database.
 
@@ -98,7 +109,9 @@ This particular command will first build the MIFF files, then compile the TAB fi
 This step will compile the object template and quest CRC files.  These files translate the long name of these files (including file path) into a very short code that
 allows the server to identify them without the danger of long text being transferred over the internet in packets.  Basically an optimization that SOE implemented:
 
-		```ant load_templates```
+```
+ant load_templates
+```
 
 Building these files will also trigger the target to then populate the database with the CRC's that were generated.  If you are doing this target in pieces
 (i.e. you're selectively building), this is a GREAT way to re-import new or changed TPF file changes.  In order to re-import CRC's into the database, if you haven't
