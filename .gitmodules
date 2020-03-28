@@ -7,9 +7,9 @@
 [submodule "src"]
 	path = src
 	url = https://github.com/SWG-Source/src.git
-[submodule "clientdata"]
-	path = clientdata
-	url = https://github.com/SWG-Source/clientdata.git
+[submodule "serverdata"]
+	path = serverdata
+	url = https://github.com/SWG-Source/serverdata.git
 [submodule "exe"]
 	path = exe
 	url = https://github.com/SWG-Source/configs.git
