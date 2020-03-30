@@ -466,7 +466,7 @@
 	</target>
 
 	<target name="create_symlinks">
-		<symlink link="${basedir}/data/sku.0/sys.client/compiled/serverdata" resource="${serverdata}" overwrite="true"/>
+		<symlink link="${basedir}/data/sku.0/sys.client/compiled/clientdata" resource="${serverdata}" overwrite="true"/>
 		<symlink link="${basedir}/exe/linux/bin" resource="${tools_home}" overwrite="true"/>
 	</target>
 
