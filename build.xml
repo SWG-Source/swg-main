@@ -36,16 +36,16 @@
 	<!-- Setup CRC Files to load into the database -->
 	<property name="object_crc_file" location="${dsrc}/sku.0/sys.server/built/game/misc/object_template_crc_string_table.tab"/>
 	<property name="templates_sql_file" location="${build}/templates.sql"/>
-	
+
 	<!-- ACM Customization directories and related properties -->
 	<property name="perl_tools" location="${basedir}/tools" />
 	<property name="swgperllib" location="${perl_tools}/perllib" />
-	
+
 	<property name="treexlat" value="${build}/treefile-xlat.dat" description="treefileLookupDataFileName"/>
-	
+
 	<property name="custinfo" value="${build}/custinfo-raw.dat" description="unoptimizedCustomizationInfoFileName" />
 	<property name="custopt" value="${build}/custinfo-raw-optimized.dat" description="optimizedCustomizationInfoFileName" />
-	
+
 	<property name="artlog" value="art-asset-customization-report.log" />
 	<property name="acmmif" value="${dsrc_shared}/customization/asset_customization_manager.mif" />
 	<property name="cimmif" value="${dsrc_shared}/customization/customization_id_manager.mif" />
@@ -134,57 +134,57 @@
 		<exec executable="nproc" dir="." outputproperty="nproc"/>
 		<echo>We have ${nproc} processors (cores) to use.</echo>
 	</target>
-	
+
 	<target name="git_update_submod_src_check" description="Check if the src_branch property is set">
 		<condition property="src_branch_is_set" else="false">
 			<isset property="src_branch"/>
 		</condition>
 	</target>
-	
+
 	<target name="git_update_submod_src" description="Checkout the src branch" depends="git_update_submod_src_check" if="src_branch_is_set">
 		<git-checkout branch="${src_branch}" dir="${src}"/>
 	</target>
-	
+
 	<target name="git_update_submod_dsrc_check" description="Check if the dsrc_branch property is set">
 		<condition property="dsrc_branch_is_set" else="false">
 			<isset property="dsrc_branch"/>
 		</condition>
 	</target>
-	
+
 	<target name="git_update_submod_dsrc" description="Checkout the dsrc branch" depends="git_update_submod_dsrc_check" if="dsrc_branch_is_set">
 		<git-checkout branch="${dsrc_branch}" dir="${dsrc}"/>
 	</target>
-	
+
 	<target name="git_update_submod_configs_check" description="Check if the configs_branch property is set">
 		<condition property="configs_branch_is_set" else="false">
 			<isset property="configs_branch"/>
 		</condition>
 	</target>
-	
+
 	<target name="git_update_submod_configs" description="Checkout the configs branch" depends="git_update_submod_configs_check" if="configs_branch_is_set">
 		<git-checkout branch="${configs_branch}" dir="${basedir}/exe"/>
 	</target>
-	
+
 	<target name="git_update_submod_serverdata_check" description="Check if the serverdata_branch property is set">
 		<condition property="serverdata_branch_is_set" else="false">
 			<isset property="serverdata_branch"/>
 		</condition>
 	</target>
-	
+
 	<target name="git_update_submod_serverdata" description="Checkout the serverdata branch" depends="git_update_submod_serverdata_check" if="serverdata_branch_is_set">
 		<git-checkout branch="${serverdata_branch}" dir="${serverdata}"/>
 	</target>
-	
+
 	<target name="git_update_submod_stationapi_check" description="Check if the stationapi_branch property is set">
 		<condition property="stationapi_branch_is_set" else="false">
 			<isset property="stationapi_branch"/>
 		</condition>
 	</target>
-	
+
 	<target name="git_update_submod_stationapi" description="Checkout the stationapi branch" depends="git_update_submod_stationapi_check" if="stationapi_branch_is_set">
 		<git-checkout branch="${stationapi_branch}" dir="${stationapi}"/>
 	</target>
-	
+
 	<target name="git_update_submods" description="Pull down the sub-modules for swg-main">
 		<git-update-submods dir="${basedir}"/>
 		<antcall target="git_update_submod_src"/>
@@ -195,8 +195,9 @@
 	</target>
 
 	<target name="update_configs" description="updates the configuration files with the desired settings" if="firstrun">
-		<replace dir="${exe}" propertyFile="${basedir}/build.properties">
-			<include name="**/*.cfg"/>
+		<copy file="${exe}/linux/template-localOptions.cfg" tofile="${exe}/linux/localOptions.cfg"/>
+		<replace dir="${exe}/linux" propertyFile="${basedir}/build.properties">
+			<include name="localOptions.cfg"/>
 			<replacefilter token="CLUSTERNAME" property="cluster_name"/>
 			<replacefilter token="HOSTIP" value="${ADDR4}"/>
 			<replacefilter token="DBUSERNAME" property="db_username"/>
@@ -204,7 +205,7 @@
 			<replacefilter token="DBPASSWORD" property="db_password"/>
 		</replace>
 	</target>
-	
+
 	<!-- Creates the Make files for our SRC that will be used during compile stage (Intel) -->
 	<target name="prepare_src_x86" depends="init,get_arch,set_compiler" description="prepare server code - Intel" if="compile.x86">
 		<exec executable="cmake" dir="${build}" failonerror="true">
@@ -249,14 +250,14 @@
 			<arg value="-j${nproc}"/>
 		</exec>
 	</target>
-	
+
 	<!-- Prepares the Station API (chat server) code for building -->
 	<target name="prepare_chat" description="prepares the chat server structure for building">
 		<copy todir="${stationapi}/externals/udplibrary">
 			<fileset dir="${stationapi}/udplibrary"/>
 		</copy>
 	</target>
-	
+
 	<!-- Compiles the Station API (chat server) code -->
 	<target name="compile_chat" description="compile chat server code" depends="prepare_chat">
 		<delete dir="${chat_build}"/>
@@ -272,7 +273,7 @@
 			<fileset dir="${chat_build}/bin"/>
 		</move>
 	</target>
-	
+
 	<!-- Compiles the DSRC (Java) code -->
 	<target name="compile_java" depends="init" description="compile java code">
 		<javac srcdir="${dsrc_server}" destdir="${data_server}" includeantruntime="false" classpath="${data_server}" encoding="utf8" sourcepath="${dsrc_server}" debug="true" deprecation="on">
@@ -352,7 +353,7 @@
 		</apply>
 		<antcall target="cleanup"/>
 	</target>
-	
+
 	<!-- Compiles all Template Definition Files (.tdf) -->
 	<!--
 	<target name="compile_tdf" description="compile the template definition files (*.tdf) into .iff">
@@ -538,11 +539,11 @@
 			</fileset>
 		</delete>
 	</target>
-	
+
 	<target name="git_update_main" description="Checkout the swg-main branch" >
 		<git-pull dir="${basedir}" branch="${swg_main_branch}"/>
 	</target>
-	
+
 	<target name="git_update_submods_to_latest_commit" description="Updates all submodules to the latest remote repository commit">
 		<exec executable="git" dir="${basedir}">
 			<arg value="submodule"/>
@@ -550,11 +551,11 @@
 			<arg line="'(git checkout master; git pull)&amp;'"/>
 		</exec>
 	</target>
-	
+
 	<!-- Call this to simply update SWG when you want your code updated to the latest version -->
 	<target name="update_swg" description="Updates the entire codebase with latest from the remote repositories and recompiles" depends="git_update_main,git_update_submods_to_latest_commit,compile">
 	</target>
-	
+
 	<!-- Begin ACM Related Targets -->
 	<target name="cleanup_acm">
 		<echo>Preface: Clean up any existing files so we don't get wires crossed.</echo>
@@ -564,7 +565,7 @@
 			<fileset dir="${data_shared}/customization" includes="asset_customization_manager.iff,customization_id_manager.iff"/>
 		</delete>
 	</target>
-	
+
 	<target name="copy_files">
 		<echo>Step 1: Copy customization data files from repo.</echo>
 		<copy todir="${build}">
@@ -578,7 +579,7 @@
 			</fileset>
 		</copy>
 	</target>
-	
+
 	<target name="create_lookup_table">
 		<echo>Step 2: Scanning serverdata and creating the Tree File Lookup Table.</echo>
 		<fileset id="shared" dir="${serverdata}">
@@ -590,7 +591,7 @@
 		</pathconvert>
 		<concat destfile="${treexlat}"><header filtering="no" trim="yes">p ${serverdata}/:0</header>${line.separator}${assets}:0${line.separator}</concat>
 	</target>
-	
+
 	<target name="collect_info">
 		<echo>Step 3a: Collecting information on customizable assets from our serverdata.</echo>
 		<exec executable="perl" dir="${perl_tools}" output="${custinfo}">
@@ -609,7 +610,7 @@
 			</filterchain>
 		</concat>
 	</target>
-	
+
 	<target name="optimize_info">
 		<echo>Step 4a: Creating an optimized customizations info file.</echo>
 		<exec executable="perl" dir="${perl_tools}">
@@ -632,7 +633,7 @@
 		</copy>
 		<move file="${custopt}.sort" tofile="${custopt}"/>
 	</target>
-	
+
 	<target name="build_acm_data">
 		<echo>Step 5: Building the ACM MIF data file</echo>
 		<exec executable="perl" dir="${perl_tools}">
@@ -648,7 +649,7 @@
 			<arg value="${treexlat}"/>
         </exec>
 	</target>
-	
+
 	<target name="miff_acm">
 		<echo>Step 6: Building the ACM IFF</echo>
 		<exec executable="./Miff" dir="${tools_home}">
@@ -659,7 +660,7 @@
 			<arg value="&quot;${acmiff}&quot;"/>
 		</exec>
 	</target>
-	
+
 	<target name="miff_cim">
 		<echo>Step 6a: Building the CIM IFF (final step)</echo>
 		<exec executable="./Miff" dir="${tools_home}">
@@ -670,12 +671,12 @@
 			<arg value="&quot;${cimiff}&quot;"/>
 		</exec>
 	</target>
-	
+
 	<target name="copy_acm" description="Copies the completed file to our serverdata folder as well so serverdata stays up to date.">
 		<copy file="${acmiff}" tofile="${serverdata}/customization/asset_customization_manager.iff"/>
 		<copy file="${cimiff}" tofile="${serverdata}/customization/customization_id_manager.iff"/>
 	</target>
-	
+
 	<target name="build_acm" depends="cleanup_acm,copy_files,create_lookup_table,collect_info,optimize_info,build_acm_data,miff_acm,miff_cim,copy_acm">
 	</target>
 	<!-- End ACM Related targets -->
