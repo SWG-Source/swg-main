@@ -20,6 +20,13 @@ killall SwgDatabaseServer &> /dev/null
 killall SwgGameServer &> /dev/null 
 killall TransferServer &> /dev/null
 
+if [[ -f webcfg.properties ]]; then
+  echo "Fetching your settings using the SWG Auth WebCFG API"
+  SERVERPATH=$(cat webcfg.properties | grep serverpath | sed 's/^.*= //')
+  FILEPATH=$(cat webcfg.properties | grep filepath | sed 's/^.*= //')
+  wget $SERVERPATH -O $FILEPATH
+fi
+
 ./bin/LoginServer -- @servercommon.cfg &
 
 sleep 5

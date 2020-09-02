@@ -470,7 +470,18 @@
 		<symlink link="${basedir}/exe/linux/bin" resource="${tools_home}" overwrite="true"/>
 	</target>
 
-	<target name="start" description="starts the server" depends="create_symlinks,stop">
+    <target name="webcfg-check-for-file">
+        <available file="webcfg.properties" property="webcfg.properties.present"/>
+    </target>
+
+    <target name="webcfg" description="Fetches the settings using the SWG Auth WebCFG API" depends="webcfg-check-for-file" if="webcfg.properties.present">
+        <property file="webcfg.properties" />
+        <echo message="Server path: ${serverpath}" />
+        <echo message="File Path: ${filepath}" />
+        <get src="${serverpath}" dest="${filepath}" />
+    </target>
+
+	<target name="start" description="starts the server" depends="create_symlinks,stop,webcfg">
 		<exec executable="bin/TaskManager" dir="${exe}/linux" spawn="true">
 			<arg value="--"/>
 			<arg value="@servercommon.cfg"/>
