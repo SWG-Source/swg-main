@@ -482,11 +482,12 @@
     </target>
 
 	<target name="start" description="starts the server" depends="create_symlinks,stop,webcfg">
-		<exec executable="bin/TaskManager" dir="${exe}/linux" spawn="true">
+		<exec executable="bin/LoginServer" dir="${exe}/linux" spawn="true">
 			<arg value="--"/>
 			<arg value="@servercommon.cfg"/>
 		</exec>
-		<exec executable="bin/LoginServer" dir="${exe}/linux">
+		<sleep seconds="5"/>
+		<exec executable="bin/TaskManager" dir="${exe}/linux">
 			<arg value="--"/>
 			<arg value="@servercommon.cfg"/>
 		</exec>
