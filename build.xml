@@ -486,7 +486,7 @@
 			<arg value="--"/>
 			<arg value="@servercommon.cfg"/>
 		</exec>
-		<sleep seconds="5"/>
+		<sleep seconds="2"/>
 		<exec executable="bin/TaskManager" dir="${exe}/linux">
 			<arg value="--"/>
 			<arg value="@servercommon.cfg"/>
