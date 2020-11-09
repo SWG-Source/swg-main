@@ -482,7 +482,7 @@
     </target>
 
 	<target name="start" description="starts the server" depends="create_symlinks,stop,webcfg">
-		<exec executable="exec.sh" />
+		<exec executable="./exec.sh" />
 	</target>
 	
 	<target name="stop" description="stops the login server">
