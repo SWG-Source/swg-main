@@ -420,6 +420,21 @@
 		<antcall target="add_new_cluster"/>
 		<antcall target="configure_limits"/>
 	</target>
+	
+	<!-- Target used to update the game database with the latest changes -->
+	<target name="update_database" description="runs the database update script to acquire the latest changes to the database">
+		<replace file="build.properties" token="firstrun = true" value="firstrun = false"/>
+		<exec executable="perl" dir="${basedir}/src/game/server/database/build/linux">
+			<env key="PATH" value="${env.PATH}:${tools_home}"/>
+			<arg value="database_update.pl"/>
+			<arg value="--username=${db_username}"/>
+			<arg value="--password=${db_password}"/>
+			<arg value="--service=${ADDR4}/${db_service}"/>
+			<arg value="--goldusername=${db_username}"/>
+			<arg value="--loginusername=${db_username}"/>
+			<arg value="--delta"/>
+		</exec>
+	</target>
 
 	<target name="add_new_cluster" description="Adds the cluster name to the database" if="firstrun">
 		<sql classpath="${env.ORACLE_HOME}/lib/ojdbc8.jar"
@@ -556,7 +571,7 @@
 	</target>
 	
 	<!-- Call this to simply update SWG when you want your code updated to the latest version -->
-	<target name="update_swg" description="Updates the entire codebase with latest from the remote repositories and recompiles" depends="git_update_main,git_update_submods_to_latest_commit,compile">
+	<target name="update_swg" description="Updates the entire codebase with latest from the remote repositories and recompiles" depends="git_update_main,git_update_submods_to_latest_commit,update_database,compile">
 	</target>
 	
 	<!-- Begin ACM Related Targets -->
