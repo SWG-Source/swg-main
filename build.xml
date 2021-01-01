@@ -337,7 +337,7 @@
 	<target name="compile_tpf" description="compile the template files (*.tpf) into .iff">
 		<echo message="Looking for Template Files to compile... please wait..."/>
 		<touch mkdirs="true" verbose="false">
-			<fileset dir="${dsrc}" includes="**/*.tpf" excludes="asset_customization_manager.tpf"/>
+			<fileset dir="${dsrc}" includes="**/*.tpf" excludes="**/asset_customization_manager.tpf"/>
 			<mapper type="glob" from="*.tpf" to="${data}/*/.tmp" />
 		</touch>
 		<delete>
