@@ -287,7 +287,7 @@
 
 	<!-- Compiles all .mif files -->
 	<target name="compile_miff">
-		<fileset id="miff_files" dir="${dsrc}" includes="**/*.mif"/>
+		<fileset id="miff_files" dir="${dsrc}" includes="**/*.mif" excludes="**/asset_customization_manager.mif"/>
 		<touch mkdirs="true" verbose="false">
 		  <fileset refid="miff_files"/>
 		  <mapper type="glob" from="*.mif" to="${data}/*/.tmp" />
@@ -337,7 +337,7 @@
 	<target name="compile_tpf" description="compile the template files (*.tpf) into .iff">
 		<echo message="Looking for Template Files to compile... please wait..."/>
 		<touch mkdirs="true" verbose="false">
-			<fileset dir="${dsrc}" includes="**/*.tpf" excludes="**/asset_customization_manager.tpf"/>
+			<fileset dir="${dsrc}" includes="**/*.tpf"/>
 			<mapper type="glob" from="*.tpf" to="${data}/*/.tmp" />
 		</touch>
 		<delete>
