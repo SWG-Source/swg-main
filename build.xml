@@ -697,6 +697,24 @@
 	
 	<target name="build_acm" depends="cleanup_acm,copy_files,create_lookup_table,collect_info,optimize_info,build_acm_data,miff_acm,miff_cim,copy_acm">
 	</target>
+	
+	<!-- Performs a hard reset on the src and dsrc repo to remove local changes potentially blocking update_swg from working -->
+	<target name="reset_repos">
+		<input message="This will remove any pending or stached changes to any files in the src or dsrc. Are you sure you want to proceed? Type YES and hit enter if you do." addproperty="do.reset"/>
+		<condition property="do.remove">
+		  <equals arg1="YES" arg2="${do.reset}"/>
+		</condition>
+		<fail unless="do.remove">Git Reset Aborted!</fail>
+		<exec executable="git" dir="${src}">
+			<arg line="reset --hard" />
+		</exec>
+		<echo>Reset of src repository was successful.</echo>
+		<exec executable="git" dir="${dsrc}">
+			<arg line="reset --hard" />
+		</exec>
+		<echo>Reset of dsrc repository was successful.</echo>
+	</target>
+	
 	<!-- End ACM Related targets -->
 
 </project>
