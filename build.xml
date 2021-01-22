@@ -16,6 +16,8 @@
 	<!-- Database Service Name is derived to make it easier in the properties file -->
 	<property name="service_name" value="//127.0.0.1/${db_service}"/>
 
+	<property name="dbip" value="${ADDR4}"/>
+
 	<!-- Setup Source Directories -->
 	<property name="exe" location="${basedir}/exe"/>
 	<property name="src" location="${basedir}/src"/>
@@ -398,7 +400,7 @@
 	<!-- Executes the generated Template CRC SQL in SQL*Plus -->
 	<target name="load_templates" description="loads generated templates into the database" depends="process_templates">
 		<exec executable="sqlplus" dir="${build}">
-			<arg value="${db_username}/${db_password}@${ADDR4}/${db_service}"/>
+			<arg value="${db_username}/${db_password}@${dbip}/${db_service}"/>
 			<arg value="@${templates_sql_file}"/>
 		</exec>
 	</target>
@@ -411,7 +413,7 @@
 			<arg value="database_update.pl"/>
 			<arg value="--username=${db_username}"/>
 			<arg value="--password=${db_password}"/>
-			<arg value="--service=${ADDR4}/${db_service}"/>
+			<arg value="--service=${dbip}/${db_service}"/>
 			<arg value="--goldusername=${db_username}"/>
 			<arg value="--loginusername=${db_username}"/>
 			<arg value="--createnewcluster"/>
@@ -429,7 +431,7 @@
 			<arg value="database_update.pl"/>
 			<arg value="--username=${db_username}"/>
 			<arg value="--password=${db_password}"/>
-			<arg value="--service=${ADDR4}/${db_service}"/>
+			<arg value="--service=${dbip}/${db_service}"/>
 			<arg value="--goldusername=${db_username}"/>
 			<arg value="--loginusername=${db_username}"/>
 			<arg value="--delta"/>
@@ -439,7 +441,7 @@
 	<target name="add_new_cluster" description="Adds the cluster name to the database" if="firstrun">
 		<sql classpath="${env.ORACLE_HOME}/lib/ojdbc8.jar"
 			 driver="oracle.jdbc.OracleDriver"
-			 url="jdbc:oracle:thin:@${ADDR4}:1521:${db_service}"
+			 url="jdbc:oracle:thin:@${dbip}:1521:${db_service}"
 			 userid="${db_username}"
 			 password="${db_password}">
 			insert into cluster_list (id, name, num_characters, address, secret, locked, not_recommended)
@@ -451,7 +453,7 @@
 	<target name="configure_limits" description="Defines the limits of the cluster and accounts in the database">
 		<sql classpath="${env.ORACLE_HOME}/lib/ojdbc8.jar"
 			 driver="oracle.jdbc.OracleDriver"
-			 url="jdbc:oracle:thin:@${ADDR4}:1521:${db_service}"
+			 url="jdbc:oracle:thin:@${dbip}:1521:${db_service}"
 			 userid="${db_username}"
 			 password="${db_password}">
 			update default_char_limits set account_limit = ${max_characters_per_account}, cluster_limit = ${max_characters_per_cluster};
@@ -472,7 +474,7 @@
 			<arg value="database_update.pl"/>
 			<arg value="--username=${db_username}"/>
 			<arg value="--password=${db_password}"/>
-			<arg value="--service=${ADDR4}/${db_service}"/>
+			<arg value="--service=${dbip}/${db_service}"/>
 			<arg value="--goldusername=${db_username}"/>
 			<arg value="--loginusername=${db_username}"/>
 			<arg value="--drop"/>
