@@ -250,6 +250,7 @@
 			<env key="CXX" value="${cxx_compiler}"/>
 			<arg value="-j${nproc}"/>
 		</exec>
+		<echo message="SRC Compiled to Build Type: ${src_build_type}" />
 	</target>
 	
 	<!-- Prepares the Station API (chat server) code for building -->
