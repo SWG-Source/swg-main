@@ -213,13 +213,13 @@
 			<env key="PATH" value="${env.PATH}:${tools_home}"/>
 			<env key="CC" value="${cc_compiler}" unless:true="${use_gcc}"/>
 			<env key="CXX" value="${cxx_compiler}" unless:true="${use_gcc}"/>
-			<env key="LDFLAGS" value="-L/usr/lib32"/>
-			<env key="CMAKE_PREFIX_PATH" value="/usr/lib32:/lib32:/usr/lib/i386-linux-gnu:/usr/include/i386-linux-gnu"/>
-			<arg value="-DCMAKE_C_FLAGS=-m32"/>
-			<arg value="-DCMAKE_CXX_FLAGS=-m32"/>
-			<arg value="-DCMAKE_EXE_LINKER_FLAGS=-m32"/>
-			<arg value="-DCMAKE_MODULE_LINKER_FLAGS=-m32"/>
-			<arg value="-DCMAKE_SHARED_LINKER_FLAGS=-m32"/>
+			<env key="LDFLAGS" value="-L/usr/lib64"/>
+			<env key="CMAKE_PREFIX_PATH" value="/usr/lib64:/lib64:/usr/lib/i386-linux-gnu:/usr/include/i386-linux-gnu"/>
+			<arg value="-DCMAKE_C_FLAGS=-Wconversion"/>
+			<arg value="-DCMAKE_CXX_FLAGS="/>
+			<arg value="-DCMAKE_EXE_LINKER_FLAGS=-g"/>
+			<arg value="-DCMAKE_MODULE_LINKER_FLAGS=-g"/>
+			<arg value="-DCMAKE_SHARED_LINKER_FLAGS=-g"/>
 			<arg value="-DCMAKE_BUILD_TYPE=${src_build_type}"/>
 			<arg value="${src}"/>
 		</exec>
@@ -227,13 +227,13 @@
 
 	<!-- Creates the Make files for our SRC that will be used during compile stage (Non-Intel) -->
 	<target name="prepare_src" depends="init,get_arch,set_compiler" description="compile server code - non Intel" unless="compile.x86">
-		<exec executable="cmake" dir="${build}" failonerror="true">
+		<!-- <exec executable="cmake" dir="${build}" failonerror="true">
 			<env key="PATH" value="${env.PATH}:${tools_home}"/>
 			<env key="CC" value="${cc_compiler}" unless:true="${use_gcc}"/>
 			<env key="CXX" value="${cxx_compiler}" unless:true="${use_gcc}"/>
 			<arg value="-DCMAKE_BUILD_TYPE=${src_build_type}"/>
 			<arg value="${src}"/>
-		</exec>
+		</exec> -->
 	</target>
 
 	<target name="strip_src" unless="${is_debug_build}" description="removes debugging information from release builds, making them smaller">
