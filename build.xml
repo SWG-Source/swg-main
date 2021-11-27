@@ -24,6 +24,7 @@
 	<property name="dsrc" location="dsrc" relative="true" basedir="${basedir}"/>
 	<property name="data" location="data" relative="true" basedir="${basedir}"/>
 	<property name="stationapi" location="${basedir}/stationapi"/>
+	<property name="src_library" location="${src}/external/3rd/library"/>
 	<property name="chat_build" location="${stationapi}/build"/>
 	<property name="serverdata" location="${basedir}/serverdata"/>
 	<property name="configs" location="configs" relative="true" basedir="${basedir}"/>
@@ -254,26 +255,25 @@
 	</target>
 	
 	<!-- Prepares the Station API (chat server) code for building -->
-	<target name="prepare_chat" description="prepares the chat server structure for building">
-		<copy todir="${stationapi}/externals/udplibrary">
-			<fileset dir="${stationapi}/udplibrary"/>
-		</copy>
+	<target name="prepare_chat" description="creates a symbolic link to the udplibrary">
+		<mkdir dir="${chat_build}"/>
+		<symlink link="${stationapi}/externals/udplibrary" resource="${src_library}/udplibrary" overwrite="true"/>
 	</target>
 	
+	<target name="cleanup_chat" description="removes the symbolic link to the udplibrary">
+		<symlink action="delete" link="${stationapi}/externals/udplibrary"/>
+	</target>
+		
 	<!-- Compiles the Station API (chat server) code -->
 	<target name="compile_chat" description="compile chat server code" depends="prepare_chat">
-		<delete dir="${chat_build}"/>
-		<mkdir dir="${chat_build}"/>
 		<exec executable="cmake" dir="${chat_build}" failonerror="true">
-			<arg value=".."/>
+			<arg value="${stationapi}"/>
+			<arg value="-DCMAKE_RUNTIME_OUTPUT_DIRECTORY=${build}/bin"/>
 		</exec>
 		<exec executable="cmake" dir="${chat_build}" failonerror="true">
 			<arg value="--build"/>
 			<arg value="."/>
 		</exec>
-		<move todir="${basedir}/chat">
-			<fileset dir="${chat_build}/bin"/>
-		</move>
 	</target>
 	
 	<!-- Compiles the DSRC (Java) code -->
