@@ -107,11 +107,29 @@
 			<equals arg1="${arch}" arg2="x86_64"/>
 		</condition>
 		<echo>Architecture is ${arch}</echo>
+		<condition property="compile.x86_32">
+			<and>
+				<equals arg1="${bits}" arg2="32"/>
+				<istrue value="${compile.x86}"/>
+			</and>
+		</condition>
+		<condition property="compile.x86_64">
+			<and>
+				<equals arg1="${bits}" arg2="64"/>
+				<istrue value="${compile.x86}"/>
+			</and>
+		</condition>
 		<condition property="compile.32">
-			<equals arg1="${bits}" arg2="32"/>
+			<and>
+				<equals arg1="${bits}" arg2="32"/>
+				<isfalse value="${compile.x86}"/>
+			</and>
 		</condition>
 		<condition property="compile.64">
-			<equals arg1="${bits}" arg2="64"/>
+			<and>
+				<equals arg1="${bits}" arg2="64"/>
+				<isfalse value="${compile.x86}"/>
+			</and>
 		</condition>
 		<echo>Compiling as ${bits}-bit application.</echo>
 		<condition property="is_debug_build">
@@ -213,19 +231,25 @@
 			<replacefilter token="DBPASSWORD" property="db_password"/>
 		</replace>
 	</target>
-	
-	<!-- Creates the Make files for our SRC that will be used during compile stage (Intel) -->
-	<target name="prepare_src_x86" depends="prepare_src_x86_32, prepare_src_x86_64" description="prepare server code - Intel" if="compile.x86">
+
+	<!-- Creates the Make files for our SRC that will be used during compile stage (Non-Intel) -->
+	<target name="prepare_src" depends="init,get_arch,set_compiler" description="compile server code">
+		<antcall target="prepare_src_x86_32" if:true="${compile.x86_32}"/>
+		<antcall target="prepare_src_x86_64" if:true="${compile.x86_64}"/>
+		<antcall target="prepare_src_32" if:true="${compile.32}"/>
+		<antcall target="prepare_src_64" if:true="${compile.64}"/>
 	</target>
 	
 	<!-- Creates the Make files for our SRC that will be used during compile stage (Intel) -->
-	<target name="prepare_src_x86_32" depends="init,get_arch,set_compiler" description="prepare server code - Intel" if="compile.x86" unless="compile.64">
+	<target name="prepare_src_x86_32" depends="init,get_arch,set_compiler" description="prepare server code - Intel" if="compile.x86_32">
 		<exec executable="cmake" dir="${build}" failonerror="true">
 			<env key="PATH" value="${env.PATH}:${tools_home}"/>
 			<env key="CC" value="${cc_compiler}" unless:true="${use_gcc}"/>
 			<env key="CXX" value="${cxx_compiler}" unless:true="${use_gcc}"/>
 			<env key="LDFLAGS" value="-L/usr/lib32"/>
 			<env key="CMAKE_PREFIX_PATH" value="/usr/lib32:/lib32:/usr/lib/i386-linux-gnu:/usr/include/i386-linux-gnu"/>
+			<arg value="-DCMAKE_ORACLE_DIR=${oracle_home.32}"/>
+			<arg value="-DCMAKE_ORACLE_INCLUDE_DIR=${oracle_include.32}"/>
 			<arg value="-DCMAKE_C_FLAGS=-m32"/>
 			<arg value="-DCMAKE_CXX_FLAGS=-m32"/>
 			<arg value="-DCMAKE_EXE_LINKER_FLAGS=-m32"/>
@@ -237,30 +261,47 @@
 	</target>
 	
 	<!-- Creates the Make files for our SRC that will be used during compile stage (Intel) -->
-	<target name="prepare_src_x86_64" depends="init,get_arch,set_compiler" description="prepare server code - Intel" if="compile.x86" unless="compile.32">
+	<target name="prepare_src_x86_64" depends="init,get_arch,set_compiler" description="prepare server code - Intel" if="compile.x86_64">
 		<exec executable="cmake" dir="${build}" failonerror="true">
 			<env key="PATH" value="${env.PATH}:${tools_home}"/>
 			<env key="CC" value="${cc_compiler}" unless:true="${use_gcc}"/>
 			<env key="CXX" value="${cxx_compiler}" unless:true="${use_gcc}"/>
 			<env key="LDFLAGS" value="-L/usr/lib64"/>
 			<env key="CMAKE_PREFIX_PATH" value="/usr/lib64:/lib64"/>
+			<arg value="-DCMAKE_ORACLE_DIR=${oracle_home.64}"/>
+			<arg value="-DCMAKE_ORACLE_INCLUDE_DIR=${oracle_include.64}"/>
 			<arg value="-DCMAKE_BUILD_TYPE=${src_build_type}"/>
 			<arg value="${src}"/>
 		</exec>
 	</target>
 
 	<!-- Creates the Make files for our SRC that will be used during compile stage (Non-Intel) -->
-	<target name="prepare_src" depends="init,get_arch,set_compiler" description="compile server code - non Intel" unless="compile.x86">
+	<target name="prepare_src_32" depends="init,get_arch,set_compiler" description="compile server code - non Intel" if="compile.32">
 		<exec executable="cmake" dir="${build}" failonerror="true">
 			<env key="PATH" value="${env.PATH}:${tools_home}"/>
 			<env key="CC" value="${cc_compiler}" unless:true="${use_gcc}"/>
 			<env key="CXX" value="${cxx_compiler}" unless:true="${use_gcc}"/>
+			<arg value="-DCMAKE_ORACLE_DIR=${oracle_home.32}"/>
+			<arg value="-DCMAKE_ORACLE_INCLUDE_DIR=${oracle_include.32}"/>
 			<arg value="-DCMAKE_BUILD_TYPE=${src_build_type}"/>
 			<arg value="${src}"/>
 		</exec>
 	</target>
 
-	<target name="strip_src" unless="${is_debug_build}" description="removes debugging information from release builds, making them smaller">
+	<!-- Creates the Make files for our SRC that will be used during compile stage (Non-Intel) -->
+	<target name="prepare_src_64" depends="init,get_arch,set_compiler" description="compile server code - non Intel" if="compile.64">
+		<exec executable="cmake" dir="${build}" failonerror="true">
+			<env key="PATH" value="${env.PATH}:${tools_home}"/>
+			<env key="CC" value="${cc_compiler}" unless:true="${use_gcc}"/>
+			<env key="CXX" value="${cxx_compiler}" unless:true="${use_gcc}"/>
+			<arg value="-DCMAKE_ORACLE_DIR=${oracle_home.64}"/>
+			<arg value="-DCMAKE_ORACLE_INCLUDE_DIR=${oracle_include.64}"/>
+			<arg value="-DCMAKE_BUILD_TYPE=${src_build_type}"/>
+			<arg value="${src}"/>
+		</exec>
+	</target>
+
+	<target name="strip_src" description="removes debugging information from release builds, making them smaller">
 		<exec executable="strip" dir="${build}">
 			<arg value="-d"/>
 			<arg value="bin/*"/>
@@ -268,13 +309,14 @@
 	</target>
 
 	<!-- Compiles the SRC (C++) code -->
-	<target name="compile_src" description="compile server code" depends="init,prepare_src,prepare_src_x86,get_num_procs,strip_src">
+	<target name="compile_src" description="compile server code" depends="init,prepare_src,get_num_procs">
 		<exec executable="make" dir="${build}" failonerror="true">
 			<env key="CC" value="${cc_compiler}"/>
 			<env key="CXX" value="${cxx_compiler}"/>
 			<arg value="-j${nproc}"/>
 		</exec>
 		<echo message="SRC Compiled to Build Type: ${src_build_type}" />
+		<antcall target="strip_src" unless:true="${is_debug_build}"/>
 	</target>
 	
 	<!-- Prepares the Station API (chat server) code for building -->
