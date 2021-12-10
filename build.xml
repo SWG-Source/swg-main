@@ -232,7 +232,7 @@
 		</replace>
 	</target>
 
-	<!-- Creates the Make files for our SRC that will be used during compile stage (Non-Intel) -->
+	<!-- Creates the Make files for our SRC that will be used during compile stage -->
 	<target name="prepare_src" depends="init,get_arch,set_compiler" description="compile server code">
 		<antcall target="prepare_src_x86_32" if:true="${compile.x86_32}"/>
 		<antcall target="prepare_src_x86_64" if:true="${compile.x86_64}"/>
@@ -240,28 +240,28 @@
 		<antcall target="prepare_src_64" if:true="${compile.64}"/>
 	</target>
 	
-	<!-- Creates the Make files for our SRC that will be used during compile stage (Intel) -->
-	<target name="prepare_src_x86_32" depends="init,get_arch,set_compiler" description="prepare server code - Intel" if="compile.x86_32">
+	<!-- Creates the Make files for our SRC that will be used during compile stage (Intel 32-bit) -->
+	<target name="prepare_src_x86_32" description="prepare server code - Intel" if="compile.x86_32">
 		<exec executable="cmake" dir="${build}" failonerror="true">
 			<env key="PATH" value="${env.PATH}:${tools_home}"/>
 			<env key="CC" value="${cc_compiler}" unless:true="${use_gcc}"/>
 			<env key="CXX" value="${cxx_compiler}" unless:true="${use_gcc}"/>
 			<env key="LDFLAGS" value="-L/usr/lib32"/>
-			<env key="CMAKE_PREFIX_PATH" value="/usr/lib32:/lib32:/usr/lib/i386-linux-gnu:/usr/include/i386-linux-gnu"/>
-			<arg value="-DCMAKE_ORACLE_DIR=${oracle_home.32}"/>
-			<arg value="-DCMAKE_ORACLE_INCLUDE_DIR=${oracle_include.32}"/>
+			<env key="CMAKE_PREFIX_PATH" value="/usr/lib32:/lib32"/>
 			<arg value="-DCMAKE_C_FLAGS=-m32"/>
 			<arg value="-DCMAKE_CXX_FLAGS=-m32"/>
 			<arg value="-DCMAKE_EXE_LINKER_FLAGS=-m32"/>
 			<arg value="-DCMAKE_MODULE_LINKER_FLAGS=-m32"/>
 			<arg value="-DCMAKE_SHARED_LINKER_FLAGS=-m32"/>
+			<arg value="-DCMAKE_ORACLE_DIR=${oracle_home.32}"/>
+			<arg value="-DCMAKE_ORACLE_INCLUDE_DIR=${oracle_include.32}"/>
 			<arg value="-DCMAKE_BUILD_TYPE=${src_build_type}"/>
 			<arg value="${src}"/>
 		</exec>
 	</target>
 	
-	<!-- Creates the Make files for our SRC that will be used during compile stage (Intel) -->
-	<target name="prepare_src_x86_64" depends="init,get_arch,set_compiler" description="prepare server code - Intel" if="compile.x86_64">
+	<!-- Creates the Make files for our SRC that will be used during compile stage (Intel 64-bit) -->
+	<target name="prepare_src_x86_64" description="prepare server code - Intel" if="compile.x86_64">
 		<exec executable="cmake" dir="${build}" failonerror="true">
 			<env key="PATH" value="${env.PATH}:${tools_home}"/>
 			<env key="CC" value="${cc_compiler}" unless:true="${use_gcc}"/>
@@ -275,8 +275,8 @@
 		</exec>
 	</target>
 
-	<!-- Creates the Make files for our SRC that will be used during compile stage (Non-Intel) -->
-	<target name="prepare_src_32" depends="init,get_arch,set_compiler" description="compile server code - non Intel" if="compile.32">
+	<!-- Creates the Make files for our SRC that will be used during compile stage (Non-Intel 32-bit) -->
+	<target name="prepare_src_32" description="compile server code - non Intel" if="compile.32">
 		<exec executable="cmake" dir="${build}" failonerror="true">
 			<env key="PATH" value="${env.PATH}:${tools_home}"/>
 			<env key="CC" value="${cc_compiler}" unless:true="${use_gcc}"/>
@@ -288,8 +288,8 @@
 		</exec>
 	</target>
 
-	<!-- Creates the Make files for our SRC that will be used during compile stage (Non-Intel) -->
-	<target name="prepare_src_64" depends="init,get_arch,set_compiler" description="compile server code - non Intel" if="compile.64">
+	<!-- Creates the Make files for our SRC that will be used during compile stage (Non-Intel 64-bit) -->
+	<target name="prepare_src_64" description="compile server code - non Intel" if="compile.64">
 		<exec executable="cmake" dir="${build}" failonerror="true">
 			<env key="PATH" value="${env.PATH}:${tools_home}"/>
 			<env key="CC" value="${cc_compiler}" unless:true="${use_gcc}"/>
@@ -309,7 +309,25 @@
 	</target>
 
 	<!-- Compiles the SRC (C++) code -->
-	<target name="compile_src" description="compile server code" depends="init,prepare_src,get_num_procs">
+	<target name="compile_src" description="compiles the server code" depends="init,prepare_src,get_num_procs">
+		<antcall target="compile_src_32" if:true="${compile.x86_32}"/>
+		<antcall target="compile_src_64" if:true="${compile.x86_64}"/>
+		<antcall target="compile_src_32" if:true="${compile.32}"/>
+		<antcall target="compile_src_64" if:true="${compile.64}"/>
+	</target>
+	
+	<target name="compile_src_32" description="compile server code">
+		<exec executable="linux32" dir="${build}" failonerror="true">
+			<env key="CC" value="${cc_compiler}"/>
+			<env key="CXX" value="${cxx_compiler}"/>
+			<arg value="make"/>
+			<arg value="-j${nproc}"/>
+		</exec>
+		<echo message="SRC Compiled to Build Type: ${src_build_type}" />
+		<antcall target="strip_src" unless:true="${is_debug_build}"/>
+	</target>
+	
+	<target name="compile_src_64" description="compile server code">
 		<exec executable="make" dir="${build}" failonerror="true">
 			<env key="CC" value="${cc_compiler}"/>
 			<env key="CXX" value="${cxx_compiler}"/>
