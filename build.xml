@@ -133,7 +133,10 @@
 		</condition>
 		<echo>Compiling as ${bits}-bit application.</echo>
 		<condition property="is_debug_build">
-			<equals arg1="${src_build_type}" arg2="Debug"/>
+			<or>
+				<equals arg1="${src_build_type}" arg2="Debug"/>
+				<equals arg1="${src_build_type}" arg2="RelWithDebInfo"/>
+			</or>
 		</condition>
 		<echo>Creating a ${src_build_type} build</echo>
 		<condition property="use_gcc">
@@ -244,6 +247,7 @@
 	<target name="prepare_src_x86_32" description="prepare server code - Intel" if="compile.x86_32">
 		<exec executable="cmake" dir="${build}" failonerror="true">
 			<env key="PATH" value="${env.PATH}:${tools_home}"/>
+			<env key="ORACLE_HOME" value="${oracle_home.32}"/>
 			<env key="CC" value="${cc_compiler}" unless:true="${use_gcc}"/>
 			<env key="CXX" value="${cxx_compiler}" unless:true="${use_gcc}"/>
 			<env key="LDFLAGS" value="-L/usr/lib32"/>
@@ -253,7 +257,6 @@
 			<arg value="-DCMAKE_EXE_LINKER_FLAGS=-m32"/>
 			<arg value="-DCMAKE_MODULE_LINKER_FLAGS=-m32"/>
 			<arg value="-DCMAKE_SHARED_LINKER_FLAGS=-m32"/>
-			<arg value="-DCMAKE_ORACLE_DIR=${oracle_home.32}"/>
 			<arg value="-DCMAKE_ORACLE_INCLUDE_DIR=${oracle_include.32}"/>
 			<arg value="-DCMAKE_BUILD_TYPE=${src_build_type}"/>
 			<arg value="${src}"/>
@@ -264,11 +267,11 @@
 	<target name="prepare_src_x86_64" description="prepare server code - Intel" if="compile.x86_64">
 		<exec executable="cmake" dir="${build}" failonerror="true">
 			<env key="PATH" value="${env.PATH}:${tools_home}"/>
+			<env key="ORACLE_HOME" value="${oracle_home.64}"/>
 			<env key="CC" value="${cc_compiler}" unless:true="${use_gcc}"/>
 			<env key="CXX" value="${cxx_compiler}" unless:true="${use_gcc}"/>
 			<env key="LDFLAGS" value="-L/usr/lib64"/>
 			<env key="CMAKE_PREFIX_PATH" value="/usr/lib64:/lib64"/>
-			<arg value="-DCMAKE_ORACLE_DIR=${oracle_home.64}"/>
 			<arg value="-DCMAKE_ORACLE_INCLUDE_DIR=${oracle_include.64}"/>
 			<arg value="-DCMAKE_BUILD_TYPE=${src_build_type}"/>
 			<arg value="${src}"/>
@@ -279,9 +282,9 @@
 	<target name="prepare_src_32" description="compile server code - non Intel" if="compile.32">
 		<exec executable="cmake" dir="${build}" failonerror="true">
 			<env key="PATH" value="${env.PATH}:${tools_home}"/>
+			<env key="ORACLE_HOME" value="${oracle_home.32}"/>
 			<env key="CC" value="${cc_compiler}" unless:true="${use_gcc}"/>
 			<env key="CXX" value="${cxx_compiler}" unless:true="${use_gcc}"/>
-			<arg value="-DCMAKE_ORACLE_DIR=${oracle_home.32}"/>
 			<arg value="-DCMAKE_ORACLE_INCLUDE_DIR=${oracle_include.32}"/>
 			<arg value="-DCMAKE_BUILD_TYPE=${src_build_type}"/>
 			<arg value="${src}"/>
@@ -292,9 +295,9 @@
 	<target name="prepare_src_64" description="compile server code - non Intel" if="compile.64">
 		<exec executable="cmake" dir="${build}" failonerror="true">
 			<env key="PATH" value="${env.PATH}:${tools_home}"/>
+			<env key="ORACLE_HOME" value="${oracle_home.64}"/>
 			<env key="CC" value="${cc_compiler}" unless:true="${use_gcc}"/>
 			<env key="CXX" value="${cxx_compiler}" unless:true="${use_gcc}"/>
-			<arg value="-DCMAKE_ORACLE_DIR=${oracle_home.64}"/>
 			<arg value="-DCMAKE_ORACLE_INCLUDE_DIR=${oracle_include.64}"/>
 			<arg value="-DCMAKE_BUILD_TYPE=${src_build_type}"/>
 			<arg value="${src}"/>
@@ -337,27 +340,26 @@
 		<antcall target="strip_src" unless:true="${is_debug_build}"/>
 	</target>
 	
-	<!-- Prepares the Station API (chat server) code for building -->
-	<target name="prepare_chat" description="prepares the chat server structure for building">
-		<copy todir="${stationapi}/externals/udplibrary">
-			<fileset dir="${stationapi}/udplibrary"/>
-		</copy>
+	<target name="prepare_chat" description="creates a symbolic link to the udplibrary">
+		<mkdir dir="${chat_build}"/>
+		<symlink link="${stationapi}/externals/udplibrary" resource="${src_library}/udplibrary" overwrite="true"/>
 	</target>
 	
+	<target name="clean_chat" description="removes the symbolic link to the udplibrary">
+		<delete dir="${chat_build}"/>
+		<symlink action="delete" link="${stationapi}/externals/udplibrary"/>
+	</target>
+		
 	<!-- Compiles the Station API (chat server) code -->
 	<target name="compile_chat" description="compile chat server code" depends="prepare_chat">
-		<delete dir="${chat_build}"/>
-		<mkdir dir="${chat_build}"/>
 		<exec executable="cmake" dir="${chat_build}" failonerror="true">
-			<arg value=".."/>
+			<arg value="${stationapi}"/>
+			<arg value="-DCMAKE_RUNTIME_OUTPUT_DIRECTORY=${build}/bin"/>
 		</exec>
 		<exec executable="cmake" dir="${chat_build}" failonerror="true">
 			<arg value="--build"/>
 			<arg value="."/>
 		</exec>
-		<move todir="${basedir}/chat">
-			<fileset dir="${chat_build}/bin"/>
-		</move>
 	</target>
 	
 	<!-- Compiles the DSRC (Java) code -->
