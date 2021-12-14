@@ -24,6 +24,7 @@
 	<property name="dsrc" location="dsrc" relative="true" basedir="${basedir}"/>
 	<property name="data" location="data" relative="true" basedir="${basedir}"/>
 	<property name="stationapi" location="${basedir}/stationapi"/>
+	<property name="src_library" location="${src}/external/3rd/library"/>
 	<property name="chat_build" location="${stationapi}/build"/>
 	<property name="serverdata" location="${basedir}/serverdata"/>
 	<property name="configs" location="configs" relative="true" basedir="${basedir}"/>
@@ -66,6 +67,15 @@
 		<mkdir dir="${data_server}"/>
 		<mkdir dir="${data_shared}"/>
 		<mkdir dir="${data_client}"/>
+		<condition property="java_home" value="${java_home.32}" else="${java_home.64}">
+			<equals arg1="${bits}" arg2="32"/>
+		</condition>
+		<condition property="oracle_home" value="${oracle_home.32}" else="${oracle_home.64}">
+			<equals arg1="${bits}" arg2="32"/>
+		</condition>
+		<condition property="oracle_include" value="${oracle_include.32}" else="${oracle_include.64}">
+			<equals arg1="${bits}" arg2="32"/>
+		</condition>
 	</target>
 
 	<target name="echoprops">
@@ -239,15 +249,15 @@
 	<target name="prepare_src" depends="init,get_arch,set_compiler" description="compile server code">
 		<antcall target="prepare_src_x86_32" if:true="${compile.x86_32}"/>
 		<antcall target="prepare_src_x86_64" if:true="${compile.x86_64}"/>
-		<antcall target="prepare_src_32" if:true="${compile.32}"/>
-		<antcall target="prepare_src_64" if:true="${compile.64}"/>
+		<antcall target="prepare_src_ni" unless:true="${compile.x86}"/>
 	</target>
 	
 	<!-- Creates the Make files for our SRC that will be used during compile stage (Intel 32-bit) -->
 	<target name="prepare_src_x86_32" description="prepare server code - Intel" if="compile.x86_32">
 		<exec executable="cmake" dir="${build}" failonerror="true">
 			<env key="PATH" value="${env.PATH}:${tools_home}"/>
-			<env key="ORACLE_HOME" value="${oracle_home.32}"/>
+			<env key="JAVA_HOME" value="${java_home}"/>
+			<env key="ORACLE_HOME" value="${oracle_home}"/>
 			<env key="CC" value="${cc_compiler}" unless:true="${use_gcc}"/>
 			<env key="CXX" value="${cxx_compiler}" unless:true="${use_gcc}"/>
 			<env key="LDFLAGS" value="-L/usr/lib32"/>
@@ -257,7 +267,7 @@
 			<arg value="-DCMAKE_EXE_LINKER_FLAGS=-m32"/>
 			<arg value="-DCMAKE_MODULE_LINKER_FLAGS=-m32"/>
 			<arg value="-DCMAKE_SHARED_LINKER_FLAGS=-m32"/>
-			<arg value="-DCMAKE_ORACLE_INCLUDE_DIR=${oracle_include.32}"/>
+			<arg value="-DCMAKE_ORACLE_INCLUDE_DIR=${oracle_include}"/>
 			<arg value="-DCMAKE_BUILD_TYPE=${src_build_type}"/>
 			<arg value="${src}"/>
 		</exec>
@@ -267,38 +277,27 @@
 	<target name="prepare_src_x86_64" description="prepare server code - Intel" if="compile.x86_64">
 		<exec executable="cmake" dir="${build}" failonerror="true">
 			<env key="PATH" value="${env.PATH}:${tools_home}"/>
-			<env key="ORACLE_HOME" value="${oracle_home.64}"/>
+			<env key="JAVA_HOME" value="${java_home}"/>
+			<env key="ORACLE_HOME" value="${oracle_home}"/>
 			<env key="CC" value="${cc_compiler}" unless:true="${use_gcc}"/>
 			<env key="CXX" value="${cxx_compiler}" unless:true="${use_gcc}"/>
 			<env key="LDFLAGS" value="-L/usr/lib64"/>
 			<env key="CMAKE_PREFIX_PATH" value="/usr/lib64:/lib64"/>
-			<arg value="-DCMAKE_ORACLE_INCLUDE_DIR=${oracle_include.64}"/>
+			<arg value="-DCMAKE_ORACLE_INCLUDE_DIR=${oracle_include}"/>
 			<arg value="-DCMAKE_BUILD_TYPE=${src_build_type}"/>
 			<arg value="${src}"/>
 		</exec>
 	</target>
 
 	<!-- Creates the Make files for our SRC that will be used during compile stage (Non-Intel 32-bit) -->
-	<target name="prepare_src_32" description="compile server code - non Intel" if="compile.32">
+	<target name="prepare_src_ni" description="compile server code - non Intel">
 		<exec executable="cmake" dir="${build}" failonerror="true">
 			<env key="PATH" value="${env.PATH}:${tools_home}"/>
-			<env key="ORACLE_HOME" value="${oracle_home.32}"/>
+			<env key="JAVA_HOME" value="${java_home}"/>
+			<env key="ORACLE_HOME" value="${oracle_home}"/>
 			<env key="CC" value="${cc_compiler}" unless:true="${use_gcc}"/>
 			<env key="CXX" value="${cxx_compiler}" unless:true="${use_gcc}"/>
-			<arg value="-DCMAKE_ORACLE_INCLUDE_DIR=${oracle_include.32}"/>
-			<arg value="-DCMAKE_BUILD_TYPE=${src_build_type}"/>
-			<arg value="${src}"/>
-		</exec>
-	</target>
-
-	<!-- Creates the Make files for our SRC that will be used during compile stage (Non-Intel 64-bit) -->
-	<target name="prepare_src_64" description="compile server code - non Intel" if="compile.64">
-		<exec executable="cmake" dir="${build}" failonerror="true">
-			<env key="PATH" value="${env.PATH}:${tools_home}"/>
-			<env key="ORACLE_HOME" value="${oracle_home.64}"/>
-			<env key="CC" value="${cc_compiler}" unless:true="${use_gcc}"/>
-			<env key="CXX" value="${cxx_compiler}" unless:true="${use_gcc}"/>
-			<arg value="-DCMAKE_ORACLE_INCLUDE_DIR=${oracle_include.64}"/>
+			<arg value="-DCMAKE_ORACLE_INCLUDE_DIR=${oracle_include}"/>
 			<arg value="-DCMAKE_BUILD_TYPE=${src_build_type}"/>
 			<arg value="${src}"/>
 		</exec>
@@ -364,7 +363,7 @@
 	
 	<!-- Compiles the DSRC (Java) code -->
 	<target name="compile_java" depends="init" description="compile java code">
-		<javac srcdir="${dsrc_server}" destdir="${data_server}" includeantruntime="false" classpath="${data_server}" encoding="utf8" sourcepath="${dsrc_server}" debug="true" deprecation="on">
+		<javac executable="${java_home}/bin/javac" srcdir="${dsrc_server}" destdir="${data_server}" includeantruntime="false" classpath="${data_server}" encoding="utf8" sourcepath="${dsrc_server}" debug="true" deprecation="on">
 			<compilerarg value="-Xlint:-options"/>
 		</javac>
 		<antcall target="create_symlinks"/>
