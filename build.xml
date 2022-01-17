@@ -263,7 +263,7 @@
 			<env key="LDFLAGS" value="-L/usr/lib32"/>
 			<env key="CMAKE_PREFIX_PATH" value="/usr/lib32:/lib32"/>
 			<arg value="-DCMAKE_C_FLAGS=-m32"/>
-			<arg value="-DCMAKE_CXX_FLAGS=-m32"/>
+			<arg value="-DCMAKE_CXX_FLAGS=-m32 -maes"/>
 			<arg value="-DCMAKE_EXE_LINKER_FLAGS=-m32"/>
 			<arg value="-DCMAKE_MODULE_LINKER_FLAGS=-m32"/>
 			<arg value="-DCMAKE_SHARED_LINKER_FLAGS=-m32"/>
