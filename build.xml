@@ -263,7 +263,7 @@
 			<env key="LDFLAGS" value="-L/usr/lib32"/>
 			<env key="CMAKE_PREFIX_PATH" value="/usr/lib32:/lib32"/>
 			<arg value="-DCMAKE_C_FLAGS=-m32"/>
-			<arg value="-DCMAKE_CXX_FLAGS=-m32 -maes"/>
+			<arg value="-DCMAKE_CXX_FLAGS=-m32"/>
 			<arg value="-DCMAKE_EXE_LINKER_FLAGS=-m32"/>
 			<arg value="-DCMAKE_MODULE_LINKER_FLAGS=-m32"/>
 			<arg value="-DCMAKE_SHARED_LINKER_FLAGS=-m32"/>
@@ -303,13 +303,6 @@
 		</exec>
 	</target>
 
-	<target name="strip_src" description="removes debugging information from release builds, making them smaller">
-		<exec executable="strip" dir="${build}">
-			<arg value="-d"/>
-			<arg value="bin/*"/>
-		</exec>
-	</target>
-
 	<!-- Compiles the SRC (C++) code -->
 	<target name="compile_src" description="compiles the server code" depends="init,prepare_src,get_num_procs">
 		<antcall target="compile_src_32" if:true="${compile.x86_32}"/>
@@ -326,7 +319,6 @@
 			<arg value="-j${nproc}"/>
 		</exec>
 		<echo message="SRC Compiled to Build Type: ${src_build_type}" />
-		<antcall target="strip_src" unless:true="${is_debug_build}"/>
 	</target>
 	
 	<target name="compile_src_64" description="compile server code">
@@ -336,7 +328,6 @@
 			<arg value="-j${nproc}"/>
 		</exec>
 		<echo message="SRC Compiled to Build Type: ${src_build_type}" />
-		<antcall target="strip_src" unless:true="${is_debug_build}"/>
 	</target>
 	
 	<target name="prepare_chat" description="creates a symbolic link to the udplibrary">
