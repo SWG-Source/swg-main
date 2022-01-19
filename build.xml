@@ -279,7 +279,7 @@
 		</exec>
 		<copy file="${stationapi}/extras/logger.cfg.dist" tofile="${basedir}/chat/etc/stationapi/logger.cfg"/>
 		<copy file="${stationapi}/extras/swgchat.cfg.dist" tofile="${basedir}/chat/etc/stationapi/swgchat.cfg"/>
-		<copy file="${stationapi}/extras/stationchat.db.dist" tofile="${basedir}/chat/var/stationapi/stationchat.db"/>
+		<copy file="${stationapi}/extras/stationchat.db.dist" tofile="${basedir}/chat/var/stationapi/stationchat.db" failonerror="false"/>
 		<copy file="${stationapi}/extras/init_database.sql" tofile="${basedir}/chat/init_database.sql"/>
 	</target>
 	
