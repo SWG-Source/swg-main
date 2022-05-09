@@ -397,6 +397,13 @@
 		</exec>
 	</target>
 
+	<!-- Creates the Planet CRC file -->
+	<target name="build_planet_crc" description="creates the planet crc file" depends="compile_tab">
+		<exec executable="utils/build_planet_crc_string_tables.py" dir="${basedir}">
+			<env key="PATH" value="${env.PATH}:${tools_home}"/>
+		</exec>
+	</target>
+
 	<!-- Creates SQL (insert statements) to get all the CRC Templates into the database -->
 	<target name="process_templates" description="generates sql from generated crc files" depends="build_object_template_crc,build_quest_crc">
 		<exec executable="perl" dir="${basedir}/src/game/server/database/templates" input="${object_crc_file}" output="${templates_sql_file}">
