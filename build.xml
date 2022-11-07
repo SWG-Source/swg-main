@@ -436,6 +436,7 @@
 		</exec>
 		<antcall target="add_new_cluster"/>
 		<antcall target="configure_limits"/>
+		<antcall target="update_database"/>
 	</target>
 
 	<!-- Target used to update the game database with the latest changes -->
