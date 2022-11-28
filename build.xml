@@ -399,7 +399,7 @@
 
 	<!-- Creates the Planet CRC file -->
 	<target name="build_planet_crc" description="creates the planet crc file" depends="compile_tab">
-		<exec executable="utils/build_planet_crc_string_tables.py" dir="${basedir}">
+		<exec executable="utils/build_planet_template_crc_string_tables.py" dir="${basedir}">
 			<env key="PATH" value="${env.PATH}:${tools_home}"/>
 		</exec>
 	</target>
