@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/python3
 
 from os import path, makedirs
 from subprocess import PIPE, Popen
