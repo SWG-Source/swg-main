@@ -70,12 +70,15 @@
 		<condition property="java_home" value="${java_home.32}" else="${java_home.64}">
 			<equals arg1="${bits}" arg2="32"/>
 		</condition>
+		<echo>Java Home: ${java_home}</echo>
 		<condition property="oracle_home" value="${oracle_home.32}" else="${oracle_home.64}">
 			<equals arg1="${bits}" arg2="32"/>
 		</condition>
+		<echo>Oracle Home: ${oracle_home}</echo>
 		<condition property="oracle_include" value="${oracle_include.32}" else="${oracle_include.64}">
 			<equals arg1="${bits}" arg2="32"/>
 		</condition>
+		<echo>Oracle Include: ${oracle_include}</echo>
 	</target>
 
 	<target name="echoprops">
