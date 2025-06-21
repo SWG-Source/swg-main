@@ -13,10 +13,10 @@
 	<!-- Global Properties -->
 	<property name="build" location="${basedir}/build"/>
 
-	<!-- Database Service Name is derived to make it easier in the properties file -->
-	<property name="service_name" value="//127.0.0.1/${db_service}"/>
-
 	<property name="dbip" value="${ADDR4}"/>
+
+	<!-- Database Service Name is derived to make it easier in the properties file -->
+	<property name="service_name" value="//${dbip}/${db_service}"/>
 
 	<!-- Setup Source Directories -->
 	<property name="exe" location="${basedir}/exe"/>
