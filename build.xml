@@ -206,6 +206,24 @@
 			<replacefilter token="DBSERVICE" value="${service_name}"/>
 			<replacefilter token="DBPASSWORD" property="db_password"/>
 		</replace>
+		<antcall target="set_ubuntu_cfg"/>
+	</target>
+
+	<exec executable="bash" outputproperty="os_version_id">
+		<arg value="-c"/>
+		<arg value="source /etc/os-release &amp;&amp; echo $VERSION_ID"/>
+	</exec>
+
+	<condition property="is_ubuntu18">
+		<equals arg1="${os_version_id}" arg2="18.04"/>
+	</condition>
+
+	<target name="set_ubuntu_cfg" if="is_ubuntu18">
+		<replace dir="${exe}">
+			<include name="**/*.cfg"/>
+			<replacefilter token="environmentVariable=PATH+=/usr/java/bin:./" value="environmentVariable=PATH+=/usr/lib/jvm/java-11-openjdk-i386/bin:./"/>
+			<replacefilter token="environmentVariable=LD_LIBRARY_PATH+=/usr/java/lib:/usr/java/lib/server:./" value="environmentVariable=LD_LIBRARY_PATH+=/usr/lib/jvm/java-11-openjdk-i386/lib:/usr/lib/jvm/java-11-openjdk-i386/lib/server:./"/>
+		</replace>
 	</target>
 	
 	<!-- Creates the Make files for our SRC that will be used during compile stage (Intel) -->
