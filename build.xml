@@ -13,10 +13,10 @@
 	<!-- Global Properties -->
 	<property name="build" location="${basedir}/build"/>
 
-	<!-- Database Service Name is derived to make it easier in the properties file -->
-	<property name="service_name" value="//127.0.0.1/${db_service}"/>
-
 	<property name="dbip" value="${ADDR4}"/>
+
+	<!-- Database Service Name is derived to make it easier in the properties file -->
+	<property name="service_name" value="//${dbip}/${db_service}"/>
 
 	<!-- Setup Source Directories -->
 	<property name="exe" location="${basedir}/exe"/>
@@ -335,6 +335,7 @@
 	
 	<target name="prepare_chat" description="creates a symbolic link to the udplibrary">
 		<mkdir dir="${chat_build}"/>
+		<mkdir dir="${basedir}/chat"/>
 		<symlink link="${stationapi}/externals/udplibrary" resource="${src_library}/udplibrary" overwrite="true"/>
 	</target>
 	
@@ -347,12 +348,16 @@
 	<target name="compile_chat" description="compile chat server code" depends="prepare_chat">
 		<exec executable="cmake" dir="${chat_build}" failonerror="true">
 			<arg value="${stationapi}"/>
-			<arg value="-DCMAKE_RUNTIME_OUTPUT_DIRECTORY=${build}/bin"/>
+			<arg value="-DCMAKE_RUNTIME_OUTPUT_DIRECTORY=${basedir}/chat"/>
 		</exec>
 		<exec executable="cmake" dir="${chat_build}" failonerror="true">
 			<arg value="--build"/>
 			<arg value="."/>
 		</exec>
+		<copy file="${stationapi}/extras/logger.cfg.dist" tofile="${basedir}/chat/etc/stationapi/logger.cfg"/>
+		<copy file="${stationapi}/extras/swgchat.cfg.dist" tofile="${basedir}/chat/etc/stationapi/swgchat.cfg"/>
+		<copy file="${stationapi}/extras/stationchat.db.dist" tofile="${basedir}/chat/var/stationapi/stationchat.db" failonerror="false"/>
+		<copy file="${stationapi}/extras/init_database.sql" tofile="${basedir}/chat/init_database.sql"/>
 	</target>
 	
 	<!-- Compiles the DSRC (Java) code -->
@@ -486,7 +491,7 @@
 	</target>
 
 	<!-- Target used to create database tables -->
-	<target name="create_database" description="creates database tables from existing sql scripts" if="firstrun">
+	<target name="create_database" description="creates database tables from existing sql scripts" depends="init" if="firstrun">
 		<replace file="build.properties" token="firstrun = true" value="firstrun = false"/>
 		<exec executable="perl" dir="${basedir}/src/game/server/database/build/linux">
 			<env key="PATH" value="${env.PATH}:${tools_home}"/>
@@ -519,9 +524,9 @@
 	</target>
 	
 	<target name="add_new_cluster" description="Adds the cluster name to the database" if="firstrun">
-		<sql classpath="${env.ORACLE_HOME}/lib/ojdbc8.jar"
+		<sql classpath="${oracle_home}/lib/ojdbc8.jar"
 			 driver="oracle.jdbc.OracleDriver"
-			 url="jdbc:oracle:thin:@${dbip}:1521:${db_service}"
+			 url="jdbc:oracle:thin:@//${dbip}:1521/${db_service}"
 			 userid="${db_username}"
 			 password="${db_password}">
 			insert into cluster_list (id, name, num_characters, address, secret, locked, not_recommended)
@@ -530,10 +535,10 @@
 		</sql>
 	</target>
 
-	<target name="configure_limits" description="Defines the limits of the cluster and accounts in the database">
-		<sql classpath="${env.ORACLE_HOME}/lib/ojdbc8.jar"
+	<target name="configure_limits" description="Defines the limits of the cluster and accounts in the database" depends="init">
+		<sql classpath="${oracle_home}/lib/ojdbc8.jar"
 			 driver="oracle.jdbc.OracleDriver"
-			 url="jdbc:oracle:thin:@${dbip}:1521:${db_service}"
+			 url="jdbc:oracle:thin:@//${dbip}:1521/${db_service}"
 			 userid="${db_username}"
 			 password="${db_password}">
 			update default_char_limits set account_limit = ${max_characters_per_account}, cluster_limit = ${max_characters_per_cluster};
