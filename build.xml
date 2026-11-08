@@ -67,6 +67,9 @@
 		<mkdir dir="${data_server}"/>
 		<mkdir dir="${data_shared}"/>
 		<mkdir dir="${data_client}"/>
+		<condition property="java_arch" value="i386" else="amd64">
+			<equals arg1="${bits}" arg2="32"/>
+		</condition>
 		<condition property="java_home" value="${java_home.32}" else="${java_home.64}">
 			<equals arg1="${bits}" arg2="32"/>
 		</condition>
@@ -147,8 +150,8 @@
 		<echo>Compiling as ${bits}-bit application.</echo>
 		<condition property="is_debug_build">
 			<or>
-				<equals arg1="${src_build_type}" arg2="Debug"/>
-				<equals arg1="${src_build_type}" arg2="RelWithDebInfo"/>
+				<equals arg1="${src_build_type}" arg2="Debug" casesensitive="false"/>
+				<equals arg1="${src_build_type}" arg2="RelWithDebInfo" casesensitive="false"/>
 			</or>
 		</condition>
 		<echo>Creating a ${src_build_type} build</echo>
@@ -258,11 +261,14 @@
 		<equals arg1="${os_version_id}" arg2="18.04"/>
 	</condition>
 
-	<target name="set_ubuntu_cfg" if="is_ubuntu18">
+	<target name="set_ubuntu_cfg" depends="init" if="is_ubuntu18">
 		<replace dir="${exe}">
 			<include name="**/*.cfg"/>
-			<replacefilter token="environmentVariable=PATH+=/usr/java/bin:./" value="environmentVariable=PATH+=/usr/lib/jvm/java-11-openjdk-i386/bin:./"/>
-			<replacefilter token="environmentVariable=LD_LIBRARY_PATH+=/usr/java/lib:/usr/java/lib/server:./" value="environmentVariable=LD_LIBRARY_PATH+=/usr/lib/jvm/java-11-openjdk-i386/lib:/usr/lib/jvm/java-11-openjdk-i386/lib/server:./"/>
+			<replacefilter token="environmentVariable=PATH+=/usr/java/bin:./" value="environmentVariable=PATH+=/usr/lib/jvm/java-11-openjdk-${java_arch}/bin:./"/>
+			<replacefilter token="environmentVariable=LD_LIBRARY_PATH+=/usr/java/lib:/usr/java/lib/server:./" value="environmentVariable=LD_LIBRARY_PATH+=/usr/lib/jvm/java-11-openjdk-${java_arch}/lib:/usr/lib/jvm/java-11-openjdk-${java_arch}/lib/server:./"/>
+			<!-- Also fix configs already rewritten for the other bitness. -->
+			<replacefilter token="/usr/lib/jvm/java-11-openjdk-i386" value="/usr/lib/jvm/java-11-openjdk-${java_arch}"/>
+			<replacefilter token="/usr/lib/jvm/java-11-openjdk-amd64" value="/usr/lib/jvm/java-11-openjdk-${java_arch}"/>
 		</replace>
 	</target>
 
