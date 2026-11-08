@@ -396,6 +396,7 @@
 
 	<!-- Compiles all code necessary for server execution -->
 	<target name="compile" depends="compile_src,compile_chat,compile_java,compile_miff,compile_tab,compile_tpf,load_templates">
+		<antcall target="label_station_id_scheme"/>
 	</target>
 
 	<!-- Compiles all .mif files -->
@@ -555,8 +556,77 @@
 			<arg value="--loginusername=${db_username}"/>
 			<arg value="--delta"/>
 		</exec>
+		<!-- Label a database update 272 left unlabelled. Needs the compiled
+		     stationIdScheme; before the first compile, compile runs it. -->
+		<available property="sid.tool.built" file="${tools_home}/stationIdScheme"/>
+		<antcall target="label_station_id_scheme" if:set="sid.tool.built"/>
+		<echo unless:set="sid.tool.built" message="stationIdScheme is not built yet; the station id scheme is checked after compiling."/>
 	</target>
 	
+	<!-- Labels an existing login database with the rule its station ids were
+	     created with (database update 272; see
+	     src/game/server/database/tools/station_id_scheme/README.md).
+	     update_database runs it automatically. It exports the station ids and
+	     lets stationIdScheme classify them. When the evidence is incomplete
+	     (usual for older servers) it records station_id_scheme from the
+	     properties, gcc32 by default: the rule every 32-bit server used.
+	     stationIdScheme refuses that if any account proves the other rule.
+	     A database the 64-bit branch created before the fix sets
+	     station_id_scheme = gcc64 in local.properties. -->
+	<target name="station_id_scheme_check" depends="init">
+		<property name="sid_dir" location="${build}/station_id_scheme"/>
+		<property name="sid_tool" location="${tools_home}/stationIdScheme"/>
+		<exec executable="sqlplus" outputproperty="sid.existing" resultproperty="sid.query.rc" failonerror="false" inputstring="set heading off feedback off pagesize 0&#10;whenever sqlerror exit failure&#10;select scheme || ' (' || basis || ', ' || to_char(recorded_at, 'YYYY-MM-DD') || ')' from station_id_scheme;&#10;exit&#10;">
+			<arg value="-s"/>
+			<arg value="-L"/>
+			<arg value="${db_username}/${db_password}@${dbip}/${db_service}"/>
+		</exec>
+		<condition property="sid.labelled"><matches string="${sid.existing}" pattern="gcc(32|64)"/></condition>
+		<condition property="sid.no_table"><not><equals arg1="${sid.query.rc}" arg2="0"/></not></condition>
+		<condition property="sid.skip"><or><isset property="sid.labelled"/><isset property="sid.no_table"/></or></condition>
+		<echo if:set="sid.labelled" message="Station id scheme: ${sid.existing}."/>
+		<echo if:set="sid.no_table" message="No station_id_scheme table yet (or the database is unreachable); run ant update_database to apply update 272 and label it."/>
+	</target>
+
+	<target name="label_station_id_scheme" description="labels an existing login database with its station id scheme (after update 272)" depends="station_id_scheme_check" unless="sid.skip">
+		<fail message="${sid_tool} not found; run ant compile_src, then ant label_station_id_scheme.">
+			<condition><not><available file="${sid_tool}"/></not></condition>
+		</fail>
+		<mkdir dir="${sid_dir}"/>
+		<delete file="${sid_dir}/label.sql" quiet="true"/>
+		<exec executable="sqlplus" dir="${src}/game/server/database/tools/station_id_scheme" output="${sid_dir}/ids.tsv" failonerror="true">
+			<arg value="-s"/>
+			<arg value="-L"/>
+			<arg value="${db_username}/${db_password}@${dbip}/${db_service}"/>
+			<arg value="@export.sql"/>
+		</exec>
+		<exec executable="${sid_tool}" input="${sid_dir}/ids.tsv" output="${sid_dir}/label.sql" error="${sid_dir}/report.txt" resultproperty="sid.classify.rc">
+			<arg value="classify"/>
+		</exec>
+		<condition property="sid.undecided"><not><equals arg1="${sid.classify.rc}" arg2="0"/></not></condition>
+		<fail message="The evidence does not decide the station id scheme and station_id_scheme is not set. Set station_id_scheme = gcc32 in local.properties if this database only ever ran 32-bit builds (gcc64 if the 64-bit branch created it before the fix). Report: ${sid_dir}/report.txt">
+			<condition><and><isset property="sid.undecided"/><not><isset property="station_id_scheme"/></not></and></condition>
+		</fail>
+		<exec executable="${sid_tool}" input="${sid_dir}/ids.tsv" output="${sid_dir}/label.sql" error="${sid_dir}/assert.txt" resultproperty="sid.assert.rc" if:set="sid.undecided">
+			<arg value="assert"/>
+			<arg value="${station_id_scheme}"/>
+		</exec>
+		<loadfile property="sid.report" srcFile="${sid_dir}/report.txt" quiet="true"/>
+		<loadfile property="sid.assert" srcFile="${sid_dir}/assert.txt" quiet="true" if:set="sid.undecided"/>
+		<echo message="${sid.report}" unless:set="sid.undecided"/>
+		<echo message="${sid.assert}" if:set="sid.undecided"/>
+		<fail message="stationIdScheme refused to record ${station_id_scheme}: some accounts prove the other rule. Do not start the LoginServer; see ${sid_dir}/report.txt and the README.">
+			<condition><and><isset property="sid.assert.rc"/><not><equals arg1="${sid.assert.rc}" arg2="0"/></not></and></condition>
+		</fail>
+		<exec executable="sqlplus" dir="${sid_dir}" failonerror="true">
+			<arg value="-s"/>
+			<arg value="-L"/>
+			<arg value="${db_username}/${db_password}@${dbip}/${db_service}"/>
+			<arg value="@label.sql"/>
+		</exec>
+		<echo message="Station id scheme recorded. Keep ${sid_dir}/report.txt with your records."/>
+	</target>
+
 	<target name="add_new_cluster" description="Adds the cluster name to the database" if="firstrun">
 		<sql classpath="${oracle_home}/lib/ojdbc8.jar"
 			 driver="oracle.jdbc.OracleDriver"
