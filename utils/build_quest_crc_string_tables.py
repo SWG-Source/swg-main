@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/python3
 
 from os import walk, path, makedirs
 from subprocess import PIPE, Popen
@@ -39,6 +39,6 @@ crc_call = ['./tools/buildCrcStringTable.pl',  '-t', tabfile, ifffile]
 p = Popen(crc_call, stdin=PIPE, stdout=PIPE)
 
 for obj in allobjs:
-	p.stdin.write(obj + '\n')
+	p.stdin.write('{}\n'.format(obj).encode('utf-8'))
 
 p.communicate()

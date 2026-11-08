@@ -246,6 +246,24 @@
 			<replacefilter token="DBSERVICE" value="${service_name}"/>
 			<replacefilter token="DBPASSWORD" property="db_password"/>
 		</replace>
+		<antcall target="set_ubuntu_cfg"/>
+	</target>
+
+	<exec executable="bash" outputproperty="os_version_id">
+		<arg value="-c"/>
+		<arg value="source /etc/os-release &amp;&amp; echo $VERSION_ID"/>
+	</exec>
+
+	<condition property="is_ubuntu18">
+		<equals arg1="${os_version_id}" arg2="18.04"/>
+	</condition>
+
+	<target name="set_ubuntu_cfg" if="is_ubuntu18">
+		<replace dir="${exe}">
+			<include name="**/*.cfg"/>
+			<replacefilter token="environmentVariable=PATH+=/usr/java/bin:./" value="environmentVariable=PATH+=/usr/lib/jvm/java-11-openjdk-i386/bin:./"/>
+			<replacefilter token="environmentVariable=LD_LIBRARY_PATH+=/usr/java/lib:/usr/java/lib/server:./" value="environmentVariable=LD_LIBRARY_PATH+=/usr/lib/jvm/java-11-openjdk-i386/lib:/usr/lib/jvm/java-11-openjdk-i386/lib/server:./"/>
+		</replace>
 	</target>
 
 	<!-- Creates the Make files for our SRC that will be used during compile stage -->
@@ -333,12 +351,14 @@
 		<echo message="SRC Compiled to Build Type: ${src_build_type}" />
 	</target>
 	
+	<!-- Prepares the Station API (chat server) code for building -->
 	<target name="prepare_chat" description="creates a symbolic link to the udplibrary">
 		<mkdir dir="${chat_build}"/>
 		<mkdir dir="${basedir}/chat"/>
 		<symlink link="${stationapi}/externals/udplibrary" resource="${src_library}/udplibrary" overwrite="true"/>
 	</target>
 	
+	<!-- Cleans up the station chat compilation process -->
 	<target name="clean_chat" description="removes the symbolic link to the udplibrary">
 		<delete dir="${chat_build}"/>
 		<symlink action="delete" link="${stationapi}/externals/udplibrary"/>
@@ -474,6 +494,13 @@
 		</exec>
 	</target>
 
+	<!-- Creates the Planet CRC file -->
+	<target name="build_planet_crc" description="creates the planet crc file" depends="compile_tab">
+		<exec executable="utils/build_planet_crc_string_tables.py" dir="${basedir}">
+			<env key="PATH" value="${env.PATH}:${tools_home}"/>
+		</exec>
+	</target>
+
 	<!-- Creates SQL (insert statements) to get all the CRC Templates into the database -->
 	<target name="process_templates" description="generates sql from generated crc files" depends="build_object_template_crc,build_quest_crc">
 		<exec executable="perl" dir="${basedir}/src/game/server/database/templates" input="${object_crc_file}" output="${templates_sql_file}">
@@ -506,6 +533,7 @@
 		</exec>
 		<antcall target="add_new_cluster"/>
 		<antcall target="configure_limits"/>
+		<antcall target="update_database"/>
 	</target>
 
 	<!-- Target used to update the game database with the latest changes -->

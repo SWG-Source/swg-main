@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/python3
 
 from os import walk, path, makedirs
 from subprocess import PIPE, Popen
@@ -34,7 +34,7 @@ def build_table(type, objs):
 	p = Popen(crc_call, stdin=PIPE, stdout=PIPE)
 
 	for obj in sorted(objs):
-		p.stdin.write(obj + '\n')
+		p.stdin.write('{}\n'.format(obj).encode('utf-8'))
 
 	p.communicate()
 
