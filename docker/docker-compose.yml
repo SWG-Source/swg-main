@@ -29,6 +29,10 @@ services:
         condition: service_healthy
     environment:
       SWG_PUBLIC_IP: ${SWG_PUBLIC_IP:?set SWG_PUBLIC_IP in .env}
+      SWG_STOP_TIMEOUT: ${SWG_STOP_TIMEOUT:-240}
+    # A stop saves the world first (see entrypoint.sh); allow longer than
+    # SWG_STOP_TIMEOUT before Docker kills the container.
+    stop_grace_period: 5m
     ports:
       - "${SWG_PUBLIC_IP}:44451-44453:44451-44453/tcp"
       - "${SWG_PUBLIC_IP}:44462-44464:44462-44464/tcp"

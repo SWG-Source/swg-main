@@ -51,7 +51,7 @@ You don't need to install Oracle, Java, CMake or a compiler yourself. Everything
 
 | To... | Run |
 | --- | --- |
-| Stop the server | `docker compose stop` |
+| Stop the server (saves first, about a minute) | `docker compose stop` |
 | Start it again | `docker compose start` |
 | Follow the logs | `docker compose logs -f swg` |
 | Rebuild with the latest code | `docker compose build --no-cache swg && docker compose up -d` |
@@ -68,6 +68,7 @@ Put these in `.env`:
 | `SWG_PUBLIC_IP` | Address game clients connect to. The game ports are only published on this address. | (required) |
 | `MAKE_JOBS` | Parallel compile jobs. Set it to your number of CPU cores. | `8` |
 | `SWG_MAIN_REF` | swg-main branch, tag or commit to build. | `master` |
+| `SWG_STOP_TIMEOUT` | Seconds a stop may take to save before the remaining servers are killed. Keep it under `stop_grace_period` (5 minutes) in `docker-compose.yml`. | `240` |
 
 The build settings themselves (64-bit, compiler, library paths, database connection) are in `swg.properties`.
 
@@ -77,6 +78,10 @@ The build settings themselves (64-bit, compiler, library paths, database connect
 - **Empty database:** the schema, the cluster entry and the object templates are created. New databases are labelled with the `gcc32` station id scheme automatically.
 - **Every start:** `ant update_database` applies any database updates the code needs. Updates that are already applied are skipped.
 - The chat server, login server and the rest of the cluster start.
+
+## What happens on stop
+
+`docker compose stop` shuts the cluster down the normal way, so the world is saved: players get the shutdown warnings, the database runs a final save, and the servers stop. It takes about a minute, and the log ends with `Cluster saved and stopped`. If it takes longer than `SWG_STOP_TIMEOUT`, the remaining servers are killed.
 
 ## Using an existing database
 
