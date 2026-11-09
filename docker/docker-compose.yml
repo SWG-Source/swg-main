@@ -1,0 +1,44 @@
+services:
+
+  oracle:
+    hostname: oracle
+    image: gvenzl/oracle-free:23-slim
+    environment:
+      ORACLE_PASSWORD: ${ORACLE_PASSWORD:-swg}
+      APP_USER: swg
+      APP_USER_PASSWORD: swg
+    healthcheck:
+      test: ["CMD", "healthcheck.sh"]
+      interval: 10s
+      timeout: 5s
+      retries: 30
+      start_period: 30s
+    volumes:
+      - oradata:/opt/oracle/oradata
+    restart: unless-stopped
+
+  swg:
+    hostname: swg
+    build:
+      context: .
+      args:
+        MAKE_JOBS: ${MAKE_JOBS:-8}
+        SWG_MAIN_REF: ${SWG_MAIN_REF:-master}
+    depends_on:
+      oracle:
+        condition: service_healthy
+    environment:
+      SWG_PUBLIC_IP: ${SWG_PUBLIC_IP:?set SWG_PUBLIC_IP in .env}
+      SWG_STOP_TIMEOUT: ${SWG_STOP_TIMEOUT:-240}
+    # A stop saves the world first (see entrypoint.sh); allow longer than
+    # SWG_STOP_TIMEOUT before Docker kills the container.
+    stop_grace_period: 5m
+    ports:
+      - "${SWG_PUBLIC_IP}:44451-44453:44451-44453/tcp"
+      - "${SWG_PUBLIC_IP}:44462-44464:44462-44464/tcp"
+      - "${SWG_PUBLIC_IP}:44451-44453:44451-44453/udp"
+      - "${SWG_PUBLIC_IP}:44462-44464:44462-44464/udp"
+    restart: unless-stopped
+
+volumes:
+  oradata:
